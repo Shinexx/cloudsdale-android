@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cloudsdale Mobile</string>
+    <string name="cloudsdale_login_button_text">Cloudsdale</string>
+    <string name="facebook_login_button_text">Facebook</string>
+    <string name="twitter_login_button_text">Twitter</string>
+    <string name="logon_logo_description_text">Cloudsdale logo</string>
+    <string name="cloudsdale_login_username_field_text">Username</string>
+    <string name="cloudsdale_login_password_field_text">Password</string>
+    <string name="cloudsdale_login_submit_button_text">Login</string>
+    <string name="main_view_spinner_prompt">Category</string>
+    <string-array name="main_view_spinner_categories">
+        <item>Clouds</item>
+        <item>Subscriptions</item>
+    </string-array>
+
+</resources>

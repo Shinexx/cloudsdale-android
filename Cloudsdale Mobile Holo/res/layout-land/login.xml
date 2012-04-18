@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:weightSum="1.0" >
+
+    <ImageView
+        android:id="@+id/cloudsdaleLogonLogo"
+        android:contentDescription="@string/logon_logo_description_text"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_margin="10dp"
+        android:layout_weight=".5"
+        android:src="@drawable/cloudsdale_logo" />
+        
+    <RelativeLayout 
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight=".5"
+        android:layout_margin="10dp"
+        android:gravity="center" >
+        
+        <TextView 
+            android:id="@+id/loginQueryView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/login_source_query"/>
+        
+        <Button
+            android:id="@+id/cloudsdale_auth_button"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/loginQueryView"
+            android:text="@string/cloudsdale_login_button_text" />
+        
+        <TextView
+            android:id="@+id/login_seperator_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cloudsdale_auth_button"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"
+            android:text="@string/login_text_seperator" />
+
+        <Button
+            android:id="@+id/facebook_auth_button"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/login_seperator_text"
+            android:layout_centerHorizontal="true"
+            android:text="@string/facebook_login_button_text" />
+
+        <Button
+            android:id="@+id/twitter_auth_button"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/facebook_auth_button"
+            android:layout_centerHorizontal="true"
+            android:text="@string/twitter_login_button_text" />
+        
+    </RelativeLayout>
+        
+</LinearLayout>
