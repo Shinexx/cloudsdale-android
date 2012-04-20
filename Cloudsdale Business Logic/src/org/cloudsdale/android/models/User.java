@@ -1,6 +1,7 @@
 package org.cloudsdale.android.models;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -15,10 +16,13 @@ public class User {
 	private String authToken;
 	private String timeZone; // DateTime? DateFormat?
 	private int role;
-	private Date memberSince;
+	private Calendar memberSince;
 	private boolean invisible;
 	private boolean forcePasswordChange;
-	private Date tncLastAccepted;
+	private Calendar tncLastAccepted;
+	private String id;
+	private String name;
+	private ArrayList<String> avatarUrls;
 
 	// Relationships
 	private ArrayList<Cloud> ownedClouds;
@@ -32,7 +36,7 @@ public class User {
 		authToken = "";
 		timeZone = "";
 		role = 0;
-		memberSince = new Date();
+		memberSince = Calendar.getInstance();
 		invisible = false;
 		forcePasswordChange = false;
 		tncLastAccepted = null;
@@ -104,7 +108,7 @@ public class User {
 	/**
 	 * @return the memberSince
 	 */
-	public Date getMemberSince() {
+	public Calendar getMemberSince() {
 		return memberSince;
 	}
 
@@ -113,7 +117,9 @@ public class User {
 	 *            the memberSince to set
 	 */
 	public void setMemberSince(Date memberSince) {
-		this.memberSince = memberSince;
+		Calendar c = Calendar.getInstance();
+		c.setTime(memberSince);
+		this.memberSince = c;
 	}
 
 	/**
@@ -149,7 +155,7 @@ public class User {
 	/**
 	 * @return the tncLastAccepted
 	 */
-	public Date getTncLastAccepted() {
+	public Calendar getTncLastAccepted() {
 		return tncLastAccepted;
 	}
 
@@ -157,7 +163,7 @@ public class User {
 	 * @param tncLastAccepted
 	 *            the tncLastAccepted to set
 	 */
-	public void setTncLastAccepted(Date tncLastAccepted) {
+	public void setTncLastAccepted(Calendar tncLastAccepted) {
 		this.tncLastAccepted = tncLastAccepted;
 	}
 
@@ -189,6 +195,51 @@ public class User {
 	 */
 	public void setClouds(ArrayList<Cloud> clouds) {
 		this.clouds = clouds;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the avatarUrls
+	 */
+	public ArrayList<String> getAvatarUrls() {
+		return avatarUrls;
+	}
+
+	/**
+	 * @param avatarUrls
+	 *            the avatarUrls to set
+	 */
+	public void setAvatarUrls(ArrayList<String> avatarUrls) {
+		this.avatarUrls = avatarUrls;
 	}
 
 	/**

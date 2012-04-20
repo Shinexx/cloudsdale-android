@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package org.cloudsdale.android;
+package org.cloudsdale.android.ui;
 
 public final class R {
     public static final class array {

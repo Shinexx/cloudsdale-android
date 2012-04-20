@@ -2,8 +2,6 @@ package org.cloudsdale.android.ui;
 
 import java.util.ArrayList;
 
-import org.cloudsdale.android.R;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
