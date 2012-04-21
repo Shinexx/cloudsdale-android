@@ -12,10 +12,7 @@ public class MainViewActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_view);
 		
-		TextView tv = new TextView(this);
 		SharedPreferences sharedPrefs = getPreferences(MODE_PRIVATE);
 		String me = sharedPrefs.getString("me", "");
-		tv.setText(me);
-		addContentView(tv, null);
 	}
 }

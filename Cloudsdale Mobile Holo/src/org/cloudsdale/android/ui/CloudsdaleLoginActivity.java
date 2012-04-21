@@ -1,10 +1,10 @@
 package org.cloudsdale.android.ui;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -18,11 +18,14 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.cloudsdale.android.models.JsonResponse;
 import org.cloudsdale.android.models.User;
 import org.cloudsdale.logic.UserJsonParser;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -33,7 +36,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 /**
  * Activity used to login to Cloudsdale using the Cloudsdale API authentication
@@ -57,7 +61,7 @@ public class CloudsdaleLoginActivity extends Activity {
 	private ProgressDialog	progressDialog;
 
 	/**
-	 * @see android.app.Activity
+	 * @see android.app.Activity#onCreate
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -92,52 +96,16 @@ public class CloudsdaleLoginActivity extends Activity {
 		}
 	}
 
-	public void postAuth(JsonReader reader) {
-		User me = null;
-
-		Log.d("Cloudsdale", reader.toString());
-		
-		try {
-			reader.setLenient(true);
-			reader.beginArray();
-			while (reader.hasNext()) {
-				String name = reader.nextName();
-				if (name.equals("result")) {
-					reader.beginObject();
-					while (reader.hasNext()) {
-						String _name = reader.nextName();
-						if (_name.equals("user")) {
-							me = readUserJson(reader);
-						}
-					}
-
-					if (me != null) {
-						SharedPreferences.Editor edit = getPreferences(
-								MODE_PRIVATE).edit();
-						edit.putString("me", me.toString());
-						edit.commit();
-
-						Intent intent = new Intent();
-						intent.setClass(CloudsdaleLoginActivity.this,
-								MainViewActivity.class);
-						startActivity(intent);
-
-					} else {
-						Log.e("Cloudsdale", "user is null");
-						Toast.makeText(this, "Couldn't log you in!",
-								Toast.LENGTH_LONG);
-					}
-				}
-			}
-
-		} catch (IOException e) {
-			Log.e("Cloudsdale", "Failure parsing JSONuser -- " + e.getMessage());
-			Toast.makeText(this, "Couldn't log you in!", Toast.LENGTH_LONG);
-		} catch (IllegalStateException e) {
-			Log.e("Cloudsdale", "Failure parsing JSONuser -- " + e.getMessage());
-			Toast.makeText(this, "Couldn't log you in!", Toast.LENGTH_LONG);
+	public void postAuth(User user) {
+		if (user != null) {
+			SharedPreferences.Editor edit = getPreferences(MODE_PRIVATE).edit();
+			edit.putString("me", user.toString());
+			edit.commit();
+			Intent intent = new Intent();
+			intent.setClass(CloudsdaleLoginActivity.this,
+					MainViewActivity.class);
+			startActivity(intent);
 		}
-
 		if (progressDialog != null) {
 			progressDialog.cancel();
 			progressDialog = null;
@@ -148,11 +116,10 @@ public class CloudsdaleLoginActivity extends Activity {
 		return new UserJsonParser().parseUserFromJson(reader);
 	}
 
-	public class CloudsdaleAsyncAuth extends
-			AsyncTask<Void, String, JsonReader> {
+	public class CloudsdaleAsyncAuth extends AsyncTask<Void, String, User> {
 
 		@Override
-		protected JsonReader doInBackground(Void... params) {
+		protected User doInBackground(Void... params) {
 			try {
 				// Create params for connection including 3sec timeout
 				// on connection and 5sec timeout on socket
@@ -168,7 +135,7 @@ public class CloudsdaleLoginActivity extends Activity {
 
 				// Create the data entities
 				HttpPost post = new HttpPost(
-						getString(R.string.cloudsdale_dev_api_url));
+						getString(R.string.cloudsdale_dev_api_url) + "sessions/");
 				HttpResponse response;
 
 				// Set POST data
@@ -182,9 +149,23 @@ public class CloudsdaleLoginActivity extends Activity {
 
 				// Query the server and store the user's ID
 				response = httpClient.execute(post);
-				JsonReader reader = new JsonReader(new InputStreamReader(response
-						.getEntity().getContent(), "UTF-8"));
-				return reader;
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(response.getEntity().getContent()));
+				StringBuilder builder = new StringBuilder();
+				String line;
+				while ((line = reader.readLine()) != null) {
+					builder.append(line);
+				}
+
+				// Get the user object
+				publishProgress(new String[] { builder.toString() });
+
+				 Gson gson = new Gson();
+				 JsonResponse jsr = gson.fromJson(builder.toString(),
+				 JsonResponse.class);
+				 User u = jsr.getResult().getUser();
+				
+				 return u;
 			} catch (UnsupportedEncodingException e) {
 				Log.e("Cloudsdale", e.getMessage());
 			} catch (ClientProtocolException e) {
@@ -195,9 +176,26 @@ public class CloudsdaleLoginActivity extends Activity {
 
 			return null;
 		}
+		
+		@Override
+		protected void onProgressUpdate(String... values) {
+			super.onProgressUpdate(values);
+			
+			progressDialog.hide();
+			new AlertDialog.Builder(CloudsdaleLoginActivity.this)
+					.setTitle("JSON RESPONSE")
+					.setMessage(values[0])
+					.setPositiveButton("Ok",
+							new DialogInterface.OnClickListener() {
+
+								public void onClick(DialogInterface dialog,
+										int which) {
+								}
+							}).show();
+		}
 
 		@Override
-		protected void onPostExecute(JsonReader result) {
+		protected void onPostExecute(User result) {
 			super.onPostExecute(result);
 			postAuth(result);
 		}

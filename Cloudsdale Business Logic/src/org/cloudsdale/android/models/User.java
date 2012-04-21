@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+
 /**
  * User model for Cloudsdale
  * 
@@ -293,5 +296,9 @@ public class User {
 	 */
 	public boolean isMemberOfCloud(Cloud c) {
 		return clouds.contains(c);
+	}
+	
+	public String toJson() {
+		return new Gson().toJson(this, this.getClass());
 	}
 }
