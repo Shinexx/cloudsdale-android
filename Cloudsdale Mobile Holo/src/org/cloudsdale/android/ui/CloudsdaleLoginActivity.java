@@ -135,7 +135,8 @@ public class CloudsdaleLoginActivity extends Activity {
 
 				// Create the data entities
 				HttpPost post = new HttpPost(
-						getString(R.string.cloudsdale_dev_api_url) + "sessions/");
+						getString(R.string.cloudsdale_dev_api_url)
+								+ "sessions/");
 				HttpResponse response;
 
 				// Set POST data
@@ -160,12 +161,12 @@ public class CloudsdaleLoginActivity extends Activity {
 				// Get the user object
 				publishProgress(new String[] { builder.toString() });
 
-				 Gson gson = new Gson();
-				 JsonResponse jsr = gson.fromJson(builder.toString(),
-				 JsonResponse.class);
-				 User u = jsr.getResult().getUser();
-				
-				 return u;
+				Gson gson = new Gson();
+				JsonResponse jsr = gson.fromJson(builder.toString(),
+						JsonResponse.class);
+				User u = jsr.getResult().getUser();
+
+				return u;
 			} catch (UnsupportedEncodingException e) {
 				Log.e("Cloudsdale", e.getMessage());
 			} catch (ClientProtocolException e) {
@@ -176,11 +177,11 @@ public class CloudsdaleLoginActivity extends Activity {
 
 			return null;
 		}
-		
+
 		@Override
 		protected void onProgressUpdate(String... values) {
 			super.onProgressUpdate(values);
-			
+
 			progressDialog.hide();
 			new AlertDialog.Builder(CloudsdaleLoginActivity.this)
 					.setTitle("JSON RESPONSE")
