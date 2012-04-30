@@ -28,9 +28,7 @@ public class CloudsdaleAsyncGetQuery extends
 	protected JSONObject doInBackground(CloudsdaleAsyncQueryParams... params) {
 		wrapper = params[0].getWrapper();
 		String apiUrl = params[0].getParams()[0];
-		String query = params[0].getParams()[1] == null ? "" : params[0]
-				.getParams()[1];
-
+		
 		try {
 			// Create the params for connection including 3sec timeout on
 			// connection and 5sec timeout on socket

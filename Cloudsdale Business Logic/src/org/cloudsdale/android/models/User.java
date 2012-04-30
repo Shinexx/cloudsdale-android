@@ -298,7 +298,19 @@ public class User {
 		return clouds.contains(c);
 	}
 	
+	/**
+	 * Converts the user to a JSON string
+	 * @return json representation of the user
+	 */
 	public String toJson() {
 		return new Gson().toJson(this, this.getClass());
+	}
+	
+	/**
+	 * Returns the string representation of the user
+	 * @see org.cloudsdale.android.models.User#toJson()
+	 */
+	public String toString() {
+		return this.toJson();
 	}
 }

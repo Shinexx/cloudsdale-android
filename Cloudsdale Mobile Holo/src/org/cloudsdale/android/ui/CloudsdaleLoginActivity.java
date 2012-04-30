@@ -101,11 +101,13 @@ public class CloudsdaleLoginActivity extends Activity {
 			SharedPreferences.Editor edit = getPreferences(MODE_PRIVATE).edit();
 			edit.putString("me", user.toString());
 			edit.commit();
+			
 			Intent intent = new Intent();
 			intent.setClass(CloudsdaleLoginActivity.this,
 					MainViewActivity.class);
 			startActivity(intent);
 		}
+		
 		if (progressDialog != null) {
 			progressDialog.cancel();
 			progressDialog = null;
