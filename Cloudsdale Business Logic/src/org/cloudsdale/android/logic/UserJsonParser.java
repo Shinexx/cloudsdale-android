@@ -1,4 +1,4 @@
-package org.cloudsdale.logic;
+package org.cloudsdale.android.logic;
 
 import java.io.IOException;
 import java.util.Date;

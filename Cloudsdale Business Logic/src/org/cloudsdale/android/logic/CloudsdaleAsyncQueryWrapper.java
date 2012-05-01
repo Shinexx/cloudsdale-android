@@ -1,4 +1,4 @@
-package org.cloudsdale.logic;
+package org.cloudsdale.android.logic;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,9 +14,11 @@ public class CloudsdaleAsyncQueryWrapper {
 
 	/**
 	 * Query Cloudsdale to get an object
-	 * @param <T> Type to return
 	 * 
-	 * @param params 
+	 * @param <T>
+	 *            Type to return
+	 * 
+	 * @param params
 	 * @return
 	 */
 	public <T> T query(String[] params, Class<T> returnType, String objectMarker) {

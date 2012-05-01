@@ -20,7 +20,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.cloudsdale.android.models.JsonResponse;
 import org.cloudsdale.android.models.User;
-import org.cloudsdale.logic.UserJsonParser;
+import org.cloudsdale.android.logic.UserJsonParser;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -101,13 +101,13 @@ public class CloudsdaleLoginActivity extends Activity {
 			SharedPreferences.Editor edit = getPreferences(MODE_PRIVATE).edit();
 			edit.putString("me", user.toString());
 			edit.commit();
-			
+
 			Intent intent = new Intent();
 			intent.setClass(CloudsdaleLoginActivity.this,
 					MainViewActivity.class);
 			startActivity(intent);
 		}
-		
+
 		if (progressDialog != null) {
 			progressDialog.cancel();
 			progressDialog = null;

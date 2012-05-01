@@ -1,4 +1,4 @@
-package org.cloudsdale.logic;
+package org.cloudsdale.android.logic;
 
 public class CloudsdaleAsyncQueryParams {
 	private CloudsdaleAsyncQueryWrapper wrapper;

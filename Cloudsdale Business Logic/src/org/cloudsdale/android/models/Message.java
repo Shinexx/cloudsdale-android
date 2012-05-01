@@ -5,12 +5,12 @@ import java.util.Date;
 public class Message {
 
 	// Object attributes
-	private Date timestamp;
-	private String content;
-	private String username;
-	private String userPath;
-	private String userAvatar;
-	private String authorId;
+	private Date	timestamp;
+	private String	content;
+	private String	username;
+	private String	userPath;
+	private String	userAvatar;
+	private String	authorId;
 
 	public Message() {
 		timestamp = new Date();
@@ -29,7 +29,8 @@ public class Message {
 	}
 
 	/**
-	 * @param timestamp the timestamp to set
+	 * @param timestamp
+	 *            the timestamp to set
 	 */
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
@@ -43,7 +44,8 @@ public class Message {
 	}
 
 	/**
-	 * @param content the content to set
+	 * @param content
+	 *            the content to set
 	 */
 	public void setContent(String content) {
 		this.content = content;
@@ -57,7 +59,8 @@ public class Message {
 	}
 
 	/**
-	 * @param username the username to set
+	 * @param username
+	 *            the username to set
 	 */
 	public void setUsername(String username) {
 		this.username = username;
@@ -71,7 +74,8 @@ public class Message {
 	}
 
 	/**
-	 * @param userPath the userPath to set
+	 * @param userPath
+	 *            the userPath to set
 	 */
 	public void setUserPath(String userPath) {
 		this.userPath = userPath;
@@ -85,7 +89,8 @@ public class Message {
 	}
 
 	/**
-	 * @param userAvatar the userAvatar to set
+	 * @param userAvatar
+	 *            the userAvatar to set
 	 */
 	public void setUserAvatar(String userAvatar) {
 		this.userAvatar = userAvatar;
@@ -99,11 +104,11 @@ public class Message {
 	}
 
 	/**
-	 * @param authorId the authorId to set
+	 * @param authorId
+	 *            the authorId to set
 	 */
 	public void setAuthorId(String authorId) {
 		this.authorId = authorId;
 	}
-	
-	
+
 }

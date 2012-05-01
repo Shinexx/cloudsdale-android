@@ -1,4 +1,4 @@
-package org.cloudsdale.logic;
+package org.cloudsdale.android.logic;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,14 +21,14 @@ import android.util.Log;
 
 public class CloudsdaleAsyncGetQuery extends
 		AsyncTask<CloudsdaleAsyncQueryParams, String, JSONObject> {
-	
-	private CloudsdaleAsyncQueryWrapper wrapper;
+
+	private CloudsdaleAsyncQueryWrapper	wrapper;
 
 	@Override
 	protected JSONObject doInBackground(CloudsdaleAsyncQueryParams... params) {
 		wrapper = params[0].getWrapper();
 		String apiUrl = params[0].getParams()[0];
-		
+
 		try {
 			// Create the params for connection including 3sec timeout on
 			// connection and 5sec timeout on socket
@@ -68,7 +68,7 @@ public class CloudsdaleAsyncGetQuery extends
 
 		return null;
 	}
-	
+
 	@Override
 	protected void onPostExecute(JSONObject result) {
 		super.onPostExecute(result);

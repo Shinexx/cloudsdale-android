@@ -5,16 +5,17 @@ import java.util.ArrayList;
 public class Cloud {
 
 	// Object properties
-	private String name;
-	private String description;
-	private boolean hidden;
-	private boolean locked;
-	private boolean featured;
+	private String			id;
+	private String			name;
+	private String			description;
+	private boolean			hidden;
+	private boolean			locked;
+	private boolean			featured;
 
 	// Relationships
-	private ArrayList<User> users;
-	private Chat chat;
-	private User owner;
+	private ArrayList<User>	users;
+	private Chat			chat;
+	private User			owner;
 
 	/**
 	 * Default constructor
@@ -47,6 +48,21 @@ public class Cloud {
 		users = new ArrayList<User>();
 		chat = new Chat();
 		this.owner = owner;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	/**

@@ -1,4 +1,4 @@
-      package org.cloudsdale.android.db;
+package org.cloudsdale.android.db;
 
 import android.content.ContentValues;
 import android.content.Context;

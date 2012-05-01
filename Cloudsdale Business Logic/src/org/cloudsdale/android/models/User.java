@@ -15,21 +15,22 @@ import com.google.gson.JsonArray;
 public class User {
 
 	// Private attributes
-	private String email;
-	private String authToken;
-	private String timeZone; // DateTime? DateFormat?
-	private int role;
-	private Calendar memberSince;
-	private boolean invisible;
-	private boolean forcePasswordChange;
-	private Calendar tncLastAccepted;
-	private String id;
-	private String name;
-	private ArrayList<String> avatarUrls;
+	private String				email;
+	private String				authToken;
+	private String				timeZone;				// DateTime?
+														// DateFormat?
+	private int					role;
+	private Calendar			memberSince;
+	private boolean				invisible;
+	private boolean				forcePasswordChange;
+	private Calendar			tncLastAccepted;
+	private String				id;
+	private String				name;
+	private ArrayList<String>	avatarUrls;
 
 	// Relationships
-	private ArrayList<Cloud> ownedClouds;
-	private ArrayList<Cloud> clouds;
+	private ArrayList<Cloud>	ownedClouds;
+	private ArrayList<Cloud>	clouds;
 
 	/**
 	 * Default constructor
@@ -297,17 +298,19 @@ public class User {
 	public boolean isMemberOfCloud(Cloud c) {
 		return clouds.contains(c);
 	}
-	
+
 	/**
 	 * Converts the user to a JSON string
+	 * 
 	 * @return json representation of the user
 	 */
 	public String toJson() {
 		return new Gson().toJson(this, this.getClass());
 	}
-	
+
 	/**
 	 * Returns the string representation of the user
+	 * 
 	 * @see org.cloudsdale.android.models.User#toJson()
 	 */
 	public String toString() {
