@@ -1,6 +1,10 @@
-package org.cloudsdale.android.models;
+package org.cloudsdale.android.logic;
 
 import java.util.ArrayList;
+
+import org.cloudsdale.android.models.Cloud;
+import org.cloudsdale.android.models.Message;
+import org.cloudsdale.android.models.User;
 
 public class PersistantData {
 

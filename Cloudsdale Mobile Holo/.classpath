@@ -9,5 +9,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/Cloudsdale Mobile Holo/libs/gson-2.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="/Cloudsdale Business Logic"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
