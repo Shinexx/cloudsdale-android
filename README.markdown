@@ -4,13 +4,13 @@
 
 The pulled folder will contain the following folders:
 
->- Cloudsdale Business Logic [BL] (All the common backend logic)
->- Cloudsdale Mobile [CDM] (All the controller and view logic for 2.x)
->- Cloudsdale Mobile Holo [Holo] (All the controller and view logic for 3.x+)
->- Gson (JSON de/serialization module)
->- Facebook SDK (Can be updated by opening it via Git)
->- Faye Android library (Can be updated by opening it via Mercurial)
->- Assets (All the raw assets for the projects)
+>- Cloudsdale Business Logic (BL) -- All the common backend logic
+>- Cloudsdale Mobile (CDM) -- All the controller and view logic for 2.x
+>- Cloudsdale Mobile Holo (Holo) -- All the controller and view logic for 3.x+
+>- Gson -- JSON de/serialization module
+>- Facebook SDK -- Can be updated by opening it via Git
+>- Faye Android library  -- Can be updated by opening it via Mercurial
+>- Assets -- All the raw assets for the projects
 
 ## Importing into Eclipse
 
