@@ -1,7 +1,7 @@
 package org.cloudsdale.android.ui;
 
 import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
-import org.cloudsdale.android.logic.PersistantData;
+import org.cloudsdale.android.logic.PersistentData;
 import org.cloudsdale.android.models.User;
 
 import android.app.Activity;
@@ -32,7 +32,7 @@ public class CloudsdaleLoginActivity extends Activity {
 	private String			usernameInput;
 	private String			passwordInput;
 
-	// Progress dialog to show while auth is occurring
+	// Progress dialog to show while authentication is occurring
 	private ProgressDialog	progressDialog;
 
 	/**
@@ -55,7 +55,7 @@ public class CloudsdaleLoginActivity extends Activity {
 				passwordInput = passwordField.getText().toString();
 
 				doAuthentication();
-				postAuth(PersistantData.getMe());
+				postAuth(PersistentData.getMe());
 			}
 		});
 	}
@@ -95,5 +95,4 @@ public class CloudsdaleLoginActivity extends Activity {
 			progressDialog = null;
 		}
 	}
-
 }

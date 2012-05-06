@@ -42,15 +42,15 @@ import com.facebook.android.FacebookError;
  * 
  */
 public class LoginActivity extends Activity {
-	private Button cloudsdaleLoginButton;
-	private Button facebookLoginButton;
-	private Button twitterLoginButton;
+	private Button				cloudsdaleLoginButton;
+	private Button				facebookLoginButton;
+	private Button				twitterLoginButton;
 
-	private SharedPreferences sharedPrefs;
+	private SharedPreferences	sharedPrefs;
 
-	private Facebook fb;
-	private String fbSelf;
-	private String FILENAME;
+	private Facebook			fb;
+	private String				fbSelf;
+	private String				FILENAME;
 
 	/**
 	 * Called when the activity is first created.
@@ -68,7 +68,7 @@ public class LoginActivity extends Activity {
 		cloudsdaleLoginButton = (Button) findViewById(R.id.cloudsdale_auth_button);
 		facebookLoginButton = (Button) findViewById(R.id.facebook_auth_button);
 		twitterLoginButton = (Button) findViewById(R.id.twitter_auth_button);
-		
+
 		// Disable oAuth buttons. No API support yet
 		facebookLoginButton.setEnabled(false);
 		twitterLoginButton.setEnabled(false);
@@ -95,7 +95,7 @@ public class LoginActivity extends Activity {
 		facebookLoginButton.setOnClickListener(new OnClickListener() {
 
 			// Check to see if Facebook is installed. If not, prompt the user to
-			// install the Facebook app
+			// install the Facebook application
 			public void onClick(View v) {
 				if (checkFacebookInstalled())
 					authFacebook();
@@ -120,7 +120,6 @@ public class LoginActivity extends Activity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-
 		this.setContentView(R.layout.login);
 	}
 
@@ -263,7 +262,6 @@ public class LoginActivity extends Activity {
 	 * 
 	 * @param me
 	 */
-
 	private void getMe(String me) {
 		fbSelf = me;
 	}
@@ -275,7 +273,6 @@ public class LoginActivity extends Activity {
 	/**
 	 * Respond to activity results
 	 */
-
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -300,49 +297,13 @@ public class LoginActivity extends Activity {
 
 		return installed;
 	}
-	
-	/**
-	 * Fetch the request token from Twitter
-	 */
-	public Pair<String,String> getTwitterRequest() {
-		
-		return null;
-	}
 
 	/**
-	 * Handle the app resuming for some reason
+	 * Handle the application resuming for some reason
 	 */
 	@Override
 	protected void onResume() {
 		super.onResume();
 		fb.extendAccessTokenIfNeeded(this, null);
-	}
-	
-	private class AsyncAuth extends AsyncTask<String, String, JSONObject> {
-
-		@Override
-		protected JSONObject doInBackground(String... arg0) {
-				// Create the HTTP args
-				HttpParams httpParams = new BasicHttpParams();
-				int timeoutConnection = 3000;
-				int timeoutSocket = 5000;
-				
-				// Set the timeouts
-				HttpConnectionParams.setConnectionTimeout(httpParams,
-						timeoutConnection);
-				HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
-				HttpClient httpClient = new DefaultHttpClient(httpParams);
-
-				// Create the data entities
-				HttpPost post = new HttpPost(
-						getString(R.string.cloudsdale_dev_api_url)
-								+ "sessions/");
-				HttpResponse response;
-				
-				// Set POST data
-				
-				return null;
-		}
-		
 	}
 }

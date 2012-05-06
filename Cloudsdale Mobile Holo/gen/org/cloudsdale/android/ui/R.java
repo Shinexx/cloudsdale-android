@@ -37,30 +37,28 @@ public final class R {
         public static final int cloud_list_view=0x7f030000;
         public static final int cloudsdale_login=0x7f030001;
         public static final int login=0x7f030002;
-        public static final int main=0x7f030003;
-        public static final int main_view=0x7f030004;
-        public static final int utility_view=0x7f030005;
+        public static final int main_view=0x7f030003;
+        public static final int utility_view=0x7f030004;
     }
     public static final class string {
-        public static final int app_display_name=0x7f040002;
-        public static final int app_name=0x7f040001;
-        public static final int cloudsdale_api_url=0x7f040003;
-        public static final int cloudsdale_dev_api_url=0x7f040011;
-        public static final int cloudsdale_login_button_text=0x7f040004;
-        public static final int cloudsdale_login_password_field_text=0x7f040005;
-        public static final int cloudsdale_login_submit_button_text=0x7f040006;
-        public static final int cloudsdale_login_username_field_text=0x7f040007;
-        public static final int facebook_dev_app_id=0x7f040008;
-        public static final int facebook_install_prompt=0x7f04000e;
-        public static final int facebook_login_button_text=0x7f040009;
-        public static final int generic_negative_button=0x7f040010;
-        public static final int generic_positive_button=0x7f04000f;
-        public static final int hello=0x7f040000;
-        public static final int login_source_query=0x7f04000c;
-        public static final int login_text_seperator=0x7f040012;
-        public static final int logon_logo_description_text=0x7f04000b;
-        public static final int main_view_spinner_prompt=0x7f04000a;
-        public static final int twitter_login_button_text=0x7f04000d;
+        public static final int app_display_name=0x7f040001;
+        public static final int app_name=0x7f040000;
+        public static final int cloudsdale_api_url=0x7f040002;
+        public static final int cloudsdale_dev_api_url=0x7f040010;
+        public static final int cloudsdale_login_button_text=0x7f040003;
+        public static final int cloudsdale_login_password_field_text=0x7f040004;
+        public static final int cloudsdale_login_submit_button_text=0x7f040005;
+        public static final int cloudsdale_login_username_field_text=0x7f040006;
+        public static final int facebook_dev_app_id=0x7f040007;
+        public static final int facebook_install_prompt=0x7f04000d;
+        public static final int facebook_login_button_text=0x7f040008;
+        public static final int generic_negative_button=0x7f04000f;
+        public static final int generic_positive_button=0x7f04000e;
+        public static final int login_source_query=0x7f04000b;
+        public static final int login_text_seperator=0x7f040011;
+        public static final int logon_logo_description_text=0x7f04000a;
+        public static final int main_view_spinner_prompt=0x7f040009;
+        public static final int twitter_login_button_text=0x7f04000c;
     }
     public static final class style {
         public static final int cloudsdale_theme=0x7f060000;

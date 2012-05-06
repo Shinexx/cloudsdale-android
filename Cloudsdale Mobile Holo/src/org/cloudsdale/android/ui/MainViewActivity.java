@@ -1,25 +1,24 @@
 package org.cloudsdale.android.ui;
 
-import org.cloudsdale.android.models.Cloud;
+import org.cloudsdale.android.logic.PersistentData;
 import org.cloudsdale.android.models.User;
-import org.cloudsdale.android.logic.CloudsdaleAsyncQueryWrapper;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ListView;
-
-import com.google.gson.Gson;
+import android.widget.LinearLayout;
 
 public class MainViewActivity extends Activity {
 
 	public static final String	TAG	= "CloudsdaleMainViewActivity";
 
 	private User				me;
-	private ListView			mCloudList;
+	private LinearLayout		mCloudList;
 
+	/**
+	 * @see andoid.app.Activity#onCreate()
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.v(TAG, "Activity State: onCreate()");
@@ -27,12 +26,10 @@ public class MainViewActivity extends Activity {
 		setContentView(R.layout.main_view);
 
 		// Bind ListView
-		mCloudList = (ListView) findViewById(R.id.main_view_root);
+		mCloudList = (LinearLayout) findViewById(R.id.main_view_root);
 
 		// Bind the user
-		SharedPreferences sharedPrefs = getPreferences(MODE_PRIVATE);
-		String meString = sharedPrefs.getString("me", "");
-		me = new Gson().fromJson(meString, User.class);
+		me = PersistentData.getMe();
 
 		if (me == null) {
 			Intent intent = new Intent();
@@ -41,8 +38,20 @@ public class MainViewActivity extends Activity {
 		}
 	}
 
+	/**
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	protected void onResume() {
+		// TODO Display clouds and update the list
+		super.onResume();
+		populateCloudList();
+	}
+
+	/**
+	 * First fetch the existing list of clouds, then populate the new ones
+	 */
 	private void populateCloudList() {
 		// Build the query object
-		CloudsdaleAsyncQueryWrapper wrapper = new CloudsdaleAsyncQueryWrapper();
 	}
 }
