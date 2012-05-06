@@ -1,27 +1,38 @@
 package org.cloudsdale.android.logic;
 
+import java.util.ArrayList;
+
+import org.apache.http.NameValuePair;
+import org.cloudsdale.android.models.Cloud;
+import org.cloudsdale.android.models.Response;
+
 import android.os.AsyncTask;
 
+import com.google.gson.Gson;
+
 /**
- * Query class to fetch clouds from Cloudsdale
+ * Asynchronous query class to fetch clouds from Cloudsdale
  * 
  * @author Jamison Greeley
  * 
  */
-public class CloudQuery extends AsyncTask<String, Void, String>{
-	// Final indexes for passed information
-	private static final int ID_TYPE_INDEX = 0;
-	private static final int ID_INDEX = 1;
-	private static final int URL_INDEX = 2;
-	
-	// Final strings for id types
-	private static final String USER_ID_TYPE = "userid";
-	private static final String CLOUD_ID_TYPE = "cloudid";
+public class CloudQuery extends AsyncTask<String, Void, Cloud[]> {
+	// Final ints for indices
+	public static final int	URL_INDEX	= 0;
 
 	@Override
-	protected String doInBackground(String... params) {
-		// TODO Create query logic for fetching clouds
-		return null;
+	protected Cloud[] doInBackground(String... params) {
+		// Create and execute the post
+		PostQueryObject post = new PostQueryObject(
+				new ArrayList<NameValuePair>(), params[URL_INDEX]);
+		String jsonResponse = post.execute();
+
+		// create the Gson and parse the clouds
+		Gson gson = new Gson();
+		Response response = gson.fromJson(jsonResponse, Response.class);
+		Cloud[] clouds = gson.fromJson(response.getResult(), Cloud[].class);
+
+		return clouds;
 	}
-	
+
 }

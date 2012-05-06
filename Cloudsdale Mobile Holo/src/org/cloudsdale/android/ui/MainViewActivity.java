@@ -1,6 +1,8 @@
 package org.cloudsdale.android.ui;
 
+import org.cloudsdale.android.logic.CloudQuery;
 import org.cloudsdale.android.logic.PersistentData;
+import org.cloudsdale.android.models.Cloud;
 import org.cloudsdale.android.models.User;
 
 import android.app.Activity;
@@ -53,5 +55,7 @@ public class MainViewActivity extends Activity {
 	 */
 	private void populateCloudList() {
 		// Build the query object
+		CloudQuery query = new CloudQuery();
+		query.execute(new String[] {});
 	}
 }

@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 
 /**
  * User model for Cloudsdale

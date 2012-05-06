@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Cloudsdale Mobile</string>
     <string name="app_display_name">Cloudsdale</string>
-    <string name="cloudsdale_api_url">cloudsdale.org/v1/</string>
+    <string name="cloudsdale_api_url">local.cloudsdale.org:3000/v1/</string>
     <string name="cloudsdale_login_button_text">Cloudsdale</string>
     <string name="cloudsdale_login_password_field_text">Password</string>
     <string name="cloudsdale_login_submit_button_text">Login</string>
@@ -20,7 +20,6 @@
     <string name="facebook_install_prompt">You need Facebook for this! Want to get it?</string>
     <string name="generic_positive_button">Yes</string>
     <string name="generic_negative_button">No</string>
-    <string name="cloudsdale_dev_api_url">http://192.168.2.21:3000/v1/</string>
     <string name="login_text_seperator">or</string>
 
 </resources>

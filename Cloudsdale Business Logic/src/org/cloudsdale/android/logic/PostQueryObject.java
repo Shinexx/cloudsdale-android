@@ -19,6 +19,12 @@ import org.apache.http.params.HttpParams;
 
 import android.util.Log;
 
+/**
+ * Entity to simply POST queries to Cloudsdale
+ * 
+ * @author Jamison Greeley (atomicrat2552@gmail.com)
+ * 
+ */
 public class PostQueryObject {
 	public static final String	TAG	= "Clousdale PostQueryObject";
 
@@ -27,6 +33,14 @@ public class PostQueryObject {
 	protected HttpClient		httpClient;
 	protected HttpResponse		httpResponse;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param entitiyValues
+	 *            List of NameValuePairs to be set as the post entity
+	 * @param postUrl
+	 *            The url that's being posted to
+	 */
 	public PostQueryObject(List<NameValuePair> entitiyValues, String postUrl) {
 		try {
 			// Create parameters for connection including 3sec timeout
@@ -39,7 +53,7 @@ public class PostQueryObject {
 			HttpConnectionParams.setConnectionTimeout(httpParams,
 					timeoutConnection);
 			HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
-			HttpClient httpClient = new DefaultHttpClient(httpParams);
+			httpClient = new DefaultHttpClient(httpParams);
 
 			// Create the data entities
 			HttpPost post = new HttpPost(postUrl);
@@ -51,6 +65,11 @@ public class PostQueryObject {
 		}
 	}
 
+	/**
+	 * Execute the post response
+	 * 
+	 * @return String with the JSON results
+	 */
 	public String execute() {
 		try {
 			httpResponse = httpClient.execute(httpPost);
