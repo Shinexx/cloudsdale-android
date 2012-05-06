@@ -1,8 +1,6 @@
 package org.cloudsdale.android.ui;
 
-import org.cloudsdale.android.logic.CloudQuery;
 import org.cloudsdale.android.logic.PersistentData;
-import org.cloudsdale.android.models.Cloud;
 import org.cloudsdale.android.models.User;
 
 import android.app.Activity;
@@ -33,7 +31,11 @@ public class MainViewActivity extends Activity {
 		// Bind the user
 		me = PersistentData.getMe();
 
+		// TODO If the current user isn't in PersistentData, check the DB or force
+		// the user to login
 		if (me == null) {
+			// TODO pull from the DB
+			
 			Intent intent = new Intent();
 			intent.setClass(this, LoginActivity.class);
 			startActivity(intent);
@@ -45,8 +47,8 @@ public class MainViewActivity extends Activity {
 	 */
 	@Override
 	protected void onResume() {
-		// TODO Display clouds and update the list
 		super.onResume();
+		// TODO Display clouds and update the list
 		populateCloudList();
 	}
 
@@ -54,8 +56,11 @@ public class MainViewActivity extends Activity {
 	 * First fetch the existing list of clouds, then populate the new ones
 	 */
 	private void populateCloudList() {
-		// Build the query object
-		CloudQuery query = new CloudQuery();
-		query.execute(new String[] {});
+		// TODO Fetch the current clouds
+		// TODO Start by checking if the PersistentData has any clouds
+		// TODO Then if it doesn't, yoink them out of the DB
+
+		// TODO Build the query object
+		// TODO Shunt all that crap into Persistent Data
 	}
 }
