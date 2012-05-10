@@ -4,18 +4,18 @@
 
 The pulled folder will contain the following folders:
 
->- Cloudsdale Mobile (CDM)
->- Ignition Core (IC) -- Android speedy development framework
->- Holo Everywhere (HE) -- Creates the Holo UI on all Android platforms
->- ActionBar Sherlock (ABS) -- Allows use of the ActionBar on all Android platforms
->- Pull to Refresh (PTR) -- Creates easy views with pull to refresh logic
->- ViewPager Indicator (VPI) -- Easy ViewPager on all platforms
->- Facebook SDK -- Can be updated by opening it via Git
->- Faye Android library  -- Can be updated by opening it via Mercurial
->- Assets -- All the raw assets for the projects
-	>- Gson -- JSON de/serialization module
-	>- Guava -- A collection of Google APIs from GWT in Java
-	>- AndroidAnnotations -- An annotation library for Android functions
+- Cloudsdale Mobile (CDM)
+- Ignition Core (IC) -- Android speedy development framework
+- Holo Everywhere (HE) -- Creates the Holo UI on all Android platforms
+- ActionBar Sherlock (ABS) -- Allows use of the ActionBar on all Android platforms
+- Pull to Refresh (PTR) -- Creates easy views with pull to refresh logic
+- ViewPager Indicator (VPI) -- Easy ViewPager on all platforms
+- Facebook SDK -- Can be updated by opening it via Git
+- Faye Android library  -- Can be updated by opening it via Mercurial
+- Assets -- All the raw assets for the projects
+	- Gson -- JSON de/serialization module
+	- Guava -- A collection of Google APIs from GWT in Java
+	- AndroidAnnotations -- An annotation library for Android functions
 
 ## Importing into Eclipse
 
