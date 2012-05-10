@@ -13,9 +13,9 @@ The pulled folder will contain the following folders:
 >- Facebook SDK -- Can be updated by opening it via Git
 >- Faye Android library  -- Can be updated by opening it via Mercurial
 >- Assets -- All the raw assets for the projects
->>- Gson -- JSON de/serialization module
->>- Guava -- A collection of Google APIs from GWT in Java
->>- AndroidAnnotations -- An annotation library for Android functions
+	>- Gson -- JSON de/serialization module
+	>- Guava -- A collection of Google APIs from GWT in Java
+	>- AndroidAnnotations -- An annotation library for Android functions
 
 ## Importing into Eclipse
 
