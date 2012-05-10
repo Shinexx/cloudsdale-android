@@ -25,22 +25,18 @@ public class MenuItemWrapper implements MenuItem, android.view.MenuItem.OnMenuIt
     }
 
 
-    
     public int getItemId() {
         return mNativeItem.getItemId();
     }
 
-    
     public int getGroupId() {
         return mNativeItem.getGroupId();
     }
 
-    
     public int getOrder() {
         return mNativeItem.getOrder();
     }
 
-    
     public MenuItem setTitle(CharSequence title) {
         mNativeItem.setTitle(title);
         return this;

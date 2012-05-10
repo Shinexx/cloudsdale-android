@@ -152,6 +152,7 @@ public class MenuPopupHelper implements AdapterView.OnItemClickListener, View.On
         return mPopup != null && mPopup.isShowing();
     }
 
+    
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         MenuAdapter adapter = mAdapter;
         adapter.mAdapterMenu.performItemAction(adapter.getItem(position), 0);
@@ -191,6 +192,7 @@ public class MenuPopupHelper implements AdapterView.OnItemClickListener, View.On
         return width;
     }
 
+    
     public void onGlobalLayout() {
         if (isShowing()) {
             final View anchor = mAnchorView;
@@ -297,6 +299,7 @@ public class MenuPopupHelper implements AdapterView.OnItemClickListener, View.On
         return null;
     }
 
+    
     public void onRestoreInstanceState(Parcelable state) {
     }
 

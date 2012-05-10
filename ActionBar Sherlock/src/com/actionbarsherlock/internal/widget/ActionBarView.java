@@ -153,7 +153,6 @@ public class ActionBarView extends AbsActionBarView {
     };
 
     private final OnClickListener mExpandedActionViewUpListener = new OnClickListener() {
-        
         public void onClick(View v) {
             final MenuItemImpl item = mExpandedMenuPresenter.mCurrentExpandedItem;
             if (item != null) {
@@ -347,7 +346,7 @@ public class ActionBarView extends AbsActionBarView {
     /*
      * Must be public so we can dispatch pre-2.2 via ActionBarImpl.
      */
-    @Override
+    
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
@@ -380,7 +379,7 @@ public class ActionBarView extends AbsActionBarView {
         mWindowCallback = cb;
     }
 
-    @Override
+    
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         //UNUSED removeCallbacks(mTabSelector);
@@ -390,7 +389,7 @@ public class ActionBarView extends AbsActionBarView {
         }
     }
 
-    @Override
+    
     public boolean shouldDelayChildPressedState() {
         return false;
     }
@@ -408,7 +407,7 @@ public class ActionBarView extends AbsActionBarView {
         addView(mIndeterminateProgressView);
     }
 
-    @Override
+    
     public void setSplitActionBar(boolean splitActionBar) {
         if (mSplitActionBar != splitActionBar) {
             if (mMenuView != null) {
@@ -794,14 +793,14 @@ public class ActionBarView extends AbsActionBarView {
         return mDisplayOptions;
     }
 
-    @Override
+    
     protected ViewGroup.LayoutParams generateDefaultLayoutParams() {
         // Used by custom nav views if they don't supply layout params. Everything else
         // added to an ActionBarView should have them already.
         return new ActionBar.LayoutParams(DEFAULT_CUSTOM_GRAVITY);
     }
 
-    @Override
+    
     protected void onFinishInflate() {
         super.onFinishInflate();
 
@@ -870,7 +869,7 @@ public class ActionBarView extends AbsActionBarView {
         return mIsCollapsed;
     }
 
-    @Override
+    
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int childCount = getChildCount();
         if (mIsCollapsable) {
@@ -1067,7 +1066,7 @@ public class ActionBarView extends AbsActionBarView {
         }
     }
 
-    @Override
+    
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int x = getPaddingLeft();
         final int y = getPaddingTop();
@@ -1206,12 +1205,12 @@ public class ActionBarView extends AbsActionBarView {
         }
     }
 
-    @Override
+    
     public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
         return new ActionBar.LayoutParams(getContext(), attrs);
     }
 
-    @Override
+    
     public ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams lp) {
         if (lp == null) {
             lp = generateDefaultLayoutParams();
@@ -1219,7 +1218,7 @@ public class ActionBarView extends AbsActionBarView {
         return lp;
     }
 
-    @Override
+    
     public Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
         SavedState state = new SavedState(superState);
@@ -1233,7 +1232,7 @@ public class ActionBarView extends AbsActionBarView {
         return state;
     }
 
-    @Override
+    
     public void onRestoreInstanceState(Parcelable p) {
         SavedState state = (SavedState) p;
 
@@ -1266,7 +1265,7 @@ public class ActionBarView extends AbsActionBarView {
             isOverflowOpen = in.readInt() != 0;
         }
 
-        @Override
+        
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
             out.writeInt(expandedMenuItemId);
@@ -1306,13 +1305,13 @@ public class ActionBarView extends AbsActionBarView {
             mIconView.setImageDrawable(icon);
         }
 
-        @Override
+        
         public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
             onPopulateAccessibilityEvent(event);
             return true;
         }
 
-        @Override
+        
         public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 super.onPopulateAccessibilityEvent(event);
@@ -1323,13 +1322,13 @@ public class ActionBarView extends AbsActionBarView {
             }
         }
 
-        @Override
+        
         public boolean dispatchHoverEvent(MotionEvent event) {
             // Don't allow children to hover; we want this to be treated as a single component.
             return onHoverEvent(event);
         }
 
-        @Override
+        
         protected void onFinishInflate() {
             mUpView = findViewById(R.id.abs__up);
             mIconView = (ImageView) findViewById(R.id.abs__home);
@@ -1339,7 +1338,7 @@ public class ActionBarView extends AbsActionBarView {
             return mUpView.getVisibility() == GONE ? mUpWidth : 0;
         }
 
-        @Override
+        
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             measureChildWithMargins(mUpView, widthMeasureSpec, 0, heightMeasureSpec, 0);
             final LayoutParams upLp = (LayoutParams) mUpView.getLayoutParams();
@@ -1382,7 +1381,7 @@ public class ActionBarView extends AbsActionBarView {
             setMeasuredDimension(width, height);
         }
 
-        @Override
+        
         protected void onLayout(boolean changed, int l, int t, int r, int b) {
             final int vCenter = (b - t) / 2;
             //UNUSED int width = r - l;

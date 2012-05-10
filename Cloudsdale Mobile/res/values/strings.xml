@@ -3,5 +3,15 @@
 
     <string name="hello">Hello World, CloudsdaleMobileActivity!</string>
     <string name="app_name">Cloudsdale Mobile</string>
+    <string name="cloudsdale_logo_description">Cloudsdale logo</string>
+    <string name="login_view_fragment_username_hint">Email address</string>
+    <string name="login_view_fragment_password_hint">Password</string>
+    <string name="login_view_fragment_login_button_text">Login</string>
+    <string name="login_view_fragment_screenname_hint">Username</string>
+    <string name="login_view_fragment_register_button_text">Register</string>
+    <string name="login_view_cloudsdale_button_text">Cloudsdale</string>
+    <string name="login_view_facebook_button_text">Facebook</string>
+    <string name="login_view_twitter_button_text">Twitter</string>
+    <string name="login_view_seperator_text">or</string>
 
 </resources>

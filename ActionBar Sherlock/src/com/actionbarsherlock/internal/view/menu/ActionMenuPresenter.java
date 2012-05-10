@@ -514,12 +514,14 @@ public class ActionMenuPresenter extends BaseMenuPresenter
         super.onCloseMenu(menu, allMenusAreClosing);
     }
 
+    
     public Parcelable onSaveInstanceState() {
         SavedState state = new SavedState();
         state.openSubMenuId = mOpenSubMenuId;
         return state;
     }
 
+    
     public void onRestoreInstanceState(Parcelable state) {
         SavedState saved = (SavedState) state;
         if (saved.openSubMenuId > 0) {
@@ -531,6 +533,7 @@ public class ActionMenuPresenter extends BaseMenuPresenter
         }
     }
 
+    
     public void onSubUiVisibilityChanged(boolean isVisible) {
         if (isVisible) {
             // Not a submenu, but treat it like one.
@@ -550,10 +553,12 @@ public class ActionMenuPresenter extends BaseMenuPresenter
             openSubMenuId = in.readInt();
         }
 
+        
         public int describeContents() {
             return 0;
         }
 
+        
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeInt(openSubMenuId);
         }

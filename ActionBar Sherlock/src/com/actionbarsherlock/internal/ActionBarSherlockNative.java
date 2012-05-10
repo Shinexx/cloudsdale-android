@@ -220,6 +220,7 @@ public class ActionBarSherlockNative extends ActionBarSherlock {
             mCallback = callback;
         }
 
+        
         public boolean onCreateActionMode(android.view.ActionMode mode, android.view.Menu menu) {
             //See ActionBarSherlockNative#startActionMode
             mActionMode = new ActionModeWrapper(mode);
@@ -227,14 +228,17 @@ public class ActionBarSherlockNative extends ActionBarSherlock {
             return mCallback.onCreateActionMode(mActionMode, mActionMode.getMenu());
         }
 
+        
         public boolean onPrepareActionMode(android.view.ActionMode mode, android.view.Menu menu) {
             return mCallback.onPrepareActionMode(mActionMode, mActionMode.getMenu());
         }
 
+        
         public boolean onActionItemClicked(android.view.ActionMode mode, android.view.MenuItem item) {
             return mCallback.onActionItemClicked(mActionMode, mActionMode.getMenu().findItem(item));
         }
 
+        
         public void onDestroyActionMode(android.view.ActionMode mode) {
             mCallback.onDestroyActionMode(mActionMode);
         }

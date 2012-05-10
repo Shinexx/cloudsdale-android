@@ -69,7 +69,7 @@ public abstract class AbsActionBarView extends NineViewGroup {
     /*
      * Must be public so we can dispatch pre-2.2 via ActionBarImpl.
      */
-    @Override
+    
     public void onConfigurationChanged(Configuration newConfig) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
             super.onConfigurationChanged(newConfig);
@@ -174,7 +174,7 @@ public abstract class AbsActionBarView extends NineViewGroup {
         }
     }
 
-    @Override
+    
     public void setVisibility(int visibility) {
         if (mVisibilityAnim != null) {
             mVisibilityAnim.end();
@@ -261,12 +261,14 @@ public abstract class AbsActionBarView extends NineViewGroup {
             return this;
         }
 
+        
         public void onAnimationStart(Animator animation) {
             setVisibility(VISIBLE);
             mVisibilityAnim = animation;
             mCanceled = false;
         }
 
+        
         public void onAnimationEnd(Animator animation) {
             if (mCanceled) return;
 
@@ -277,10 +279,12 @@ public abstract class AbsActionBarView extends NineViewGroup {
             }
         }
 
+        
         public void onAnimationCancel(Animator animation) {
             mCanceled = true;
         }
 
+        
         public void onAnimationRepeat(Animator animation) {
         }
     }

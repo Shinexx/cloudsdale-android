@@ -29,18 +29,22 @@ public class MenuWrapper implements Menu {
         return item;
     }
 
+    
     public MenuItem add(CharSequence title) {
         return addInternal(mNativeMenu.add(title));
     }
 
+    
     public MenuItem add(int titleRes) {
         return addInternal(mNativeMenu.add(titleRes));
     }
 
+    
     public MenuItem add(int groupId, int itemId, int order, CharSequence title) {
         return addInternal(mNativeMenu.add(groupId, itemId, order, title));
     }
 
+    
     public MenuItem add(int groupId, int itemId, int order, int titleRes) {
         return addInternal(mNativeMenu.add(groupId, itemId, order, titleRes));
     }
@@ -53,22 +57,27 @@ public class MenuWrapper implements Menu {
         return subMenu;
     }
 
+    
     public SubMenu addSubMenu(CharSequence title) {
         return addInternal(mNativeMenu.addSubMenu(title));
     }
 
+    
     public SubMenu addSubMenu(int titleRes) {
         return addInternal(mNativeMenu.addSubMenu(titleRes));
     }
 
+    
     public SubMenu addSubMenu(int groupId, int itemId, int order, CharSequence title) {
         return addInternal(mNativeMenu.addSubMenu(groupId, itemId, order, title));
     }
 
+    
     public SubMenu addSubMenu(int groupId, int itemId, int order, int titleRes) {
         return addInternal(mNativeMenu.addSubMenu(groupId, itemId, order, titleRes));
     }
 
+    
     public int addIntentOptions(int groupId, int itemId, int order, ComponentName caller, Intent[] specifics, Intent intent, int flags, MenuItem[] outSpecificItems) {
         android.view.MenuItem[] nativeOutItems = new android.view.MenuItem[outSpecificItems.length];
         int result = mNativeMenu.addIntentOptions(groupId, itemId, order, caller, specifics, intent, flags, nativeOutItems);

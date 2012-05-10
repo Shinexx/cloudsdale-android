@@ -80,12 +80,10 @@ public class ActionMenuItemView extends LinearLayout
         a.recycle();
     }
 
-    
     public void addOnAttachStateChangeListener(View_OnAttachStateChangeListener listener) {
         mListeners.add(listener);
     }
 
-    
     public void removeOnAttachStateChangeListener(View_OnAttachStateChangeListener listener) {
         mListeners.remove(listener);
     }

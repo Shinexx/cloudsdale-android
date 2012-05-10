@@ -469,18 +469,22 @@ public class ScrollingTabContainerView extends NineHorizontalScrollView
     }
 
     private class TabAdapter extends BaseAdapter {
+        
         public int getCount() {
             return mTabLayout.getChildCount();
         }
 
+        
         public Object getItem(int position) {
             return ((TabView) mTabLayout.getChildAt(position)).getTab();
         }
 
+        
         public long getItemId(int position) {
             return position;
         }
 
+        
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 convertView = createTabView((ActionBar.Tab) getItem(position), true);
@@ -512,12 +516,14 @@ public class ScrollingTabContainerView extends NineHorizontalScrollView
             return this;
         }
 
+        
         public void onAnimationStart(Animator animation) {
             setVisibility(VISIBLE);
             mVisibilityAnim = animation;
             mCanceled = false;
         }
 
+        
         public void onAnimationEnd(Animator animation) {
             if (mCanceled) return;
 
@@ -525,10 +531,12 @@ public class ScrollingTabContainerView extends NineHorizontalScrollView
             setVisibility(mFinalVisibility);
         }
 
+        
         public void onAnimationCancel(Animator animation) {
             mCanceled = true;
         }
 
+        
         public void onAnimationRepeat(Animator animation) {
         }
     }

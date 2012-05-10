@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.CloudsdaleLight" parent="Theme.HoloEverywhereLight.Sherlock"></style>
+
+    <style name="Theme.CloudsdaleDark" parent="Theme.HoloEverywhereDark.Sherlock"></style>
+
+    <style name="Theme.CloudsdaleLight.NoActionBar" parent="Theme.Sherlock.Light.NoActionBar"></style>
+
+    <style name="Theme.CloudsdaleDark.NoActionBar" parent="Theme.Sherlock.NoActionBar"></style>
+
+</resources>

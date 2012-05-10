@@ -593,6 +593,7 @@ public final class MenuItemImpl implements MenuItem {
         return this;
     }
 
+    
     public boolean expandActionView() {
         if ((mShowAsAction & SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW) == 0 || mActionView == null) {
             return false;
@@ -606,6 +607,7 @@ public final class MenuItemImpl implements MenuItem {
         return false;
     }
 
+    
     public boolean collapseActionView() {
         if ((mShowAsAction & SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW) == 0) {
             return false;
@@ -623,6 +625,7 @@ public final class MenuItemImpl implements MenuItem {
         return false;
     }
 
+    
     public MenuItem setOnActionExpandListener(OnActionExpandListener listener) {
         mOnActionExpandListener = listener;
         return this;
