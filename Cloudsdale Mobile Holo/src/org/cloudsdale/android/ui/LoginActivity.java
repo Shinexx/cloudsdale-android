@@ -156,15 +156,15 @@ public class LoginActivity extends Activity {
 				}
 
 				public void onFacebookError(FacebookError error) {
-					/** TODO handle FB errors **/
+					// TODO handle FB errors 
 				}
 
 				public void onError(DialogError e) {
-					/** TODO handle dialog errors **/
+					// TODO handle dialog errors
 				}
 
 				public void onCancel() {
-					/** TODO handle user canceling login **/
+					// TODO handle user canceling login 
 				}
 			});
 		}

@@ -35,4 +35,15 @@ public class CloudQuery extends AsyncTask<String, Void, Cloud[]> {
 		return clouds;
 	}
 
+	/**
+	 * Shunt the data into Persistent Data
+	 */
+	@Override
+	protected void onPostExecute(Cloud[] result) {
+		super.onPostExecute(result);
+
+		for (Cloud c : result) {
+			PersistentData.storeCloud(c);
+		}
+	}
 }

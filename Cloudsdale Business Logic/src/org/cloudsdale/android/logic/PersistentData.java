@@ -21,6 +21,12 @@ public class PersistentData {
 	private static ArrayList<User>		users;
 	private static ArrayList<Cloud>		clouds;
 	private static ArrayList<Message>	messages;
+	
+	public PersistentData() {
+		users = new ArrayList<User>();
+		clouds = new ArrayList<Cloud>();
+		messages = new ArrayList<Message>();
+	}
 
 	/**
 	 * Set the logged in user
@@ -86,9 +92,9 @@ public class PersistentData {
 	 * @return The cloud as identified by the id
 	 */
 	public static Cloud getCloud(String cloudId) {
-		for (Cloud c : clouds) {
-			if (c.getId() == cloudId) {
-				return c;
+		for (int i = 0; i < clouds.size(); i++) {
+			if (clouds.get(i).getId() == cloudId) {
+				return clouds.get(i);
 			}
 		}
 
