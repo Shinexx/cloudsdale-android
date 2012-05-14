@@ -10,6 +10,7 @@ public class LoginBundle {
 	private String	usernameInput;
 	private String	passwordInput;
 	private String	loginUrl;
+	private String	authToken;
 
 	/**
 	 * Constructor
@@ -21,10 +22,12 @@ public class LoginBundle {
 	 * @param loginUrl
 	 *            The url to login to
 	 */
-	public LoginBundle(String username, String password, String loginUrl) {
+	public LoginBundle(String username, String password, String loginUrl,
+			String authToken) {
 		this.usernameInput = username;
 		this.passwordInput = password;
 		this.loginUrl = loginUrl;
+		this.authToken = authToken;
 	}
 
 	/**
@@ -52,5 +55,14 @@ public class LoginBundle {
 	 */
 	public String getLoginUrl() {
 		return loginUrl;
+	}
+
+	/**
+	 * Get the internal authorization token
+	 * 
+	 * @return The internal authorization token string
+	 */
+	public String getAuthToken() {
+		return authToken;
 	}
 }

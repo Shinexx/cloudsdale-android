@@ -5,8 +5,8 @@
 
     <style name="Theme.CloudsdaleDark" parent="Theme.HoloEverywhereDark.Sherlock"></style>
 
-    <style name="Theme.CloudsdaleLight.NoActionBar" parent="Theme.Sherlock.Light.NoActionBar"></style>
+    <style name="Theme.CloudsdaleLight.NoActionBar" parent="Theme.HoloEverywhereLight"></style>
 
-    <style name="Theme.CloudsdaleDark.NoActionBar" parent="Theme.Sherlock.NoActionBar"></style>
+    <style name="Theme.CloudsdaleDark.NoActionBar" parent="Theme.HoloEverywhereDark"></style>
 
 </resources>

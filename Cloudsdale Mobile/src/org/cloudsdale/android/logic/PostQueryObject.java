@@ -26,7 +26,7 @@ import android.util.Log;
  * 
  */
 public class PostQueryObject {
-	public static final String	TAG	= "Clousdale PostQueryObject";
+	public static final String	TAG	= "Cloudsdale PostQueryObject";
 
 	protected HttpParams		httpParams;
 	protected HttpPost			httpPost;
@@ -45,7 +45,7 @@ public class PostQueryObject {
 		try {
 			// Create parameters for connection including 3sec timeout
 			// on connection and 5sec timeout on socket
-			HttpParams httpParams = new BasicHttpParams();
+			httpParams = new BasicHttpParams();
 			int timeoutConnection = 3000;
 			int timeoutSocket = 5000;
 
@@ -56,10 +56,10 @@ public class PostQueryObject {
 			httpClient = new DefaultHttpClient(httpParams);
 
 			// Create the data entities
-			HttpPost post = new HttpPost(postUrl);
+			httpPost = new HttpPost(postUrl);
 
 			// Set the POST data
-			post.setEntity(new UrlEncodedFormEntity(entitiyValues));
+			httpPost.setEntity(new UrlEncodedFormEntity(entitiyValues));
 		} catch (UnsupportedEncodingException e) {
 			Log.e(TAG, e.getMessage());
 		}
@@ -83,9 +83,9 @@ public class PostQueryObject {
 
 			return builder.toString();
 		} catch (ClientProtocolException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Protocol Exception " + e.getMessage());
 		} catch (IOException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "IO Exception " + e.getMessage());
 		}
 
 		return null;

@@ -11,6 +11,8 @@
 
     <uses-library android:name="com.WazaBe.HoloEverywhere" >
     </uses-library>
+    
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name="CloudsdaleMobileApplication"
@@ -20,12 +22,17 @@
         <activity
             android:name=".ui.LoginViewActivity"
             android:configChanges="orientation"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.CloudsdaleLight.NoActionBar" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.CloudsdaleLoginActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
             </intent-filter>
         </activity>
     </application>
