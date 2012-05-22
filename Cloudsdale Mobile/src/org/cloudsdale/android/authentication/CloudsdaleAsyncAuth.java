@@ -17,6 +17,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * Asynchronous authentication for Cloudsdale
@@ -47,14 +48,18 @@ public class CloudsdaleAsyncAuth extends AsyncTask<LoginBundle, String, User> {
 		String response = post.execute();
 
 		// Get the user object
-		Gson gson = new Gson();
-		Response jsonResponse = gson.fromJson(response, Response.class);
+		GsonBuilder gb = new GsonBuilder();
+		gb.serializeNulls();
+		Gson gson = gb.create();
+		Log.d(TAG, response);
+		Response jsonResponse = gson.fromJson("\"response\": " + response, Response.class);
 		if (jsonResponse != null) {
-			if (jsonResponse.getError() == null) {
+			if (jsonResponse.getErrors() == null) {
 				User u = gson.fromJson(jsonResponse.getResult(), User.class);
 				Log.e(TAG, "User received");
 				return u;
 			} else {
+				Log.e(TAG, "There was an error");
 				return new User();
 			}
 		} else {

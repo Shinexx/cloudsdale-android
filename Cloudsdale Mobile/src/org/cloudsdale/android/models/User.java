@@ -1,10 +1,9 @@
 package org.cloudsdale.android.models;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * User model for Cloudsdale
@@ -14,68 +13,47 @@ import com.google.gson.Gson;
 public class User {
 
 	// Private attributes
-	private String				email;
-	private String				authToken;
-	private String				timeZone;				// DateTime?
-														// DateFormat?
-	private int					role;
-	private Calendar			memberSince;
-	private boolean				invisible;
-	private boolean				forcePasswordChange;
-	private Calendar			tncLastAccepted;
-	private String				id;
-	private String				name;
-	private ArrayList<String>	avatarUrls;
-
-	// Relationships
-	private ArrayList<Cloud>	ownedClouds;
-	private ArrayList<Cloud>	clouds;
+	private String			name;
+	@SerializedName("time_zone")
+	private String			timeZone;
+	@SerializedName("member_since")
+	private Date			memberSince;
+	@SerializedName("suspended_until")
+	private Date			suspendedUntil;
+	@SerializedName("reason_for_suspension")
+	private String			reasonForSuspension;
+	private String			id;
+	private AvatarContainer	avatar;
+	@SerializedName("is_registered")
+	private boolean			isRegistered;
+	@SerializedName("is_transient")
+	private boolean			isTransient;
+	@SerializedName("is_banned")
+	private boolean			isBanned;
+	private Prosecution[]	prosecutions;
+	@SerializedName("auth_token")
+	private String			authToken;
+	private String			email;
+	@SerializedName("needs_to_confirm_registration")
+	private boolean			needsToConfirmRegistration;
+	@SerializedName("needs_password_change")
+	private boolean			needsToChangePassword;
+	@SerializedName("needs_name_change")
+	private boolean			needsToChangeName;
 
 	/**
-	 * Default constructor
+	 * @return the name
 	 */
-	public User() {
-		email = "";
-		authToken = "";
-		timeZone = "";
-		role = 0;
-		memberSince = Calendar.getInstance();
-		invisible = false;
-		forcePasswordChange = false;
-		tncLastAccepted = null;
-
-		ownedClouds = new ArrayList<Cloud>();
-		clouds = new ArrayList<Cloud>();
+	public String getName() {
+		return name;
 	}
 
 	/**
-	 * @return the email
+	 * @param name
+	 *            the name to set
 	 */
-	public String getEmail() {
-		return email;
-	}
-
-	/**
-	 * @param email
-	 *            the email to set
-	 */
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	/**
-	 * @return the authToken
-	 */
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	/**
-	 * @param authToken
-	 *            the authToken to set
-	 */
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -94,24 +72,9 @@ public class User {
 	}
 
 	/**
-	 * @return the role
-	 */
-	public int getRole() {
-		return role;
-	}
-
-	/**
-	 * @param role
-	 *            the role to set
-	 */
-	public void setRole(int role) {
-		this.role = role;
-	}
-
-	/**
 	 * @return the memberSince
 	 */
-	public Calendar getMemberSince() {
+	public Date getMemberSince() {
 		return memberSince;
 	}
 
@@ -120,84 +83,37 @@ public class User {
 	 *            the memberSince to set
 	 */
 	public void setMemberSince(Date memberSince) {
-		Calendar c = Calendar.getInstance();
-		c.setTime(memberSince);
-		this.memberSince = c;
+		this.memberSince = memberSince;
 	}
 
 	/**
-	 * @return the invisible
+	 * @return the suspendedUntil
 	 */
-	public boolean isInvisible() {
-		return invisible;
+	public Date getSuspendedUntil() {
+		return suspendedUntil;
 	}
 
 	/**
-	 * @param invisible
-	 *            the invisible to set
+	 * @param suspendedUntil
+	 *            the suspendedUntil to set
 	 */
-	public void setInvisible(boolean invisible) {
-		this.invisible = invisible;
+	public void setSuspendedUntil(Date suspendedUntil) {
+		this.suspendedUntil = suspendedUntil;
 	}
 
 	/**
-	 * @return the forcePasswordChange
+	 * @return the reasonForSuspension
 	 */
-	public boolean isForcePasswordChange() {
-		return forcePasswordChange;
+	public String getReasonForSuspension() {
+		return reasonForSuspension;
 	}
 
 	/**
-	 * @param forcePasswordChange
-	 *            the forcePasswordChange to set
+	 * @param reasonForSuspension
+	 *            the reasonForSuspension to set
 	 */
-	public void setForcePasswordChange(boolean forcePasswordChange) {
-		this.forcePasswordChange = forcePasswordChange;
-	}
-
-	/**
-	 * @return the tncLastAccepted
-	 */
-	public Calendar getTncLastAccepted() {
-		return tncLastAccepted;
-	}
-
-	/**
-	 * @param tncLastAccepted
-	 *            the tncLastAccepted to set
-	 */
-	public void setTncLastAccepted(Calendar tncLastAccepted) {
-		this.tncLastAccepted = tncLastAccepted;
-	}
-
-	/**
-	 * @return the ownedClouds
-	 */
-	public ArrayList<Cloud> getOwnedClouds() {
-		return ownedClouds;
-	}
-
-	/**
-	 * @param ownedClouds
-	 *            the ownedClouds to set
-	 */
-	public void setOwnedClouds(ArrayList<Cloud> ownedClouds) {
-		this.ownedClouds = ownedClouds;
-	}
-
-	/**
-	 * @return the clouds
-	 */
-	public ArrayList<Cloud> getClouds() {
-		return clouds;
-	}
-
-	/**
-	 * @param clouds
-	 *            the clouds to set
-	 */
-	public void setClouds(ArrayList<Cloud> clouds) {
-		this.clouds = clouds;
+	public void setReasonForSuspension(String reasonForSuspension) {
+		this.reasonForSuspension = reasonForSuspension;
 	}
 
 	/**
@@ -216,86 +132,153 @@ public class User {
 	}
 
 	/**
-	 * @return the name
+	 * @return the avatar
 	 */
-	public String getName() {
-		return name;
+	public AvatarContainer getAvatar() {
+		return avatar;
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param avatar
+	 *            the avatar to set
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setAvatar(AvatarContainer avatar) {
+		this.avatar = avatar;
 	}
 
 	/**
-	 * @return the avatarUrls
+	 * @return the isRegistered
 	 */
-	public ArrayList<String> getAvatarUrls() {
-		return avatarUrls;
+	public boolean isRegistered() {
+		return isRegistered;
 	}
 
 	/**
-	 * @param avatarUrls
-	 *            the avatarUrls to set
+	 * @param isRegistered
+	 *            the isRegistered to set
 	 */
-	public void setAvatarUrls(ArrayList<String> avatarUrls) {
-		this.avatarUrls = avatarUrls;
+	public void setRegistered(boolean isRegistered) {
+		this.isRegistered = isRegistered;
 	}
 
 	/**
-	 * Adds the cloud to the list of owned clouds
-	 * 
-	 * @param c
-	 *            the cloud that the user owns
+	 * @return the isTransient
 	 */
-	public void addOwnedCloud(Cloud c) {
-		ownedClouds.add(c);
+	public boolean isTransient() {
+		return isTransient;
 	}
 
 	/**
-	 * Removes a cloud from a user's ownership
-	 * 
-	 * @param c
-	 *            the cloud to remove from the user's ownership
+	 * @param isTransient
+	 *            the isTransient to set
 	 */
-	public void removeOwnedCloud(Cloud c) {
-		if (ownedClouds.contains(c))
-			ownedClouds.remove(c);
+	public void setTransient(boolean isTransient) {
+		this.isTransient = isTransient;
 	}
 
 	/**
-	 * Add a cloud to the user's clouds
-	 * 
-	 * @param c
-	 *            the cloud the user is joining
+	 * @return the isBanned
 	 */
-	public void joinCloud(Cloud c) {
-		clouds.add(c);
+	public boolean isBanned() {
+		return isBanned;
 	}
 
 	/**
-	 * Remove a cloud from the list of a user's clouds
-	 * 
-	 * @param c
-	 *            the cloud the user is leaving
+	 * @param isBanned
+	 *            the isBanned to set
 	 */
-	public void leaveCloud(Cloud c) {
-		if (clouds.contains(c))
-			clouds.remove(c);
+	public void setBanned(boolean isBanned) {
+		this.isBanned = isBanned;
 	}
 
 	/**
-	 * Determine whether or not a user is a member of a cloud
-	 * 
-	 * @param c
-	 *            the cloud that a user is or is not a member of
-	 * @return whether or not the user is a member of the cloud
+	 * @return the prosecutions
 	 */
-	public boolean isMemberOfCloud(Cloud c) {
-		return clouds.contains(c);
+	public Prosecution[] getProsecutions() {
+		return prosecutions;
+	}
+
+	/**
+	 * @param prosecutions
+	 *            the prosecutions to set
+	 */
+	public void setProsecutions(Prosecution[] prosecutions) {
+		this.prosecutions = prosecutions;
+	}
+
+	/**
+	 * @return the authToken
+	 */
+	public String getAuthToken() {
+		return authToken;
+	}
+
+	/**
+	 * @param authToken
+	 *            the authToken to set
+	 */
+	public void setAuthToken(String authToken) {
+		this.authToken = authToken;
+	}
+
+	/**
+	 * @return the email
+	 */
+	public String getEmail() {
+		return email;
+	}
+
+	/**
+	 * @param email
+	 *            the email to set
+	 */
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	/**
+	 * @return the needsToConfirmRegistration
+	 */
+	public boolean isNeedsToConfirmRegistration() {
+		return needsToConfirmRegistration;
+	}
+
+	/**
+	 * @param needsToConfirmRegistration
+	 *            the needsToConfirmRegistration to set
+	 */
+	public void setNeedsToConfirmRegistration(boolean needsToConfirmRegistration) {
+		this.needsToConfirmRegistration = needsToConfirmRegistration;
+	}
+
+	/**
+	 * @return the needsToChangePassword
+	 */
+	public boolean isNeedsToChangePassword() {
+		return needsToChangePassword;
+	}
+
+	/**
+	 * @param needsToChangePassword
+	 *            the needsToChangePassword to set
+	 */
+	public void setNeedsToChangePassword(boolean needsToChangePassword) {
+		this.needsToChangePassword = needsToChangePassword;
+	}
+
+	/**
+	 * @return the needsToChangeName
+	 */
+	public boolean isNeedsToChangeName() {
+		return needsToChangeName;
+	}
+
+	/**
+	 * @param needsToChangeName
+	 *            the needsToChangeName to set
+	 */
+	public void setNeedsToChangeName(boolean needsToChangeName) {
+		this.needsToChangeName = needsToChangeName;
 	}
 
 	/**
