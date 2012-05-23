@@ -1,8 +1,12 @@
 package org.cloudsdale.android.models;
 
-import java.util.Date;
+import java.text.ParseException;
+import java.util.Calendar;
+
+import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -12,14 +16,18 @@ import com.google.gson.annotations.SerializedName;
  */
 public class User {
 
+	private final String	TAG	= "Cloudsdale User";
+
 	// Private attributes
 	private String			name;
 	@SerializedName("time_zone")
 	private String			timeZone;
 	@SerializedName("member_since")
-	private Date			memberSince;
+	private String			memberSinceTemp;
 	@SerializedName("suspended_until")
-	private Date			suspendedUntil;
+	private String			suspendedUntilTemp;
+	private Calendar		memberSince;
+	private Calendar		suspendedUntil;
 	@SerializedName("reason_for_suspension")
 	private String			reasonForSuspension;
 	private String			id;
@@ -72,9 +80,51 @@ public class User {
 	}
 
 	/**
+	 * @return the memberSinceTemp
+	 */
+	public String getMemberSinceTemp() {
+		return memberSinceTemp;
+	}
+
+	/**
+	 * @param memberSinceTemp
+	 *            the memberSinceTemp to set
+	 */
+	public void setMemberSinceTemp(String memberSinceTemp) {
+		try {
+			Calendar cal = ISO8601.toCalendar(memberSinceTemp);
+			setMemberSince(cal);
+		} catch (ParseException e) {
+			Log.e(TAG, "Parse Exception: " + e.getMessage());
+		}
+		this.memberSinceTemp = memberSinceTemp;
+	}
+
+	/**
+	 * @return the suspendedUntilTemp
+	 */
+	public String getSuspendedUntilTemp() {
+		return suspendedUntilTemp;
+	}
+
+	/**
+	 * @param suspendedUntilTemp
+	 *            the suspendedUntilTemp to set
+	 */
+	public void setSuspendedUntilTemp(String suspendedUntilTemp) {
+		try {
+			Calendar cal = ISO8601.toCalendar(memberSinceTemp);
+			setSuspendedUntil(cal);
+		} catch (ParseException e) {
+			Log.e(TAG, "Parse Exception: " + e.getMessage());
+		}
+		this.suspendedUntilTemp = suspendedUntilTemp;
+	}
+
+	/**
 	 * @return the memberSince
 	 */
-	public Date getMemberSince() {
+	public Calendar getMemberSince() {
 		return memberSince;
 	}
 
@@ -82,14 +132,14 @@ public class User {
 	 * @param memberSince
 	 *            the memberSince to set
 	 */
-	public void setMemberSince(Date memberSince) {
+	public void setMemberSince(Calendar memberSince) {
 		this.memberSince = memberSince;
 	}
 
 	/**
 	 * @return the suspendedUntil
 	 */
-	public Date getSuspendedUntil() {
+	public Calendar getSuspendedUntil() {
 		return suspendedUntil;
 	}
 
@@ -97,7 +147,7 @@ public class User {
 	 * @param suspendedUntil
 	 *            the suspendedUntil to set
 	 */
-	public void setSuspendedUntil(Date suspendedUntil) {
+	public void setSuspendedUntil(Calendar suspendedUntil) {
 		this.suspendedUntil = suspendedUntil;
 	}
 

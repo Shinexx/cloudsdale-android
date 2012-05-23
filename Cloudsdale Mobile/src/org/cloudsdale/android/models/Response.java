@@ -1,5 +1,6 @@
 package org.cloudsdale.android.models;
 
+import org.cloudsdale.android.annotations.GsonIgnore;
 
 /**
  * Response bean for easy GSON (de)serialization
@@ -9,10 +10,10 @@ package org.cloudsdale.android.models;
  */
 public class Response {
 	// Data objects
-	private String		status;
-	private String[]	errors;
-	private String		flash;
-	private String		result;
+	protected String	status;
+	@GsonIgnore
+	protected Error[]	errors;
+	protected Flash		flash;
 
 	/**
 	 * @return the status
@@ -32,7 +33,7 @@ public class Response {
 	/**
 	 * @return the errors
 	 */
-	public String[] getErrors() {
+	public Error[] getErrors() {
 		return errors;
 	}
 
@@ -40,14 +41,14 @@ public class Response {
 	 * @param error
 	 *            the errors to set
 	 */
-	public void setErrors(String[] errors) {
+	public void setErrors(Error[] errors) {
 		this.errors = errors;
 	}
 
 	/**
 	 * @return the flash
 	 */
-	public String getFlash() {
+	public Flash getFlash() {
 		return flash;
 	}
 
@@ -55,22 +56,8 @@ public class Response {
 	 * @param the
 	 *            flash to set
 	 */
-	public void setFlash(String flash) {
+	public void setFlash(Flash flash) {
 		this.flash = flash;
 	}
 
-	/**
-	 * @return the result
-	 */
-	public String getResult() {
-		return result;
-	}
-
-	/**
-	 * @param result
-	 *            the result to set
-	 */
-	public void setResult(String result) {
-		this.result = result;
-	}
 }

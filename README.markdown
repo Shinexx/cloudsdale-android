@@ -4,7 +4,7 @@
 
 The pulled folder will contain the following folders:
 
-- Cloudsdale Mobile (CDM)
+>- Cloudsdale Mobile (CDM)
 - Ignition Core (IC) -- Android speedy development framework
 - Holo Everywhere (HE) -- Creates the Holo UI on all Android platforms
 - ActionBar Sherlock (ABS) -- Allows use of the ActionBar on all Android platforms

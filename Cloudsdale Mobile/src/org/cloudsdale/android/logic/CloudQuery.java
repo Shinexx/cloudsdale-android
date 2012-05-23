@@ -30,9 +30,9 @@ public class CloudQuery extends AsyncTask<String, Void, Cloud[]> {
 		// create the Gson and parse the clouds
 		Gson gson = new Gson();
 		Response response = gson.fromJson(jsonResponse, Response.class);
-		Cloud[] clouds = gson.fromJson(response.getResult(), Cloud[].class);
-
-		return clouds;
+		//TODO Create cloud response and get clouds from it
+		
+		return null;
 	}
 
 	/**

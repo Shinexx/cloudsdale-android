@@ -13,7 +13,7 @@
     <string name="login_view_facebook_button_text">Facebook</string>
     <string name="login_view_twitter_button_text">Twitter</string>
     <string name="login_view_seperator_text">or</string>
-    <string name="cloudsdale_api_url">http://192.168.2.2:3000/v1/</string>
+    <string name="cloudsdale_api_url">http://192.168.2.15:3000/v1/</string>
     <string name="cloudsdale_auth_token">1234</string>
 
 </resources>
