@@ -4,17 +4,14 @@ import org.cloudsdale.android.CloudsdaleMobileApplication;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
 import org.cloudsdale.android.authentication.LoginBundle;
-import org.cloudsdale.android.logic.PersistentData;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Window;
 
 public class CloudsdaleLoginActivity extends SherlockActivity {
 

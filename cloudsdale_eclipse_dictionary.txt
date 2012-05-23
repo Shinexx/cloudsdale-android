@@ -5,3 +5,4 @@ facebook
 username
 url
 auth
+async

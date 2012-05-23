@@ -1,11 +1,8 @@
 package org.cloudsdale.android.models;
 
-import com.google.gson.annotations.Expose;
 
 public class FacebookResponse extends Response {
-	@Expose
 	private String id;
-	@Expose
 	private String type;
 	
 	public FacebookResponse() {

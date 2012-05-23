@@ -1,8 +1,5 @@
 package org.cloudsdale.android.authentication;
 
-import java.text.MessageFormat;
-
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 public class OAuthBundle {
@@ -14,6 +11,16 @@ public class OAuthBundle {
 	@SerializedName("client_type")
 	private String				clientType;
 
+	/**
+	 * Constuctor for the oAuth bundle class
+	 * 
+	 * @param provider
+	 *            Provider for the oAuth
+	 * @param uid
+	 *            User's ID from provider
+	 * @param token
+	 *            The security token for the app
+	 */
 	public OAuthBundle(Provider provider, String uid, String token) {
 		this.provider = provider.toString();
 		this.uid = uid;
@@ -21,10 +28,13 @@ public class OAuthBundle {
 		clientType = CLIENT_TYPE;
 	}
 
+	/**
+	 * @see Object#toString()
+	 */
 	public String toString() {
-		return MessageFormat
-				.format("{ \"oauth\": { \"provider\": \"{0}\", \"uid\": \"{1}\", \"token\": \"{2}\", \"client_type\": \"{3}\" }}",
-						provider, uid, token, clientType);
+		return "{ \"oauth\": { \"provider\": \"" + provider + "\", \"uid\": \""
+				+ uid + "\", \"token\": \"" + token + "\", \"client_type\": \""
+				+ clientType + "\" }}";
 	}
 
 	/**

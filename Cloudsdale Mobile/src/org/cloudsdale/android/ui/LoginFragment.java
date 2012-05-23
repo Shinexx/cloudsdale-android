@@ -1,9 +1,19 @@
 package org.cloudsdale.android.ui;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
+import org.cloudsdale.android.authentication.LoginBundle;
+import org.cloudsdale.android.authentication.OAuthBundle;
+import org.cloudsdale.android.authentication.Provider;
+import org.cloudsdale.android.models.FacebookResponse;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,10 +24,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
-import com.facebook.android.Facebook.DialogListener;
 import com.facebook.android.FacebookError;
+import com.google.gson.Gson;
 
 /**
  * Code behind for the Login fragment. Supports FB and Twitter login
@@ -29,6 +40,7 @@ public class LoginFragment extends SherlockFragment {
 
 	private final String	TAG	= "Cloudsdale LoginFragment";
 	public static Facebook	fb;
+	public static Gson		gson;
 
 	/**
 	 * Lifetime method to create a new instance of the fragment
@@ -101,8 +113,16 @@ public class LoginFragment extends SherlockFragment {
 		}
 
 		// Start the auth flow
-		fb.authorize(LoginFragment.this.getActivity(), new String[] {},
+		fb.authorize(LoginFragment.this.getActivity(), new String[] { "offline_access" },
 				LoginViewActivity.FACEBOOK_ACTIVITY_CODE, new FbListener());
+	}
+
+	/**
+	 * Method to start the Facebook Graph request
+	 */
+	private void startGraphRequest() {
+		FbRunner runner = new FbRunner(LoginFragment.fb);
+		runner.request("me?fields=id", new FbAsyncListener());
 	}
 
 	/**
@@ -116,8 +136,8 @@ public class LoginFragment extends SherlockFragment {
 		@Override
 		public void onComplete(Bundle values) {
 			Log.d(TAG, "Starting Facebook Auth");
-			// TODO Handle the actual auth flow
-			Log.d(TAG, "Facebook auth completed");
+			fb.extendAccessTokenIfNeeded(getActivity(), new FbServiceListener());
+			startGraphRequest();
 		}
 
 		@Override
@@ -139,6 +159,112 @@ public class LoginFragment extends SherlockFragment {
 		@Override
 		public void onCancel() {
 			// Do nothing, already on login screen
+		}
+	}
+
+	/**
+	 * Internal helper class to listen for async responses from Facebook
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com)
+	 * 
+	 */
+	private class FbAsyncListener implements
+			AsyncFacebookRunner.RequestListener {
+
+		@Override
+		public void onComplete(String response, Object state) {
+			if (gson == null) {
+				gson = new Gson();
+			}
+			FacebookResponse resp = gson.fromJson(response,
+					FacebookResponse.class);
+			Log.d(TAG, "Facebook response: " + response);
+			Log.d(TAG, "Facebook access token: " + fb.getAccessToken());
+			OAuthBundle bundle = new OAuthBundle(Provider.FACEBOOK,
+					resp.getId(), getString(R.string.cloudsdale_auth_token));
+			Looper.prepare();
+			LoginBundle lBundle = new LoginBundle(null, null,
+					getString(R.string.cloudsdale_api_url) + "sessions",
+					getString(R.string.cloudsdale_auth_token), bundle);
+			new Auth().execute(new LoginBundle[] { lBundle });
+			Log.d(TAG, "Facebook auth Completed");
+		}
+
+		@Override
+		public void onIOException(IOException e, Object state) {
+			Toast.makeText(LoginFragment.this.getActivity(),
+					"There was an error, please try again", Toast.LENGTH_LONG)
+					.show();
+			Log.e(TAG, "IO Exception: " + e.getMessage());
+		}
+
+		@Override
+		public void onFileNotFoundException(FileNotFoundException e,
+				Object state) {
+			Toast.makeText(LoginFragment.this.getActivity(),
+					"There was an error, please try again", Toast.LENGTH_LONG)
+					.show();
+			Log.e(TAG, "FileNotFound Exception: " + e.getMessage());
+		}
+
+		@Override
+		public void onMalformedURLException(MalformedURLException e,
+				Object state) {
+			Toast.makeText(LoginFragment.this.getActivity(),
+					"There was an error, please try again", Toast.LENGTH_LONG)
+					.show();
+			Log.e(TAG, "MalformedURL Exception: " + e.getMessage());
+		}
+
+		@Override
+		public void onFacebookError(FacebookError e, Object state) {
+			Toast.makeText(LoginFragment.this.getActivity(),
+					"There was an error with Facebook, please try again",
+					Toast.LENGTH_LONG).show();
+			Log.e(TAG, "Facebook Error: " + e.getMessage());
+		}
+
+	}
+	
+	private class FbServiceListener implements Facebook.ServiceListener {
+
+		@Override
+		public void onComplete(Bundle values) {
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void onFacebookError(FacebookError e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onError(Error e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+
+	/**
+	 * Helper class to run Graph requests asynchronously
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com)
+	 * 
+	 */
+	private class FbRunner extends AsyncFacebookRunner {
+
+		public FbRunner(Facebook fb) {
+			super(fb);
+		}
+
+	}
+
+	private class Auth extends CloudsdaleAsyncAuth {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
 		}
 	}
 }
