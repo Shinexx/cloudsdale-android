@@ -4,3 +4,4 @@ greeley
 facebook
 username
 url
+auth

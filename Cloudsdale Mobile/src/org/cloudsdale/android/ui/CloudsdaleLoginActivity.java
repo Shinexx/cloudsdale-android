@@ -29,9 +29,6 @@ public class CloudsdaleLoginActivity extends SherlockActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// Request an indeterminate progress bar in the Sherlock bar
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
 		// Data bind the view objects
 		setContentView(R.layout.cloudsdale_login_fields);
 		usernameField = (EditText) findViewById(R.id.cloudsdaleLoginUsernameField);

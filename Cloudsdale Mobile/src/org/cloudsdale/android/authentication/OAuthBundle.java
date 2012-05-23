@@ -1,5 +1,7 @@
 package org.cloudsdale.android.authentication;
 
+import java.text.MessageFormat;
+
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
@@ -20,7 +22,9 @@ public class OAuthBundle {
 	}
 
 	public String toString() {
-		return new Gson().toJson(this);
+		return MessageFormat
+				.format("{ \"oauth\": { \"provider\": \"{0}\", \"uid\": \"{1}\", \"token\": \"{2}\", \"client_type\": \"{3}\" }}",
+						provider, uid, token, clientType);
 	}
 
 	/**
@@ -31,7 +35,8 @@ public class OAuthBundle {
 	}
 
 	/**
-	 * @param provider the provider to set
+	 * @param provider
+	 *            the provider to set
 	 */
 	public void setProvider(String provider) {
 		this.provider = provider;
@@ -45,7 +50,8 @@ public class OAuthBundle {
 	}
 
 	/**
-	 * @param uid the uid to set
+	 * @param uid
+	 *            the uid to set
 	 */
 	public void setUid(String uid) {
 		this.uid = uid;
@@ -59,7 +65,8 @@ public class OAuthBundle {
 	}
 
 	/**
-	 * @param token the token to set
+	 * @param token
+	 *            the token to set
 	 */
 	public void setToken(String token) {
 		this.token = token;
@@ -73,7 +80,8 @@ public class OAuthBundle {
 	}
 
 	/**
-	 * @param clientType the clientType to set
+	 * @param clientType
+	 *            the clientType to set
 	 */
 	public void setClientType(String clientType) {
 		this.clientType = clientType;

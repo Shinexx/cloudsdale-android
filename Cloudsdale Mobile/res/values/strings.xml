@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="hello">Hello World, CloudsdaleMobileActivity!</string>
     <string name="app_name">Cloudsdale Mobile</string>
     <string name="cloudsdale_logo_description">Cloudsdale logo</string>
     <string name="login_view_fragment_username_hint">Email address</string>
@@ -13,8 +11,8 @@
     <string name="login_view_facebook_button_text">Facebook</string>
     <string name="login_view_twitter_button_text">Twitter</string>
     <string name="login_view_seperator_text">or</string>
-    <string name="cloudsdale_api_url">http://192.168.2.15:3000/v1/</string>
-    <string name="cloudsdale_auth_token">1234</string>
+    <string name="cloudsdale_api_url">http://192.168.2.2:3000/v1/</string>
+    <string name="cloudsdale_auth_token">1449307c2dc78c53ce6a8da7c2cd0d5aaee7614f7e215bb4c127989728f8c5b465d23b5a0247570331355e8e7331f9bba37570d35886d22fbe1a3ee2df92d3b5</string>
     <string name="facebook_api_token">213007855430354</string>
     <string name="login_dialog_wait_string">Logging in...</string>
 
