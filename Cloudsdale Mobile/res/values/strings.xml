@@ -15,5 +15,7 @@
     <string name="login_view_seperator_text">or</string>
     <string name="cloudsdale_api_url">http://192.168.2.15:3000/v1/</string>
     <string name="cloudsdale_auth_token">1234</string>
+    <string name="facebook_api_token">213007855430354</string>
+    <string name="login_dialog_wait_string">Logging in...</string>
 
 </resources>

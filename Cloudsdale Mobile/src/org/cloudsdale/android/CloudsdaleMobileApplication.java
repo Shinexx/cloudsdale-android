@@ -3,13 +3,20 @@ package org.cloudsdale.android;
 import org.cloudsdale.android.logic.PersistentData;
 
 import android.app.Application;
+import android.content.Context;
 
 public class CloudsdaleMobileApplication extends Application {
 	
+	private static CloudsdaleMobileApplication instance;
+	
 	public CloudsdaleMobileApplication() {
 		super();
-		
-		PersistentData pd = new PersistentData();
+		instance = this;
+		new PersistentData();
+	}
+	
+	public static Context getContext() {
+		return instance;
 	}
 
 }

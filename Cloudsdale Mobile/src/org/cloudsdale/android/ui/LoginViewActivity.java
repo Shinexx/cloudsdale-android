@@ -1,22 +1,41 @@
 package org.cloudsdale.android.ui;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 
+import org.cloudsdale.android.CloudsdaleMobileApplication;
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
+import org.cloudsdale.android.authentication.LoginBundle;
+import org.cloudsdale.android.authentication.OAuthBundle;
+import org.cloudsdale.android.authentication.Provider;
+import org.cloudsdale.android.models.FacebookResponse;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TabWidget;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.facebook.android.AsyncFacebookRunner;
+import com.facebook.android.Facebook;
+import com.facebook.android.FacebookError;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * Controller for the login view
@@ -25,9 +44,14 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
  * 
  */
 public class LoginViewActivity extends SherlockFragmentActivity {
-	TabHost		mTabHost;
-	ViewPager	mViewPager;
-	TabsAdapter	mTabsAdapter;
+	public static final String	TAG						= "Cloudsdale LoginViewActivity";
+	public static final int		FACEBOOK_ACTIVITY_CODE	= 10298;
+
+	private Gson				gson;
+
+	TabHost						mTabHost;
+	ViewPager					mViewPager;
+	TabsAdapter					mTabsAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +108,7 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 		private final ArrayList<TabInfo>	mTabs	= new ArrayList<TabInfo>();
 
 		static final class TabInfo {
+			@SuppressWarnings("unused")
 			private final String	tag;
 			private final Class<?>	clss;
 			private final Bundle	args;
@@ -171,6 +196,102 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 
 		@Override
 		public void onPageScrollStateChanged(int state) {
+		}
+	}
+
+	private void authFromFacebook() {
+		if (LoginFragment.fb == null) {
+			LoginFragment.fb = new Facebook(
+					getString(R.string.facebook_api_token));
+		}
+		Log.d(TAG, "Engaging FB Auth");
+		FacebookRunner runner = new FacebookRunner(LoginFragment.fb);
+		runner.request("/me?fields=id", new FbListener());
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (requestCode == FACEBOOK_ACTIVITY_CODE) {
+			authFromFacebook();
+		}
+	}
+
+	private void executeFbAuth(LoginBundle login) {
+		Looper.prepare();
+		new Auth().execute(login);
+	}
+
+	private class FacebookRunner extends AsyncFacebookRunner {
+
+		public FacebookRunner(Facebook fb) {
+			super(fb);
+		}
+	}
+
+	private class FbListener implements AsyncFacebookRunner.RequestListener {
+
+		@Override
+		public void onComplete(String response, Object state) {
+			String me = response;
+			gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
+					.create();
+			FacebookResponse fbRes = gson.fromJson(me, FacebookResponse.class);
+			OAuthBundle oAuth = new OAuthBundle(Provider.FACEBOOK,
+					fbRes.getId(), LoginFragment.fb.getAccessToken());
+			LoginBundle login = new LoginBundle(null, null,
+					getString(R.string.cloudsdale_api_url) + "sessions",
+					getString(R.string.cloudsdale_auth_token), oAuth);
+			executeFbAuth(login);
+		}
+
+		@Override
+		public void onIOException(IOException e, Object state) {
+			Log.e(TAG, "IO Exception: " + e.getMessage());
+			Toast.makeText(LoginViewActivity.this,
+					"There was an error logging in, please try again",
+					Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void onFileNotFoundException(FileNotFoundException e,
+				Object state) {
+			Log.e(TAG, "FileNotFound Exception: " + e.getMessage());
+			Toast.makeText(LoginViewActivity.this,
+					"There was an error logging in, please try again",
+					Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void onMalformedURLException(MalformedURLException e,
+				Object state) {
+			Log.e(TAG, "MalformedUrl Exception: " + e.getMessage());
+			Toast.makeText(LoginViewActivity.this,
+					"There was an error logging in, please try again",
+					Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void onFacebookError(FacebookError e, Object state) {
+			Log.e(TAG, "FB Error: " + e.getMessage());
+			Toast.makeText(LoginViewActivity.this,
+					"There was an error logging in, please try again",
+					Toast.LENGTH_LONG).show();
+		}
+
+	}
+
+	private class Auth extends CloudsdaleAsyncAuth {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			// dialog = new ProgressDialog(LoginViewActivity.this);
+			// dialog.setMessage(CloudsdaleMobileApplication.getContext()
+			// .getString(R.string.login_dialog_wait_string));
+			// dialog.setIndeterminate(true);
+			// dialog.setCancelable(false);
+			// dialog.show();
 		}
 	}
 }

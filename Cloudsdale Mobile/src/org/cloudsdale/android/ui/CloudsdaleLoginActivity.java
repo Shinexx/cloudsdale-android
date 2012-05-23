@@ -1,29 +1,29 @@
 package org.cloudsdale.android.ui;
 
+import org.cloudsdale.android.CloudsdaleMobileApplication;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
 import org.cloudsdale.android.authentication.LoginBundle;
 import org.cloudsdale.android.logic.PersistentData;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Window;
-import com.googlecode.androidannotations.annotations.Background;
 
 public class CloudsdaleLoginActivity extends SherlockActivity {
 
+	@SuppressWarnings("unused")
 	private static final String	TAG	= "CloudsdaleLoginActivity";
 
 	private EditText			usernameField;
 	private EditText			passwordField;
 	private Button				submitButton;
-	private Handler				handler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,36 +50,24 @@ public class CloudsdaleLoginActivity extends SherlockActivity {
 				String loginUrl = getString(R.string.cloudsdale_api_url)
 						+ "sessions";
 
-				new CloudsdaleAsyncAuth().execute(new LoginBundle(username,
-						password, loginUrl,
-						getString(R.string.cloudsdale_auth_token)));
+				new Auth().execute(new LoginBundle(username, password,
+						loginUrl, getString(R.string.cloudsdale_auth_token),
+						null));
 
-				// Show a progress dialog while login is happening
-				getSherlock().setProgressBarIndeterminateVisibility(true);
-
-				// Since login is async, keep checking the user object until it
-				// returns a value then cancel the progress dialog
-				handler = new Handler();
-				handler.postDelayed(new Runnable() {
-
-					@Override
-					public void run() {
-						boolean running = true;
-
-						while (running) {
-							if (PersistentData.getMe() != null) {
-								getSherlock()
-										.setProgressBarIndeterminateVisibility(
-												false);
-								running = false;
-								// TODO Forward to the main view
-							} else {
-								handler.postDelayed(this, 500);
-							}
-						}
-					}
-				}, 500);
 			}
 		});
+	}
+
+	private class Auth extends CloudsdaleAsyncAuth {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			dialog = new ProgressDialog(CloudsdaleLoginActivity.this);
+			dialog.setMessage(CloudsdaleMobileApplication.getContext()
+					.getString(R.string.login_dialog_wait_string));
+			dialog.setIndeterminate(true);
+			dialog.setCancelable(false);
+			dialog.show();
+		}
 	}
 }

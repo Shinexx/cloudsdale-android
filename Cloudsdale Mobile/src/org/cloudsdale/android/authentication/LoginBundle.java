@@ -1,5 +1,6 @@
 package org.cloudsdale.android.authentication;
 
+
 /**
  * Bundle to store all the objects required for login
  * 
@@ -7,10 +8,11 @@ package org.cloudsdale.android.authentication;
  * 
  */
 public class LoginBundle {
-	private String	usernameInput;
-	private String	passwordInput;
-	private String	loginUrl;
-	private String	authToken;
+	private String		usernameInput;
+	private String		passwordInput;
+	private String		loginUrl;
+	private String		authToken;
+	private OAuthBundle	oAuthBundle;
 
 	/**
 	 * Constructor
@@ -23,11 +25,12 @@ public class LoginBundle {
 	 *            The url to login to
 	 */
 	public LoginBundle(String username, String password, String loginUrl,
-			String authToken) {
+			String authToken, OAuthBundle oAuthBundle) {
 		this.usernameInput = username;
 		this.passwordInput = password;
 		this.loginUrl = loginUrl;
 		this.authToken = authToken;
+		this.oAuthBundle = oAuthBundle;
 	}
 
 	/**
@@ -64,5 +67,20 @@ public class LoginBundle {
 	 */
 	public String getAuthToken() {
 		return authToken;
+	}
+
+	/**
+	 * @return the oAuthBundle
+	 */
+	public OAuthBundle getoAuthBundle() {
+		return oAuthBundle;
+	}
+
+	/**
+	 * @param oAuthBundle
+	 *            the Name/Value pair bundle to set
+	 */
+	public void setoAuthBundle(OAuthBundle oAuthBundle) {
+		this.oAuthBundle = oAuthBundle;
 	}
 }
