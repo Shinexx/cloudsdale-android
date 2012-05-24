@@ -50,6 +50,7 @@ public class CloudsdaleAsyncAuth extends AsyncTask<LoginBundle, String, User> {
 		if (params[0].getoAuthBundle() != null) {
 			nameValuePairs.add(new BasicNameValuePair("oAuth", params[0]
 					.getoAuthBundle().toString()));
+			Log.d(TAG, params[0].getoAuthBundle().toString());
 		}
 
 		// Create the post object

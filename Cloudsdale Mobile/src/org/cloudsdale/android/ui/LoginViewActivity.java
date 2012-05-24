@@ -86,6 +86,16 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 	}
 
 	/**
+	 * Handle results sent from an activity started for an intent
+	 */
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		LoginFragment.fb.authorizeCallback(requestCode, resultCode, data);
+	}
+	
+	/**
 	 * This is a helper class that implements the management of tabs and all
 	 * details of connecting a ViewPager with associated TabHost. It relies on a
 	 * trick. Normally a tab host has a simple API for supplying a View or
@@ -192,18 +202,6 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 
 		@Override
 		public void onPageScrollStateChanged(int state) {
-		}
-	}
-
-	/**
-	 * Handle results sent from an activity started for an intent
-	 */
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		if (requestCode == FACEBOOK_ACTIVITY_CODE) {
-			Log.d(TAG, "Facebook callback received");
 		}
 	}
 }

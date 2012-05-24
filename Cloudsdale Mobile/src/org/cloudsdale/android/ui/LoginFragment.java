@@ -12,6 +12,7 @@ import org.cloudsdale.android.authentication.Provider;
 import org.cloudsdale.android.models.FacebookResponse;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -38,9 +39,12 @@ import com.google.gson.Gson;
  */
 public class LoginFragment extends SherlockFragment {
 
-	private final String	TAG	= "Cloudsdale LoginFragment";
-	public static Facebook	fb;
-	public static Gson		gson;
+	private final String		TAG			= "Cloudsdale LoginFragment";
+	private final String		FILENAME	= "AndroidSSO_data";
+	public static Facebook		fb;
+	public static Gson			gson;
+
+	private SharedPreferences	mPrefs;
 
 	/**
 	 * Lifetime method to create a new instance of the fragment
@@ -106,15 +110,30 @@ public class LoginFragment extends SherlockFragment {
 	/**
 	 * Method to start the FB authentication flow through the FB SDK
 	 */
-	private void startFacebookAuthFlow() {
-		// Create the FB instance as needed
+	public void startFacebookAuthFlow() {
+		// Create the FB instance
 		if (fb == null) {
 			fb = new Facebook(getString(R.string.facebook_api_token));
 		}
 
+		// Fetch stored SSO data
+		mPrefs = getActivity().getPreferences(getActivity().MODE_PRIVATE);
+		String access_token = mPrefs.getString("access_token", null);
+		long expires = mPrefs.getLong("access_expires", 0);
+
+		if (access_token != null) {
+			fb.setAccessToken(access_token);
+		}
+		if (expires != 0) {
+			fb.setAccessExpires(expires);
+		}
+
 		// Start the auth flow
-		fb.authorize(LoginFragment.this.getActivity(), new String[] { "offline_access" },
-				LoginViewActivity.FACEBOOK_ACTIVITY_CODE, new FbListener());
+		if (!fb.isSessionValid()) {
+			fb.authorize(LoginFragment.this.getActivity(),
+					new String[] { "offline_access" },
+					LoginViewActivity.FACEBOOK_ACTIVITY_CODE, new FbListener());
+		}
 	}
 
 	/**
@@ -136,7 +155,6 @@ public class LoginFragment extends SherlockFragment {
 		@Override
 		public void onComplete(Bundle values) {
 			Log.d(TAG, "Starting Facebook Auth");
-			fb.extendAccessTokenIfNeeded(getActivity(), new FbServiceListener());
 			startGraphRequest();
 		}
 
@@ -178,16 +196,22 @@ public class LoginFragment extends SherlockFragment {
 			}
 			FacebookResponse resp = gson.fromJson(response,
 					FacebookResponse.class);
-			Log.d(TAG, "Facebook response: " + response);
-			Log.d(TAG, "Facebook access token: " + fb.getAccessToken());
-			OAuthBundle bundle = new OAuthBundle(Provider.FACEBOOK,
-					resp.getId(), getString(R.string.cloudsdale_auth_token));
-			Looper.prepare();
-			LoginBundle lBundle = new LoginBundle(null, null,
-					getString(R.string.cloudsdale_api_url) + "sessions",
-					getString(R.string.cloudsdale_auth_token), bundle);
-			new Auth().execute(new LoginBundle[] { lBundle });
-			Log.d(TAG, "Facebook auth Completed");
+			if (resp.getId() == null) {
+				Looper.prepare();
+				fb.authorize(getActivity(), new FbListener());
+				return;
+			} else {
+				Log.d(TAG, "Facebook response: " + response);
+				Log.d(TAG, "Facebook access token: " + fb.getAccessToken());
+				OAuthBundle bundle = new OAuthBundle(Provider.FACEBOOK,
+						resp.getId(), getString(R.string.cloudsdale_auth_token));
+				Looper.prepare();
+				LoginBundle lBundle = new LoginBundle(null, null,
+						getString(R.string.cloudsdale_api_url) + "sessions",
+						getString(R.string.cloudsdale_auth_token), bundle);
+				new Auth().execute(new LoginBundle[] { lBundle });
+				Log.d(TAG, "Facebook auth Completed");
+			}
 		}
 
 		@Override
@@ -225,7 +249,7 @@ public class LoginFragment extends SherlockFragment {
 		}
 
 	}
-	
+
 	private class FbServiceListener implements Facebook.ServiceListener {
 
 		@Override
@@ -236,15 +260,15 @@ public class LoginFragment extends SherlockFragment {
 		@Override
 		public void onFacebookError(FacebookError e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onError(Error e) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
+
 	}
 
 	/**
