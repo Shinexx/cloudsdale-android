@@ -57,7 +57,8 @@ Open one of the .java files in Eclipse, click one of the launch buttons
 
 ## Commit policy
 
-If you finish something or finish a session and your code compiles and DOESN'T ANR, push it. Else, simply commit it and push when one of the above is true.
+Commit all you want. Generally I commit at the end of any coding session or when I finish something (e.g. a class or group of classes required to finish a feature)
+If you finish a feature, your code compiles and DOESN'T ANR, push it. 
 
 ## On the matter of TODOs
 

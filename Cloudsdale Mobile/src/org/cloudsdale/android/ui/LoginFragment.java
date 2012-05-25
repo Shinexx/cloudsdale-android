@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -40,7 +41,7 @@ import com.google.gson.Gson;
 public class LoginFragment extends SherlockFragment {
 
 	private final String		TAG			= "Cloudsdale LoginFragment";
-	private final String		FILENAME	= "AndroidSSO_data";
+	public final String			FILENAME	= "AndroidSSO_data";
 	public static Facebook		fb;
 	public static Gson			gson;
 
@@ -112,12 +113,11 @@ public class LoginFragment extends SherlockFragment {
 	 */
 	public void startFacebookAuthFlow() {
 		// Create the FB instance
-		if (fb == null) {
-			fb = new Facebook(getString(R.string.facebook_api_token));
-		}
+		fb = new Facebook(getString(R.string.facebook_api_token));
 
+		getActivity();
 		// Fetch stored SSO data
-		mPrefs = getActivity().getPreferences(getActivity().MODE_PRIVATE);
+		mPrefs = getActivity().getPreferences(FragmentActivity.MODE_PRIVATE);
 		String access_token = mPrefs.getString("access_token", null);
 		long expires = mPrefs.getLong("access_expires", 0);
 
@@ -131,8 +131,10 @@ public class LoginFragment extends SherlockFragment {
 		// Start the auth flow
 		if (!fb.isSessionValid()) {
 			fb.authorize(LoginFragment.this.getActivity(),
-					new String[] { "offline_access" },
+					new String[] {  },
 					LoginViewActivity.FACEBOOK_ACTIVITY_CODE, new FbListener());
+		} else {
+			startGraphRequest();
 		}
 	}
 
@@ -141,7 +143,7 @@ public class LoginFragment extends SherlockFragment {
 	 */
 	private void startGraphRequest() {
 		FbRunner runner = new FbRunner(LoginFragment.fb);
-		runner.request("me?fields=id", new FbAsyncListener());
+		runner.request("me", new FbAsyncListener());
 	}
 
 	/**
@@ -154,6 +156,11 @@ public class LoginFragment extends SherlockFragment {
 
 		@Override
 		public void onComplete(Bundle values) {
+			Log.d(TAG, values.toString());
+			SharedPreferences.Editor edit = mPrefs.edit();
+			edit.putString("access_token", fb.getAccessToken());
+			edit.putLong("access_expores", fb.getAccessExpires());
+			edit.commit();
 			Log.d(TAG, "Starting Facebook Auth");
 			startGraphRequest();
 		}
@@ -197,9 +204,7 @@ public class LoginFragment extends SherlockFragment {
 			FacebookResponse resp = gson.fromJson(response,
 					FacebookResponse.class);
 			if (resp.getId() == null) {
-				Looper.prepare();
-				fb.authorize(getActivity(), new FbListener());
-				return;
+				Log.d(TAG, "No Id in respose: " + response);
 			} else {
 				Log.d(TAG, "Facebook response: " + response);
 				Log.d(TAG, "Facebook access token: " + fb.getAccessToken());
