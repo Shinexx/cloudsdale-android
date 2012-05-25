@@ -3,23 +3,29 @@ package org.cloudsdale.android.ui;
 import java.util.ArrayList;
 
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
+import org.cloudsdale.android.authentication.LoginBundle;
+import org.cloudsdale.android.authentication.OAuthBundle;
+import org.cloudsdale.android.authentication.Provider;
 
+import twitter4j.TwitterException;
+import twitter4j.auth.AccessToken;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TabWidget;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.google.gson.Gson;
 
 /**
  * Controller for the login view
@@ -91,10 +97,10 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		
+
 		LoginFragment.fb.authorizeCallback(requestCode, resultCode, data);
 	}
-	
+
 	/**
 	 * This is a helper class that implements the management of tabs and all
 	 * details of connecting a ViewPager with associated TabHost. It relies on a
@@ -202,6 +208,31 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 
 		@Override
 		public void onPageScrollStateChanged(int state) {
+		}
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		Uri uri = intent.getData();
+		try {
+			String verifier = uri.getQueryParameter("oauth_verifier");
+			AccessToken accessToken = LoginFragment.twitter
+					.getOAuthAccessToken(LoginFragment.twitterRequestToken,
+							verifier);
+			String token = accessToken.getToken();
+			String secret = accessToken.getTokenSecret();
+			OAuthBundle auth = new OAuthBundle(Provider.TWITTER,
+					String.valueOf(LoginFragment.twitter.getId()),
+					getString(R.string.cloudsdale_auth_token));
+			LoginBundle bundle = new LoginBundle(null, null,
+					getString(R.string.cloudsdale_api_url) + "sessions",
+					getString(R.string.cloudsdale_auth_token), auth);
+			new CloudsdaleAsyncAuth().execute(bundle);
+		} catch (TwitterException e) {
+			Toast.makeText(this,
+					"There was an error with Twitter, please try again",
+					Toast.LENGTH_LONG);
 		}
 	}
 }

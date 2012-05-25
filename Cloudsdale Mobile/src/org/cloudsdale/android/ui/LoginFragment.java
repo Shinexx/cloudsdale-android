@@ -11,8 +11,13 @@ import org.cloudsdale.android.authentication.OAuthBundle;
 import org.cloudsdale.android.authentication.Provider;
 import org.cloudsdale.android.models.FacebookResponse;
 
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.RequestToken;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
@@ -43,6 +48,8 @@ public class LoginFragment extends SherlockFragment {
 	private final String		TAG			= "Cloudsdale LoginFragment";
 	public final String			FILENAME	= "AndroidSSO_data";
 	public static Facebook		fb;
+	public static Twitter		twitter;
+	public static RequestToken	twitterRequestToken;
 	public static Gson			gson;
 
 	private SharedPreferences	mPrefs;
@@ -91,7 +98,7 @@ public class LoginFragment extends SherlockFragment {
 			}
 		});
 
-		// Hand FB login by calling on FB SDK
+		// Handle FB login by calling on FB SDK
 		Button facebookButton = (Button) layout
 				.findViewById(R.id.loginViewFacebookButton);
 		facebookButton.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +106,17 @@ public class LoginFragment extends SherlockFragment {
 			@Override
 			public void onClick(View v) {
 				startFacebookAuthFlow();
+			}
+		});
+
+		// Handle Twitter login by calling on Twitter4J
+		Button twitterButton = (Button) layout
+				.findViewById(R.id.loginViewTwitterButton);
+		twitterButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				startTwitterAuthFlow();
 			}
 		});
 
@@ -130,8 +148,7 @@ public class LoginFragment extends SherlockFragment {
 
 		// Start the auth flow
 		if (!fb.isSessionValid()) {
-			fb.authorize(LoginFragment.this.getActivity(),
-					new String[] {  },
+			fb.authorize(LoginFragment.this.getActivity(), new String[] {},
 					LoginViewActivity.FACEBOOK_ACTIVITY_CODE, new FbListener());
 		} else {
 			startGraphRequest();
@@ -144,6 +161,22 @@ public class LoginFragment extends SherlockFragment {
 	private void startGraphRequest() {
 		FbRunner runner = new FbRunner(LoginFragment.fb);
 		runner.request("me", new FbAsyncListener());
+	}
+
+	private void startTwitterAuthFlow() {
+		try {
+			twitter = new TwitterFactory().getInstance();
+			twitter.setOAuthConsumer(getString(R.string.twitter_consumer_key),
+					getString(R.string.twitter_consumer_secret));
+			twitterRequestToken = twitter
+					.getOAuthRequestToken(getString(R.string.twitter_callback_url));
+			String authUrl = twitterRequestToken.getAuthenticationURL();
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(authUrl)));
+		} catch (TwitterException e) {
+			Toast.makeText(getActivity(),
+					"There was an error with Twitter, please try again",
+					Toast.LENGTH_LONG).show();
+		}
 	}
 
 	/**
@@ -251,27 +284,6 @@ public class LoginFragment extends SherlockFragment {
 					"There was an error with Facebook, please try again",
 					Toast.LENGTH_LONG).show();
 			Log.e(TAG, "Facebook Error: " + e.getMessage());
-		}
-
-	}
-
-	private class FbServiceListener implements Facebook.ServiceListener {
-
-		@Override
-		public void onComplete(Bundle values) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void onFacebookError(FacebookError e) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onError(Error e) {
-			// TODO Auto-generated method stub
-
 		}
 
 	}

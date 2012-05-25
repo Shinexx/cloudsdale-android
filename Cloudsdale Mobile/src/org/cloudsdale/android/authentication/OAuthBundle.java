@@ -32,9 +32,9 @@ public class OAuthBundle {
 	 * @see Object#toString()
 	 */
 	public String toString() {
-		return "{ \"oauth\": { \"provider\": \"" + provider + "\", \"uid\": \""
+		return "\"oauth\": { \"provider\": \"" + provider + "\", \"uid\": \""
 				+ uid + "\", \"token\": \"" + token + "\", \"client_type\": \""
-				+ clientType + "\" }}";
+				+ clientType + "\" }";
 	}
 
 	/**

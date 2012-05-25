@@ -16,5 +16,8 @@
     <string name="facebook_api_token">213007855430354</string>
     <string name="login_dialog_wait_string">Logging in...</string>
     <string name="facebook_graph_api_base_path">http://graph.facebook.com/</string>
+    <string name="twitter_consumer_key">mHnUVYK5NUfk0IHbqruZcA</string>
+    <string name="twitter_consumer_secret">Jlz13rBFDrPMKvr5EcWmNHaB6YwYHH1FCCASGFdOSkY</string>
+    <string name="twitter_callback_url">T4JOAuth://main</string>
 
 </resources>
