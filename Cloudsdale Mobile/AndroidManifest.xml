@@ -21,7 +21,6 @@
         android:theme="@style/Theme.CloudsdaleLight" >
         <activity
             android:name=".ui.LoginViewActivity"
-            android:configChanges="orientation"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

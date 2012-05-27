@@ -4,12 +4,14 @@ import org.cloudsdale.android.CloudsdaleMobileApplication;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
 import org.cloudsdale.android.authentication.LoginBundle;
+import org.cloudsdale.android.models.User;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
@@ -53,6 +55,15 @@ public class CloudsdaleLoginActivity extends SherlockActivity {
 	}
 
 	private class Auth extends CloudsdaleAsyncAuth {
+		@Override
+		protected void onCancelled(User result) {
+			super.onCancelled(result);
+			dialog.cancel();
+			Toast.makeText(CloudsdaleLoginActivity.this,
+					"There was an error logging in, please try again",
+					Toast.LENGTH_LONG).show();
+		}
+
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();

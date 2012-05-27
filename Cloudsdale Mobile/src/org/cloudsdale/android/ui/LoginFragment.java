@@ -9,7 +9,9 @@ import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
 import org.cloudsdale.android.authentication.LoginBundle;
 import org.cloudsdale.android.authentication.OAuthBundle;
 import org.cloudsdale.android.authentication.Provider;
+import org.cloudsdale.android.logic.PersistentData;
 import org.cloudsdale.android.models.FacebookResponse;
+import org.cloudsdale.android.models.User;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -21,7 +23,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,11 +48,13 @@ public class LoginFragment extends SherlockFragment {
 
 	private final String		TAG			= "Cloudsdale LoginFragment";
 	public final String			FILENAME	= "AndroidSSO_data";
+
 	public static Facebook		fb;
 	public static Twitter		twitter;
 	public static RequestToken	twitterRequestToken;
 	public static Gson			gson;
 
+	private LoginViewActivity	parent;
 	private SharedPreferences	mPrefs;
 
 	/**
@@ -69,6 +72,7 @@ public class LoginFragment extends SherlockFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		parent = (LoginViewActivity) getSherlockActivity();
 	}
 
 	/**
@@ -159,6 +163,7 @@ public class LoginFragment extends SherlockFragment {
 	 * Method to start the Facebook Graph request
 	 */
 	private void startGraphRequest() {
+		parent.showDialog();
 		FbRunner runner = new FbRunner(LoginFragment.fb);
 		runner.request("me", new FbAsyncListener());
 	}
@@ -189,12 +194,10 @@ public class LoginFragment extends SherlockFragment {
 
 		@Override
 		public void onComplete(Bundle values) {
-			Log.d(TAG, values.toString());
 			SharedPreferences.Editor edit = mPrefs.edit();
 			edit.putString("access_token", fb.getAccessToken());
 			edit.putLong("access_expores", fb.getAccessExpires());
 			edit.commit();
-			Log.d(TAG, "Starting Facebook Auth");
 			startGraphRequest();
 		}
 
@@ -203,7 +206,6 @@ public class LoginFragment extends SherlockFragment {
 			Toast.makeText(LoginFragment.this.getActivity(),
 					"There was an error with Facebook, please try again",
 					Toast.LENGTH_LONG).show();
-			Log.e(TAG, "Facebook Error: " + e.getMessage());
 		}
 
 		@Override
@@ -211,7 +213,6 @@ public class LoginFragment extends SherlockFragment {
 			Toast.makeText(LoginFragment.this.getActivity(),
 					"There was an error, please try again", Toast.LENGTH_LONG)
 					.show();
-			Log.e(TAG, "Error during Facebook login: " + e.getMessage());
 		}
 
 		@Override
@@ -237,18 +238,15 @@ public class LoginFragment extends SherlockFragment {
 			FacebookResponse resp = gson.fromJson(response,
 					FacebookResponse.class);
 			if (resp.getId() == null) {
-				Log.d(TAG, "No Id in respose: " + response);
+				// TODO Handle failed FB response
 			} else {
-				Log.d(TAG, "Facebook response: " + response);
-				Log.d(TAG, "Facebook access token: " + fb.getAccessToken());
 				OAuthBundle bundle = new OAuthBundle(Provider.FACEBOOK,
 						resp.getId(), getString(R.string.cloudsdale_auth_token));
 				Looper.prepare();
 				LoginBundle lBundle = new LoginBundle(null, null,
 						getString(R.string.cloudsdale_api_url) + "sessions",
 						getString(R.string.cloudsdale_auth_token), bundle);
-				new Auth().execute(new LoginBundle[] { lBundle });
-				Log.d(TAG, "Facebook auth Completed");
+				parent.getAuth().execute(new LoginBundle[] { lBundle });
 			}
 		}
 
@@ -257,7 +255,6 @@ public class LoginFragment extends SherlockFragment {
 			Toast.makeText(LoginFragment.this.getActivity(),
 					"There was an error, please try again", Toast.LENGTH_LONG)
 					.show();
-			Log.e(TAG, "IO Exception: " + e.getMessage());
 		}
 
 		@Override
@@ -266,7 +263,6 @@ public class LoginFragment extends SherlockFragment {
 			Toast.makeText(LoginFragment.this.getActivity(),
 					"There was an error, please try again", Toast.LENGTH_LONG)
 					.show();
-			Log.e(TAG, "FileNotFound Exception: " + e.getMessage());
 		}
 
 		@Override
@@ -275,7 +271,6 @@ public class LoginFragment extends SherlockFragment {
 			Toast.makeText(LoginFragment.this.getActivity(),
 					"There was an error, please try again", Toast.LENGTH_LONG)
 					.show();
-			Log.e(TAG, "MalformedURL Exception: " + e.getMessage());
 		}
 
 		@Override
@@ -283,7 +278,6 @@ public class LoginFragment extends SherlockFragment {
 			Toast.makeText(LoginFragment.this.getActivity(),
 					"There was an error with Facebook, please try again",
 					Toast.LENGTH_LONG).show();
-			Log.e(TAG, "Facebook Error: " + e.getMessage());
 		}
 
 	}
@@ -302,10 +296,4 @@ public class LoginFragment extends SherlockFragment {
 
 	}
 
-	private class Auth extends CloudsdaleAsyncAuth {
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-		}
-	}
 }

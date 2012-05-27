@@ -7,24 +7,32 @@ import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
 import org.cloudsdale.android.authentication.LoginBundle;
 import org.cloudsdale.android.authentication.OAuthBundle;
 import org.cloudsdale.android.authentication.Provider;
+import org.cloudsdale.android.logic.PersistentData;
+import org.cloudsdale.android.models.User;
 
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 /**
@@ -40,6 +48,9 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 	TabHost						mTabHost;
 	ViewPager					mViewPager;
 	TabsAdapter					mTabsAdapter;
+
+	private ProgressDialog		progress;
+	private Auth				auth;
 
 	/**
 	 * Lifetime method for the creation of the controller
@@ -74,15 +85,6 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 	}
 
 	/**
-	 * Handle configuration (e.g. screen orientation) changes
-	 */
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-
-	}
-
-	/**
 	 * Keep track of the current tab
 	 */
 	@Override
@@ -99,6 +101,47 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		LoginFragment.fb.authorizeCallback(requestCode, resultCode, data);
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		Uri uri = intent.getData();
+		try {
+			String verifier = uri.getQueryParameter("oauth_verifier");
+			AccessToken accessToken = LoginFragment.twitter
+					.getOAuthAccessToken(LoginFragment.twitterRequestToken,
+							verifier);
+			String token = accessToken.getToken();
+			String secret = accessToken.getTokenSecret();
+			OAuthBundle auth = new OAuthBundle(Provider.TWITTER,
+					String.valueOf(LoginFragment.twitter.getId()),
+					getString(R.string.cloudsdale_auth_token));
+			LoginBundle bundle = new LoginBundle(null, null,
+					getString(R.string.cloudsdale_api_url) + "sessions",
+					getString(R.string.cloudsdale_auth_token), auth);
+			new CloudsdaleAsyncAuth().execute(bundle);
+		} catch (TwitterException e) {
+			Toast.makeText(this,
+					"There was an error with Twitter, please try again",
+					Toast.LENGTH_LONG);
+		}
+	}
+
+	public Auth getAuth() {
+		auth = new Auth();
+		return auth;
+	}
+
+	public void showDialog() {
+		progress = ProgressDialog.show(this, "",
+				getString(R.string.login_dialog_wait_string));
+	}
+
+	public void cancelDialog() {
+		if (progress.isShowing()) {
+			progress.dismiss();
+		}
 	}
 
 	/**
@@ -211,28 +254,29 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 		}
 	}
 
-	@Override
-	protected void onNewIntent(Intent intent) {
-		super.onNewIntent(intent);
-		Uri uri = intent.getData();
-		try {
-			String verifier = uri.getQueryParameter("oauth_verifier");
-			AccessToken accessToken = LoginFragment.twitter
-					.getOAuthAccessToken(LoginFragment.twitterRequestToken,
-							verifier);
-			String token = accessToken.getToken();
-			String secret = accessToken.getTokenSecret();
-			OAuthBundle auth = new OAuthBundle(Provider.TWITTER,
-					String.valueOf(LoginFragment.twitter.getId()),
-					getString(R.string.cloudsdale_auth_token));
-			LoginBundle bundle = new LoginBundle(null, null,
-					getString(R.string.cloudsdale_api_url) + "sessions",
-					getString(R.string.cloudsdale_auth_token), auth);
-			new CloudsdaleAsyncAuth().execute(bundle);
-		} catch (TwitterException e) {
-			Toast.makeText(this,
-					"There was an error with Twitter, please try again",
+	class Auth extends CloudsdaleAsyncAuth {
+
+		@Override
+		protected void onCancelled(User result) {
+			super.onCancelled(result);
+			Toast.makeText(LoginViewActivity.this,
+					"There was an error logging in, please try again",
 					Toast.LENGTH_LONG);
+
+			cancelDialog();
+		}
+
+		@Override
+		protected void onPostExecute(User result) {
+			if (result != null) {
+				PersistentData.setMe(result);
+			} else {
+				Toast.makeText(LoginViewActivity.this,
+						"There was an error, please try again",
+						Toast.LENGTH_LONG);
+			}
+
+			cancelDialog();
 		}
 	}
 }

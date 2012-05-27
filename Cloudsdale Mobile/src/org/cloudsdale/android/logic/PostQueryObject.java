@@ -12,6 +12,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -60,6 +61,39 @@ public class PostQueryObject {
 
 			// Set the POST data
 			httpPost.setEntity(new UrlEncodedFormEntity(entitiyValues));
+		} catch (UnsupportedEncodingException e) {
+			Log.e(TAG, e.getMessage());
+		}
+	}
+
+	/**
+	 * Overload Constructor
+	 * 
+	 * @param json
+	 *            The json representation of the object to send
+	 * @param postUrl
+	 *            The url that's being posted to
+	 */
+	public PostQueryObject(String json, String postUrl, String internalToken) {
+		try {
+			// Create parameters for connection including 3sec timeout
+			// on connection and 5sec timeout on socket
+			httpParams = new BasicHttpParams();
+			int timeoutConnection = 3000;
+			int timeoutSocket = 5000;
+
+			// Set the timeouts
+			HttpConnectionParams.setConnectionTimeout(httpParams,
+					timeoutConnection);
+			HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
+			httpClient = new DefaultHttpClient(httpParams);
+
+			// Create the data entities
+			httpPost = new HttpPost(postUrl);
+
+			// Set the POST data
+			httpPost.setHeader("Content-type", "application/json");
+			httpPost.setEntity(new StringEntity(json));
 		} catch (UnsupportedEncodingException e) {
 			Log.e(TAG, e.getMessage());
 		}

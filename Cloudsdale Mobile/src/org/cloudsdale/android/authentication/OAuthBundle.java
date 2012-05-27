@@ -24,17 +24,8 @@ public class OAuthBundle {
 	public OAuthBundle(Provider provider, String uid, String token) {
 		this.provider = provider.toString();
 		this.uid = uid;
-		this.token = token;
+		this.token = BCrypt.hashpw(uid + provider.toString(), token);
 		clientType = CLIENT_TYPE;
-	}
-
-	/**
-	 * @see Object#toString()
-	 */
-	public String toString() {
-		return "\"oauth\": { \"provider\": \"" + provider + "\", \"uid\": \""
-				+ uid + "\", \"token\": \"" + token + "\", \"client_type\": \""
-				+ clientType + "\" }";
 	}
 
 	/**
