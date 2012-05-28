@@ -9,6 +9,8 @@ import org.cloudsdale.android.authentication.OAuthBundle;
 import org.cloudsdale.android.authentication.Provider;
 import org.cloudsdale.android.logic.PersistentData;
 import org.cloudsdale.android.models.User;
+import org.cloudsdale.android.ui.fragments.LoginFragment;
+import org.cloudsdale.android.ui.fragments.RegisterAccountFragment;
 
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
@@ -254,7 +256,7 @@ public class LoginViewActivity extends SherlockFragmentActivity {
 		}
 	}
 
-	class Auth extends CloudsdaleAsyncAuth {
+	public class Auth extends CloudsdaleAsyncAuth {
 
 		@Override
 		protected void onCancelled(User result) {

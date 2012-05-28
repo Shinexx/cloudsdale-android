@@ -1,17 +1,16 @@
-package org.cloudsdale.android.ui;
+package org.cloudsdale.android.ui.fragments;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
 import org.cloudsdale.android.authentication.LoginBundle;
 import org.cloudsdale.android.authentication.OAuthBundle;
 import org.cloudsdale.android.authentication.Provider;
-import org.cloudsdale.android.logic.PersistentData;
 import org.cloudsdale.android.models.FacebookResponse;
-import org.cloudsdale.android.models.User;
+import org.cloudsdale.android.ui.CloudsdaleLoginActivity;
+import org.cloudsdale.android.ui.LoginViewActivity;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -46,6 +45,7 @@ import com.google.gson.Gson;
  */
 public class LoginFragment extends SherlockFragment {
 
+	@SuppressWarnings("unused")
 	private final String		TAG			= "Cloudsdale LoginFragment";
 	public final String			FILENAME	= "AndroidSSO_data";
 
@@ -116,6 +116,7 @@ public class LoginFragment extends SherlockFragment {
 		// Handle Twitter login by calling on Twitter4J
 		Button twitterButton = (Button) layout
 				.findViewById(R.id.loginViewTwitterButton);
+		twitterButton.setEnabled(false);
 		twitterButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override

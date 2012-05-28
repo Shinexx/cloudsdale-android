@@ -29,7 +29,7 @@ public class CloudsdaleLoginActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 
 		// Data bind the view objects
-		setContentView(R.layout.cloudsdale_login_fields);
+		setContentView(R.layout.login_view_cloudsdale_fields);
 		usernameField = (EditText) findViewById(R.id.cloudsdaleLoginUsernameField);
 		passwordField = (EditText) findViewById(R.id.cloudsdaleLoginPasswordField);
 		submitButton = (Button) findViewById(R.id.cloudsdaleLoginSubmitButton);

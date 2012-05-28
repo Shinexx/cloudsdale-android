@@ -1,4 +1,4 @@
-package org.cloudsdale.android.ui;
+package org.cloudsdale.android.ui.fragments;
 
 import org.cloudsdale.android.R;
 
@@ -56,6 +56,7 @@ public class RegisterAccountFragment extends SherlockFragment {
 				String screenName = screennameField.getText().toString();
 
 				// TODO Implement registration logic
+				
 				Toast.makeText(v.getContext(), "Registration not availible",
 						Toast.LENGTH_LONG).show();
 			}
