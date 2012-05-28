@@ -7,6 +7,7 @@ import org.cloudsdale.android.authentication.LoginBundle;
 import org.cloudsdale.android.models.User;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -54,6 +55,15 @@ public class CloudsdaleLoginActivity extends SherlockActivity {
 		});
 	}
 
+	/**
+	 * Helper method to forward the app to the main view activity
+	 */
+	private void forwardToMainView() {
+		Intent intent = new Intent();
+		intent.setClass(this, MainViewActivity.class);
+		startActivity(intent);
+	}
+
 	private class Auth extends CloudsdaleAsyncAuth {
 		@Override
 		protected void onCancelled(User result) {
@@ -73,6 +83,14 @@ public class CloudsdaleLoginActivity extends SherlockActivity {
 			dialog.setIndeterminate(true);
 			dialog.setCancelable(false);
 			dialog.show();
+		}
+
+		@Override
+		protected void onPostExecute(User result) {
+			super.onPostExecute(result);
+
+			dialog.dismiss();
+			forwardToMainView();
 		}
 	}
 }
