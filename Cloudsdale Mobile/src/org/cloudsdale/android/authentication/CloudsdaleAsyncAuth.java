@@ -31,7 +31,6 @@ import com.google.gson.JsonSyntaxException;
 public class CloudsdaleAsyncAuth extends AsyncTask<LoginBundle, String, User> {
 
 	public static final String	TAG	= "Cloudsdale AsyncAuth";
-	protected ProgressDialog	dialog;
 	protected Gson				gson;
 
 	public String stripHtml(String html) {
@@ -112,12 +111,4 @@ public class CloudsdaleAsyncAuth extends AsyncTask<LoginBundle, String, User> {
 		return null;
 	}
 
-	@Override
-	protected void onPostExecute(User result) {
-		super.onPostExecute(result);
-		PersistentData.setMe(result);
-		if (dialog != null) {
-			dialog.dismiss();
-		}
-	}
 }
