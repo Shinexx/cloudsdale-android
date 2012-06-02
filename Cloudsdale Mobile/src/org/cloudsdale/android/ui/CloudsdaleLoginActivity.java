@@ -68,28 +68,15 @@ public class CloudsdaleLoginActivity extends SherlockActivity {
 		@Override
 		protected void onCancelled(User result) {
 			super.onCancelled(result);
-			dialog.cancel();
 			Toast.makeText(CloudsdaleLoginActivity.this,
 					"There was an error logging in, please try again",
 					Toast.LENGTH_LONG).show();
 		}
 
 		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			dialog = new ProgressDialog(CloudsdaleLoginActivity.this);
-			dialog.setMessage(CloudsdaleMobileApplication.getContext()
-					.getString(R.string.login_dialog_wait_string));
-			dialog.setIndeterminate(true);
-			dialog.setCancelable(false);
-			dialog.show();
-		}
-
-		@Override
 		protected void onPostExecute(User result) {
 			super.onPostExecute(result);
 
-			dialog.dismiss();
 			forwardToMainView();
 		}
 	}
