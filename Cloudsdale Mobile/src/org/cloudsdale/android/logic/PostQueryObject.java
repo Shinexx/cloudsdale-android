@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -27,12 +28,12 @@ import android.util.Log;
  * 
  */
 public class PostQueryObject {
-	public static final String	TAG	= "Cloudsdale PostQueryObject";
+	public static final String TAG = "Cloudsdale PostQueryObject";
 
-	protected HttpParams		httpParams;
-	protected HttpPost			httpPost;
-	protected HttpClient		httpClient;
-	protected HttpResponse		httpResponse;
+	protected HttpParams httpParams;
+	protected HttpPost httpPost;
+	protected HttpClient httpClient;
+	protected HttpResponse httpResponse;
 
 	/**
 	 * Constructor
@@ -44,23 +45,22 @@ public class PostQueryObject {
 	 */
 	public PostQueryObject(List<NameValuePair> entitiyValues, String postUrl) {
 		try {
-			// Create parameters for connection including 3sec timeout
-			// on connection and 5sec timeout on socket
+			// Create the data entity
+			httpPost = new HttpPost(postUrl);
+
+			// Set the POST data
+			httpPost.setEntity(new UrlEncodedFormEntity(entitiyValues));
+
+			// Timeout params in millis
 			httpParams = new BasicHttpParams();
-			int timeoutConnection = 3000;
-			int timeoutSocket = 5000;
+			int timeoutConnection = 30000;
+			int timeoutSocket = 30000;
 
 			// Set the timeouts
 			HttpConnectionParams.setConnectionTimeout(httpParams,
 					timeoutConnection);
 			HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
 			httpClient = new DefaultHttpClient(httpParams);
-
-			// Create the data entities
-			httpPost = new HttpPost(postUrl);
-
-			// Set the POST data
-			httpPost.setEntity(new UrlEncodedFormEntity(entitiyValues));
 		} catch (UnsupportedEncodingException e) {
 			Log.e(TAG, e.getMessage());
 		}
@@ -76,24 +76,24 @@ public class PostQueryObject {
 	 */
 	public PostQueryObject(String json, String postUrl, String internalToken) {
 		try {
-			// Create parameters for connection including 3sec timeout
-			// on connection and 5sec timeout on socket
-			httpParams = new BasicHttpParams();
-			int timeoutConnection = 3000;
-			int timeoutSocket = 5000;
-
-			// Set the timeouts
-			HttpConnectionParams.setConnectionTimeout(httpParams,
-					timeoutConnection);
-			HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
-			httpClient = new DefaultHttpClient(httpParams);
-
 			// Create the data entities
 			httpPost = new HttpPost(postUrl);
 
 			// Set the POST data
 			httpPost.setHeader("Content-type", "application/json");
 			httpPost.setEntity(new StringEntity(json));
+
+			// Create parameters for connection including 3sec timeout
+			// on connection and 5sec timeout on socket
+			httpParams = new BasicHttpParams();
+			int timeoutConnection = 30000;
+			int timeoutSocket = 30000;
+
+			// Set the timeouts
+			HttpConnectionParams.setConnectionTimeout(httpParams,
+					timeoutConnection);
+			HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
+			httpClient = new DefaultHttpClient(httpParams);
 		} catch (UnsupportedEncodingException e) {
 			Log.e(TAG, e.getMessage());
 		}
@@ -117,9 +117,10 @@ public class PostQueryObject {
 
 			return builder.toString();
 		} catch (ClientProtocolException e) {
-			Log.e(TAG, "Protocol Exception " + e.getMessage());
+			Log.e(TAG, "Protocol Exception: " + e.getMessage());
 		} catch (IOException e) {
-			Log.e(TAG, "IO Exception " + e.getMessage());
+			Log.e(TAG, "IO Exception: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		return null;

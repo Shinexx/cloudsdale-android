@@ -6,7 +6,6 @@ import java.util.Calendar;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**

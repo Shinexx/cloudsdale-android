@@ -6,3 +6,5 @@ username
 url
 auth
 async
+json
+serializer

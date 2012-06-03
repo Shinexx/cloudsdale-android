@@ -1,22 +1,19 @@
 package org.cloudsdale.android.authentication;
 
-import java.net.NetPermission;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.cloudsdale.android.annotations.GsonIgnoreExclusionStrategy;
-import org.cloudsdale.android.logic.PersistentData;
 import org.cloudsdale.android.logic.PostQueryObject;
 import org.cloudsdale.android.models.LoginResponse;
 import org.cloudsdale.android.models.User;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,9 +43,9 @@ public class CloudsdaleAsyncAuth extends AsyncTask<LoginBundle, String, User> {
 				String[].class));
 		Gson gson = gb.create();
 
+		// Create the post object
 		PostQueryObject post = null;
-
-		// Set POST data
+		
 		// Set entity data
 		if (params[0].getUsernameInput() != null
 				&& params[0].getPasswordInput() != null) {
@@ -106,6 +103,7 @@ public class CloudsdaleAsyncAuth extends AsyncTask<LoginBundle, String, User> {
 			Log.e(TAG, "Illegal state: " + e.getMessage());
 		} catch (Exception e) {
 			cancel(true);
+			Log.e(TAG, "Exception: " + e.getMessage());
 		}
 
 		return null;

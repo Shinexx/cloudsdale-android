@@ -6,7 +6,7 @@
     android:weightSum="1.0" >
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/login_view_logo"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
@@ -18,39 +18,59 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.8" >
+        android:layout_weight="0.8"
+        android:orientation="vertical" >
 
-        <TabHost
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@android:id/tabhost"
+        <EditText
+            android:id="@+id/login_email_field"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="36dp"
+            android:layout_margin="6dp"
+            android:ems="10"
+            android:hint="@string/login_view_email_hint"
+            android:inputType="textEmailAddress" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical" >
+        <EditText
+            android:id="@+id/login_password_field"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_margin="6dp"
+            android:ems="10"
+            android:hint="@string/login_view_password_hint"
+            android:inputType="textPassword" />
 
-                <TabWidget
-                    android:id="@android:id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:orientation="horizontal" />
+        <Button
+            android:id="@+id/login_view_cd_button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="6dp"
+            android:text="@string/login_view_login_button_text" />
 
-                <FrameLayout
-                    android:id="@android:id/tabcontent"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="0" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1" >
 
-                <android.support.v4.view.ViewPager
-                    android:id="@+id/pager"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-            </LinearLayout>
-        </TabHost>
+            <Button
+                android:id="@+id/login_view_fb_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="6dp"
+                android:layout_weight=".5"
+                android:text="@string/login_view_facebook_button_text" />
+
+            <Button
+                android:id="@+id/login_view_twitter_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="6dp"
+                android:layout_weight=".5"
+                android:text="@string/login_view_twitter_button_text" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
