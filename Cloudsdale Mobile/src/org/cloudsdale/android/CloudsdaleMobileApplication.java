@@ -1,6 +1,7 @@
 package org.cloudsdale.android;
 
 import org.cloudsdale.android.logic.PersistentData;
+import com.bugsense.trace.BugSenseHandler;
 
 import android.app.Application;
 import android.content.Context;
