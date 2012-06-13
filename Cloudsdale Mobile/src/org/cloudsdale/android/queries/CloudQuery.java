@@ -1,8 +1,9 @@
-package org.cloudsdale.android.logic;
+package org.cloudsdale.android.queries;
 
 import java.util.ArrayList;
 
 import org.apache.http.NameValuePair;
+import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.models.Cloud;
 import org.cloudsdale.android.models.Response;
 
@@ -43,7 +44,7 @@ public class CloudQuery extends AsyncTask<String, Void, Cloud[]> {
 		super.onPostExecute(result);
 
 		for (Cloud c : result) {
-			PersistentData.storeCloud(c);
+			// Store the cloud
 		}
 	}
 }

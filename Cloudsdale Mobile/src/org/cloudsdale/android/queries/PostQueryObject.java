@@ -1,4 +1,4 @@
-package org.cloudsdale.android.logic;
+package org.cloudsdale.android.queries;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class PostQueryObject {
 	 * @param postUrl
 	 *            The url that's being posted to
 	 */
-	public PostQueryObject(String json, String postUrl, String internalToken) {
+	public PostQueryObject(String json, String postUrl) {
 		try {
 			// Create the data entities
 			httpPost = new HttpPost(postUrl);

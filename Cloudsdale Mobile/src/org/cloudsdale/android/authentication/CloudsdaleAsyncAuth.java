@@ -1,15 +1,14 @@
 package org.cloudsdale.android.authentication;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.cloudsdale.android.annotations.GsonIgnoreExclusionStrategy;
-import org.cloudsdale.android.logic.PostQueryObject;
 import org.cloudsdale.android.models.LoginResponse;
 import org.cloudsdale.android.models.User;
+import org.cloudsdale.android.queries.PostQueryObject;
 
 import android.os.AsyncTask;
 import android.text.Html;
@@ -60,8 +59,7 @@ public class CloudsdaleAsyncAuth extends AsyncTask<LoginBundle, String, User> {
 			String oAuthJson = " { \"oauth\": "
 					+ gson.toJson(params[0].getoAuthBundle(), OAuthBundle.class)
 					+ "}";
-			post = new PostQueryObject(oAuthJson, params[0].getLoginUrl(),
-					params[0].getAuthToken());
+			post = new PostQueryObject(oAuthJson, params[0].getLoginUrl());
 			Log.d(TAG, oAuthJson);
 		}
 

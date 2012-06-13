@@ -1,15 +1,23 @@
 package org.cloudsdale.android.ui;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
 import org.cloudsdale.android.authentication.LoginBundle;
-import org.cloudsdale.android.logic.PersistentData;
+import org.cloudsdale.android.authentication.OAuthBundle;
+import org.cloudsdale.android.authentication.Provider;
+import org.cloudsdale.android.models.FacebookResponse;
 import org.cloudsdale.android.models.User;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,10 +26,11 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.bugsense.trace.BugSenseHandler;
+import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
+import com.google.gson.Gson;
 
 /**
  * Controller for the login view
@@ -42,8 +51,7 @@ public class LoginActivity extends SherlockActivity {
 	private Button twitterButton;
 	private ProgressDialog progress;
 
-	private Facebook facebook = new Facebook(
-			getString(R.string.facebook_api_token));
+	private Facebook facebook;
 	private SharedPreferences mPrefs;
 
 	/**
@@ -56,12 +64,13 @@ public class LoginActivity extends SherlockActivity {
 
 		// Hide the Cloudsdale text in the ActionBar
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
 
 		// Set the layout
 		setContentView(R.layout.login_view);
 
-		// Setup BugSense
-		BugSenseHandler.setup(this, "2bccbeb2");
+		// Instantiate the Facebook client
+		facebook = new Facebook(getString(R.string.facebook_api_token));
 
 		// Bind the data entities
 		emailField = (EditText) findViewById(R.id.login_email_field);
@@ -131,8 +140,31 @@ public class LoginActivity extends SherlockActivity {
 
 		// Only call auth if access has expired
 		if (!facebook.isSessionValid()) {
-			facebook.authorize(this, new String[] { "email" }, new FbDialogListener());
+			facebook.authorize(this, new String[] { "email" }, new FbListener());
 		}
+
+		// Start CD Auth flow
+		startCdAuthFromFb();
+	}
+
+	public void startCdAuthFromFb() {
+		// Show the dialog
+		showDialog();
+
+		// Get the user's uid from FB
+		FbAsyncRunner runner = new FbAsyncRunner(facebook);
+		runner.request("me", new Bundle(), new FbAsyncListener());
+	}
+
+	public void sendFbCredentials(LoginBundle bundle) {
+		Auth auth = new Auth();
+		auth.execute(bundle);
+
+		while (auth.getStatus() == AsyncTask.Status.RUNNING) {
+			continue;
+		}
+
+		cancelDialog();
 	}
 
 	public void showDialog() {
@@ -157,28 +189,26 @@ public class LoginActivity extends SherlockActivity {
 		@Override
 		protected void onCancelled(User result) {
 			super.onCancelled(result);
+			LoginActivity.this.cancelDialog();
 			Toast.makeText(LoginActivity.this,
 					"There was an error logging in, please try again",
 					Toast.LENGTH_LONG);
-
-			cancelDialog();
 		}
 
 		@Override
 		protected void onPostExecute(User result) {
+			LoginActivity.this.cancelDialog();
 			if (result != null) {
-				PersistentData.setMe(result);
+				// Preserve the "me" user
 			} else {
 				Toast.makeText(LoginActivity.this,
 						"There was an error, please try again",
 						Toast.LENGTH_LONG);
 			}
-
-			cancelDialog();
 		}
 	}
 
-	public class FbDialogListener implements Facebook.DialogListener {
+	private class FbListener implements Facebook.DialogListener {
 
 		@Override
 		public void onComplete(Bundle values) {
@@ -200,6 +230,57 @@ public class LoginActivity extends SherlockActivity {
 
 		@Override
 		public void onCancel() {
+
+		}
+
+	}
+
+	private class FbAsyncRunner extends AsyncFacebookRunner {
+
+		public FbAsyncRunner(Facebook fb) {
+			super(fb);
+		}
+
+	}
+
+	private class FbAsyncListener implements
+			AsyncFacebookRunner.RequestListener {
+
+		@Override
+		public void onComplete(String response, Object state) {
+			Looper.prepare();
+			Gson gson = new Gson();
+			FacebookResponse fbr = gson.fromJson(response,
+					FacebookResponse.class);
+			String id = fbr.getId();
+			OAuthBundle oAuth = new OAuthBundle(Provider.FACEBOOK, id,
+					getString(R.string.cloudsdale_auth_token));
+			LoginBundle bundle = new LoginBundle(null, null,
+					getString(R.string.cloudsdale_api_url) + "sessions",
+					getString(R.string.cloudsdale_auth_token), oAuth);
+
+			sendFbCredentials(bundle);
+		}
+
+		@Override
+		public void onIOException(IOException e, Object state) {
+
+		}
+
+		@Override
+		public void onFileNotFoundException(FileNotFoundException e,
+				Object state) {
+
+		}
+
+		@Override
+		public void onMalformedURLException(MalformedURLException e,
+				Object state) {
+
+		}
+
+		@Override
+		public void onFacebookError(FacebookError e, Object state) {
 
 		}
 

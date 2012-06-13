@@ -20,5 +20,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="C:/Users/loki/Documents/GitHub/Cloudsdale-Android/Assets/bugsense-trace1-1-3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/zubhiumsdk.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
