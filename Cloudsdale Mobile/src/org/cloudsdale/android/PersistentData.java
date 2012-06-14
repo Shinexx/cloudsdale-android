@@ -9,7 +9,9 @@ import java.io.IOException;
 
 import org.cloudsdale.android.models.User;
 
+import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -23,6 +25,8 @@ import com.google.gson.Gson;
  */
 public class PersistentData {
 	
+	private final static String TAG = "Persistant Data";
+
 	/**
 	 * Gets the proper external storage location according to the systems API
 	 * level
@@ -30,7 +34,7 @@ public class PersistentData {
 	 * @return Null unless the external media is mounted and writable, then a
 	 *         file representing the directory of the external app storage
 	 */
-	public static File getExternalStorage() {
+	public static File getExternalStorage(Context context) {
 		File externalDir = null;
 		boolean externalAvailible;
 		boolean externalWriteable;
@@ -50,22 +54,34 @@ public class PersistentData {
 
 		if (externalAvailible && externalWriteable) {
 			if (android.os.Build.VERSION.SDK_INT >= 8) {
-				externalDir = Cloudsdale.getContext().getExternalFilesDir(null);
+				externalDir = context.getExternalFilesDir(null);
 			} else {
 				externalDir = Environment.getExternalStorageDirectory();
 			}
 		}
 
+		// Create the app folder if it doesn't exist
+		if(!externalDir.exists()) {
+			externalDir.mkdir();
+		}
+		
 		return externalDir;
 	}
 
 	/**
 	 * Store the logged in user to the external flat file system
-	 * @param me The logged in user
+	 * 
+	 * @param me
+	 *            The logged in user
 	 */
-	public static void StoreMe(User me) {
+	public static void StoreMe(User me, Context context) {
 		try {
-			File external = new File(getExternalStorage().getCanonicalPath() + "me");
+			File external = new File(getExternalStorage(context) + "/me");
+			if (!external.exists()) {
+				external.createNewFile();
+			}
+			
+			// Serialize and store the user
 			Gson gson = new Gson();
 			BufferedWriter bw = new BufferedWriter(new FileWriter(external));
 			bw.write(gson.toJson(me));
@@ -75,25 +91,30 @@ public class PersistentData {
 			e.printStackTrace();
 		}
 	}
-	
-	public static User getMe() {
+
+	public static User getMe(Context context) {
 		User me = null;
 		File external;
-		
+
 		try {
-			external = new File(getExternalStorage() + "me");
-			if(!external.exists()) { return me; }
+			Log.d(TAG, getExternalStorage(context) + "/me");
+			external = new File(getExternalStorage(context) + "/me");
+			if (!external.exists()) {
+				return me;
+			}
+			
+			// Deserialize the user
 			Gson gson = new Gson();
 			BufferedReader br = new BufferedReader(new FileReader(external));
 			String json = br.readLine();
 			br.close();
-			
+
 			me = gson.fromJson(json, User.class);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return me;
 	}
 }

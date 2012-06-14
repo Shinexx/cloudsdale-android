@@ -5,7 +5,6 @@ import org.cloudsdale.android.ui.MainViewActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bugsense.trace.BugSenseHandler;
@@ -27,9 +26,7 @@ public class StartActivity extends SherlockActivity {
 				getApplicationContext(), "65de0ea209fa414beee8518bd08b05");
 		sdk.enableCrashReporting(true);
 		
-		Log.d("Start", String.valueOf(PersistentData.getMe() != null));
-		
-		if(PersistentData.getMe() != null) {
+		if(PersistentData.getMe(this) != null) {
 			Intent intent = new Intent();
 			intent.setClass(this, MainViewActivity.class);
 			startActivity(intent);

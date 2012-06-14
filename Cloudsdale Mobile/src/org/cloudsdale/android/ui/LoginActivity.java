@@ -4,6 +4,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import oauth.signpost.OAuthProvider;
+import oauth.signpost.basic.DefaultOAuthProvider;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+
+import org.apache.http.protocol.HTTP;
+import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
 import org.cloudsdale.android.authentication.LoginBundle;
@@ -15,9 +21,11 @@ import org.cloudsdale.android.models.User;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,11 +34,17 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.bugsense.trace.BugSenseHandler;
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.google.gson.Gson;
+import com.zubhium.ZubhiumSDK;
+import com.zubhium.utils.ZubhiumBase;
+import com.zubhium.utils.ZubhiumCrashReporter;
+import com.zubhium.utils.ZubhiumError;
+import com.zubhium.utils.ZubhiumUtils;
 
 /**
  * Controller for the login view
@@ -42,7 +56,9 @@ public class LoginActivity extends SherlockActivity {
 	public static final String TAG = "Cloudsdale LoginViewActivity";
 	public static final int FACEBOOK_ACTIVITY_CODE = 10298;
 
+	@SuppressWarnings("unused")
 	private static final String FILENAME = "AndroidSSO_data";
+	private static final String CALLBACKURL = "app://twitter";
 
 	private EditText emailField;
 	private EditText passwordField;
@@ -53,6 +69,8 @@ public class LoginActivity extends SherlockActivity {
 
 	private Facebook facebook;
 	private SharedPreferences mPrefs;
+	private CommonsHttpOAuthConsumer httpOauthConsumer;
+	private OAuthProvider httpOauthProvider;
 
 	/**
 	 * Lifetime method for the creation of the controller
@@ -60,11 +78,12 @@ public class LoginActivity extends SherlockActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// SET THEMES HERE
-		super.onCreate(savedInstanceState);
 
-		// Hide the Cloudsdale text in the ActionBar
+		// Hide the Cloudsdale text and icon in the ActionBar
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
+
+		super.onCreate(savedInstanceState);
 
 		// Set the layout
 		setContentView(R.layout.login_view);
@@ -105,6 +124,14 @@ public class LoginActivity extends SherlockActivity {
 			}
 		});
 
+		// Set the Twitter button listener
+		twitterButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				startTwitterAuthFlow();
+			}
+		});
 	}
 
 	@Override
@@ -124,6 +151,33 @@ public class LoginActivity extends SherlockActivity {
 
 		// Callback to Facebook
 		facebook.authorizeCallback(requestCode, resultCode, data);
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+
+		Uri uri = intent.getData();
+		showDialog();
+
+		// Handle twitter login when url is for Twitter
+		if (uri != null && uri.toString().startsWith(CALLBACKURL)) {
+			String verifier = uri
+					.getQueryParameter(oauth.signpost.OAuth.OAUTH_VERIFIER);
+			
+			try {
+				httpOauthProvider.retrieveAccessToken(httpOauthConsumer, verifier);
+				String userKey = httpOauthConsumer.getToken();
+				String userSecret = httpOauthConsumer.getTokenSecret();
+				
+				Log.d(TAG, "User key: " + userKey);
+				Log.d(TAG, "User secret: " + userSecret);
+				// Do CD login stuff here
+			} catch (Exception e) {
+				Toast.makeText(this, "There was an error, please try again", Toast.LENGTH_LONG).show();
+				BugSenseHandler.log(TAG, e);
+			}
+		}
 	}
 
 	public void startFbAuthFlow() {
@@ -167,6 +221,27 @@ public class LoginActivity extends SherlockActivity {
 		cancelDialog();
 	}
 
+	public void startTwitterAuthFlow() {
+		try {
+			httpOauthConsumer = new CommonsHttpOAuthConsumer(
+					getString(R.string.twitter_consumer_key),
+					getString(R.string.twitter_consumer_secret));
+			httpOauthProvider = new DefaultOAuthProvider(
+					"http://twitter.com/oauth/request_token",
+					"http://twitter.com/oauth/access_token",
+					"http://twitter.com/authorize");
+			String authUrl = httpOauthProvider.retrieveRequestToken(
+					httpOauthConsumer, CALLBACKURL);
+
+			// Fire up the browser and get do oAuth
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(authUrl)));
+		} catch (Exception e) {
+			Toast.makeText(this, "There was an error, please try again",
+					Toast.LENGTH_LONG).show();
+			BugSenseHandler.log(TAG, e);
+		}
+	}
+
 	public void showDialog() {
 		progress = ProgressDialog.show(this, "",
 				getString(R.string.login_dialog_wait_string));
@@ -183,7 +258,7 @@ public class LoginActivity extends SherlockActivity {
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			showDialog();
+			LoginActivity.this.showDialog();
 		}
 
 		@Override
@@ -198,8 +273,12 @@ public class LoginActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(User result) {
 			LoginActivity.this.cancelDialog();
+
 			if (result != null) {
-				// Preserve the "me" user
+				PersistentData.StoreMe(result, LoginActivity.this);
+				Intent intent = new Intent();
+				intent.setClass(LoginActivity.this, MainViewActivity.class);
+				startActivity(intent);
 			} else {
 				Toast.makeText(LoginActivity.this,
 						"There was an error, please try again",

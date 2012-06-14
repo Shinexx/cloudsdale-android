@@ -9,17 +9,14 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="C:/Users/loki/Documents/GitHub/Cloudsdale-Android/Assets/Twitter4J Android 2.2.5/lib/twitter4j-core-android-2.2.5.jar" sourcepath="C:/Users/loki/Documents/GitHub/Cloudsdale-Android/Assets/Twitter4J Android 2.2.5/twitter4j-core/twitter4j-core-2.2.5-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/loki/Documents/GitHub/Cloudsdale-Android/Assets/Twitter4J Android 2.2.5/twitter4j-core/twitter4j-core-2.2.5-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="C:/Users/loki/Documents/GitHub/Cloudsdale-Android/Assets/google-gson-2.1/gson-2.1.jar" sourcepath="C:/Users/loki/Documents/GitHub/Cloudsdale-Android/Assets/google-gson-2.1/gson-2.1-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/loki/Documents/GitHub/Cloudsdale-Android/Assets/google-gson-2.1/gson-2.1-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="C:/Users/loki/Documents/GitHub/Cloudsdale-Android/Assets/bugsense-trace1-1-3.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/zubhiumsdk.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/bugsense-trace1-1-3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/gson-2.1.jar" sourcepath="libs/gson-2.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/Cloudsdale Mobile/libs/gson-2.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="libs/signpost-commonshttp4-1.2.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/signpost-core-1.2.1.2.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
