@@ -18,6 +18,9 @@
     <string name="login_view_seperator_text">or</string>
     <string name="login_view_twitter_button_text">Twitter</string>
     <string name="twitter_consumer_key">mHnUVYK5NUfk0IHbqruZcA</string>
-    <string name="twitter_consumer_secret">Jlz13rBFDrPMKvr5EcWmNHaB6YwYHH1FCCASGFdOSkY</string>    <string name="twitter_callback_url">T4JOAuth://main</string>
+    <string name="twitter_consumer_secret">Jlz13rBFDrPMKvr5EcWmNHaB6YwYHH1FCCASGFdOSkY</string>    <string name="twitter_callback_url">app://twitter</string>
+    <string name="twitter_request_url">https://api.twitter.com/oauth/request_token</string>
+    <string name="twitter_access_token_url">https://api.twitter.com/oauth/access_token</string>
+    <string name="twitter_auth_url">https://api.twitter.com/oauth/authorize</string>
 
 </resources>

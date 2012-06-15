@@ -7,8 +7,11 @@ import java.net.MalformedURLException;
 import oauth.signpost.OAuthProvider;
 import oauth.signpost.basic.DefaultOAuthProvider;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
+import oauth.signpost.exception.OAuthNotAuthorizedException;
 
-import org.apache.http.protocol.HTTP;
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
@@ -40,11 +43,6 @@ import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.google.gson.Gson;
-import com.zubhium.ZubhiumSDK;
-import com.zubhium.utils.ZubhiumBase;
-import com.zubhium.utils.ZubhiumCrashReporter;
-import com.zubhium.utils.ZubhiumError;
-import com.zubhium.utils.ZubhiumUtils;
 
 /**
  * Controller for the login view
@@ -58,7 +56,6 @@ public class LoginActivity extends SherlockActivity {
 
 	@SuppressWarnings("unused")
 	private static final String FILENAME = "AndroidSSO_data";
-	private static final String CALLBACKURL = "app://twitter";
 
 	private EditText emailField;
 	private EditText passwordField;
@@ -153,28 +150,31 @@ public class LoginActivity extends SherlockActivity {
 		facebook.authorizeCallback(requestCode, resultCode, data);
 	}
 
-	@Override
-	protected void onNewIntent(Intent intent) {
+	protected void onResume(Intent intent) {
 		super.onNewIntent(intent);
 
 		Uri uri = intent.getData();
 		showDialog();
 
 		// Handle twitter login when url is for Twitter
-		if (uri != null && uri.toString().startsWith(CALLBACKURL)) {
+		if (uri != null
+				&& uri.toString().startsWith(
+						getString(R.string.twitter_callback_url))) {
 			String verifier = uri
 					.getQueryParameter(oauth.signpost.OAuth.OAUTH_VERIFIER);
-			
+
 			try {
-				httpOauthProvider.retrieveAccessToken(httpOauthConsumer, verifier);
+				httpOauthProvider.retrieveAccessToken(httpOauthConsumer,
+						verifier);
 				String userKey = httpOauthConsumer.getToken();
 				String userSecret = httpOauthConsumer.getTokenSecret();
-				
+
 				Log.d(TAG, "User key: " + userKey);
 				Log.d(TAG, "User secret: " + userSecret);
 				// Do CD login stuff here
 			} catch (Exception e) {
-				Toast.makeText(this, "There was an error, please try again", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "There was an error, please try again",
+						Toast.LENGTH_LONG).show();
 				BugSenseHandler.log(TAG, e);
 			}
 		}
@@ -223,15 +223,19 @@ public class LoginActivity extends SherlockActivity {
 
 	public void startTwitterAuthFlow() {
 		try {
+			// Create OAuth objects
 			httpOauthConsumer = new CommonsHttpOAuthConsumer(
 					getString(R.string.twitter_consumer_key),
 					getString(R.string.twitter_consumer_secret));
 			httpOauthProvider = new DefaultOAuthProvider(
-					"http://twitter.com/oauth/request_token",
-					"http://twitter.com/oauth/access_token",
-					"http://twitter.com/authorize");
-			String authUrl = httpOauthProvider.retrieveRequestToken(
-					httpOauthConsumer, CALLBACKURL);
+					getString(R.string.twitter_request_url),
+					getString(R.string.twitter_access_token_url),
+					getString(R.string.twitter_auth_url));
+
+			// Get the request token and generate the login url
+			String authUrl = "";
+			AsyncTwitter twit = new AsyncTwitter();
+			authUrl = twit.doInBackground(new String[] { authUrl });
 
 			// Fire up the browser and get do oAuth
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(authUrl)));
@@ -284,6 +288,29 @@ public class LoginActivity extends SherlockActivity {
 						"There was an error, please try again",
 						Toast.LENGTH_LONG);
 			}
+		}
+	}
+
+	private class AsyncTwitter extends AsyncTask<String, Void, String> {
+
+		@Override
+		protected String doInBackground(String... params) {
+			try {
+				params[0] = httpOauthProvider
+						.retrieveRequestToken(httpOauthConsumer,
+								getString(R.string.twitter_callback_url));
+			} catch (OAuthMessageSignerException e) {
+				BugSenseHandler.log(TAG, e);
+			} catch (OAuthNotAuthorizedException e) {
+				BugSenseHandler.log(TAG, e);
+			} catch (OAuthExpectationFailedException e) {
+				BugSenseHandler.log(TAG, e);
+			} catch (OAuthCommunicationException e) {
+				BugSenseHandler.log(TAG, e);
+			}
+			Log.d(TAG, params[0]);
+
+			return params[0];
 		}
 	}
 
