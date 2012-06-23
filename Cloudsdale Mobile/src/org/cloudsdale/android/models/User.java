@@ -1,10 +1,10 @@
 package org.cloudsdale.android.models;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
-import android.util.Log;
-
+import com.bugsense.trace.BugSenseHandler;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
@@ -15,320 +15,53 @@ import com.google.gson.annotations.SerializedName;
  */
 public class User {
 
-	private final String	TAG	= "Cloudsdale User";
+	private final String		TAG	= "Cloudsdale User";
 
-	// Private attributes
-	private String			name;
+	// Private attributes from JSON
+	private String				name;
 	@SerializedName("time_zone")
-	private String			timeZone;
+	private String				timeZone;
+	@SuppressWarnings("unused")
 	@SerializedName("member_since")
-	private String			memberSinceTemp;
+	private String				memberSinceTemp;
+	private Calendar			memberSince;
+	@SuppressWarnings("unused")
 	@SerializedName("suspended_until")
-	private String			suspendedUntilTemp;
-	private Calendar		memberSince;
-	private Calendar		suspendedUntil;
+	private String				suspendedUntilTemp;
+	private Calendar			suspendedUntil;
 	@SerializedName("reason_for_suspension")
-	private String			reasonForSuspension;
-	private String			id;
-	private AvatarContainer	avatar;
+	private String				reasonForSuspension;
+	private String				id;
+	private AvatarContainer		avatar;
 	@SerializedName("is_registered")
-	private boolean			isRegistered;
+	private boolean				isRegistered;
 	@SerializedName("is_transient")
-	private boolean			isTransient;
+	private boolean				transientStatus;
 	@SerializedName("is_banned")
-	private boolean			isBanned;
-	private Prosecution[]	prosecutions;
+	private boolean				banStatus;
+	@SerializedName("is_member_of_a_cloud")
+	private boolean				memberOfACloud;
+	@SerializedName("has_an_avatar")
+	private boolean				hasAvatar;
+	@SerializedName("has_read_tnc")
+	private boolean				hasReadTnC;
+	@SuppressWarnings("unused")
+	@SerializedName("role")
+	private String				roleTemp;
+	private Role				userRole;
+	private Prosecution[]		prosecutions;
 	@SerializedName("auth_token")
-	private String			authToken;
-	private String			email;
+	private String				authToken;
+	private String				email;
 	@SerializedName("needs_to_confirm_registration")
-	private boolean			needsToConfirmRegistration;
+	private boolean				needsToConfirmRegistration;
 	@SerializedName("needs_password_change")
-	private boolean			needsToChangePassword;
+	private boolean				needsToChangePassword;
 	@SerializedName("needs_name_change")
-	private boolean			needsToChangeName;
+	private boolean				needsToChangeName;
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * @return the timeZone
-	 */
-	public String getTimeZone() {
-		return timeZone;
-	}
-
-	/**
-	 * @param timeZone
-	 *            the timeZone to set
-	 */
-	public void setTimeZone(String timeZone) {
-		this.timeZone = timeZone;
-	}
-
-	/**
-	 * @return the memberSinceTemp
-	 */
-	public String getMemberSinceTemp() {
-		return memberSinceTemp;
-	}
-
-	/**
-	 * @param memberSinceTemp
-	 *            the memberSinceTemp to set
-	 */
-	public void setMemberSinceTemp(String memberSinceTemp) {
-		try {
-			Calendar cal = ISO8601.toCalendar(memberSinceTemp);
-			setMemberSince(cal);
-		} catch (ParseException e) {
-			Log.e(TAG, "Parse Exception: " + e.getMessage());
-		}
-		this.memberSinceTemp = memberSinceTemp;
-	}
-
-	/**
-	 * @return the suspendedUntilTemp
-	 */
-	public String getSuspendedUntilTemp() {
-		return suspendedUntilTemp;
-	}
-
-	/**
-	 * @param suspendedUntilTemp
-	 *            the suspendedUntilTemp to set
-	 */
-	public void setSuspendedUntilTemp(String suspendedUntilTemp) {
-		try {
-			Calendar cal = ISO8601.toCalendar(memberSinceTemp);
-			setSuspendedUntil(cal);
-		} catch (ParseException e) {
-			Log.e(TAG, "Parse Exception: " + e.getMessage());
-		}
-		this.suspendedUntilTemp = suspendedUntilTemp;
-	}
-
-	/**
-	 * @return the memberSince
-	 */
-	public Calendar getMemberSince() {
-		return memberSince;
-	}
-
-	/**
-	 * @param memberSince
-	 *            the memberSince to set
-	 */
-	public void setMemberSince(Calendar memberSince) {
-		this.memberSince = memberSince;
-	}
-
-	/**
-	 * @return the suspendedUntil
-	 */
-	public Calendar getSuspendedUntil() {
-		return suspendedUntil;
-	}
-
-	/**
-	 * @param suspendedUntil
-	 *            the suspendedUntil to set
-	 */
-	public void setSuspendedUntil(Calendar suspendedUntil) {
-		this.suspendedUntil = suspendedUntil;
-	}
-
-	/**
-	 * @return the reasonForSuspension
-	 */
-	public String getReasonForSuspension() {
-		return reasonForSuspension;
-	}
-
-	/**
-	 * @param reasonForSuspension
-	 *            the reasonForSuspension to set
-	 */
-	public void setReasonForSuspension(String reasonForSuspension) {
-		this.reasonForSuspension = reasonForSuspension;
-	}
-
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the avatar
-	 */
-	public AvatarContainer getAvatar() {
-		return avatar;
-	}
-
-	/**
-	 * @param avatar
-	 *            the avatar to set
-	 */
-	public void setAvatar(AvatarContainer avatar) {
-		this.avatar = avatar;
-	}
-
-	/**
-	 * @return the isRegistered
-	 */
-	public boolean isRegistered() {
-		return isRegistered;
-	}
-
-	/**
-	 * @param isRegistered
-	 *            the isRegistered to set
-	 */
-	public void setRegistered(boolean isRegistered) {
-		this.isRegistered = isRegistered;
-	}
-
-	/**
-	 * @return the isTransient
-	 */
-	public boolean isTransient() {
-		return isTransient;
-	}
-
-	/**
-	 * @param isTransient
-	 *            the isTransient to set
-	 */
-	public void setTransient(boolean isTransient) {
-		this.isTransient = isTransient;
-	}
-
-	/**
-	 * @return the isBanned
-	 */
-	public boolean isBanned() {
-		return isBanned;
-	}
-
-	/**
-	 * @param isBanned
-	 *            the isBanned to set
-	 */
-	public void setBanned(boolean isBanned) {
-		this.isBanned = isBanned;
-	}
-
-	/**
-	 * @return the prosecutions
-	 */
-	public Prosecution[] getProsecutions() {
-		return prosecutions;
-	}
-
-	/**
-	 * @param prosecutions
-	 *            the prosecutions to set
-	 */
-	public void setProsecutions(Prosecution[] prosecutions) {
-		this.prosecutions = prosecutions;
-	}
-
-	/**
-	 * @return the authToken
-	 */
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	/**
-	 * @param authToken
-	 *            the authToken to set
-	 */
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
-	}
-
-	/**
-	 * @return the email
-	 */
-	public String getEmail() {
-		return email;
-	}
-
-	/**
-	 * @param email
-	 *            the email to set
-	 */
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	/**
-	 * @return the needsToConfirmRegistration
-	 */
-	public boolean isNeedsToConfirmRegistration() {
-		return needsToConfirmRegistration;
-	}
-
-	/**
-	 * @param needsToConfirmRegistration
-	 *            the needsToConfirmRegistration to set
-	 */
-	public void setNeedsToConfirmRegistration(boolean needsToConfirmRegistration) {
-		this.needsToConfirmRegistration = needsToConfirmRegistration;
-	}
-
-	/**
-	 * @return the needsToChangePassword
-	 */
-	public boolean isNeedsToChangePassword() {
-		return needsToChangePassword;
-	}
-
-	/**
-	 * @param needsToChangePassword
-	 *            the needsToChangePassword to set
-	 */
-	public void setNeedsToChangePassword(boolean needsToChangePassword) {
-		this.needsToChangePassword = needsToChangePassword;
-	}
-
-	/**
-	 * @return the needsToChangeName
-	 */
-	public boolean isNeedsToChangeName() {
-		return needsToChangeName;
-	}
-
-	/**
-	 * @param needsToChangeName
-	 *            the needsToChangeName to set
-	 */
-	public void setNeedsToChangeName(boolean needsToChangeName) {
-		this.needsToChangeName = needsToChangeName;
-	}
+	// Child objects from JSON
+	private ArrayList<Cloud>	clouds;
 
 	/**
 	 * Converts the user to a JSON string
@@ -347,4 +80,203 @@ public class User {
 	public String toString() {
 		return this.toJson();
 	}
+
+	public String getTAG() {
+		return TAG;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getTimeZone() {
+		return timeZone;
+	}
+
+	public String getReasonForSuspension() {
+		return reasonForSuspension;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public AvatarContainer getAvatar() {
+		return avatar;
+	}
+
+	public boolean isRegistered() {
+		return isRegistered;
+	}
+
+	public boolean isTransientStatus() {
+		return transientStatus;
+	}
+
+	public boolean isBanStatus() {
+		return banStatus;
+	}
+
+	public boolean isMemberOfACloud() {
+		return memberOfACloud;
+	}
+
+	public boolean isHasAvatar() {
+		return hasAvatar;
+	}
+
+	public boolean isHasReadTnC() {
+		return hasReadTnC;
+	}
+
+	public Role getRole() {
+		return userRole;
+	}
+
+	public Prosecution[] getProsecutions() {
+		return prosecutions;
+	}
+
+	public String getAuthToken() {
+		return authToken;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public boolean isNeedsToConfirmRegistration() {
+		return needsToConfirmRegistration;
+	}
+
+	public boolean isNeedsToChangePassword() {
+		return needsToChangePassword;
+	}
+
+	public boolean isNeedsToChangeName() {
+		return needsToChangeName;
+	}
+
+	public ArrayList<Cloud> getClouds() {
+		return clouds;
+	}
+
+	public Calendar getMemberSince() {
+		return memberSince;
+	}
+
+	public Calendar getSuspendedUntil() {
+		return suspendedUntil;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
+	}
+
+	public void setMemberSince(Calendar memberSince) {
+		this.memberSince = memberSince;
+	}
+
+	public void setMemberSinceTemp(String iso8601) {
+		try {
+			memberSince = ISO8601.toCalendar(iso8601);
+		} catch (ParseException e) {
+			BugSenseHandler.log(TAG, e);
+		}
+	}
+
+	public void setSuspendedUntil(Calendar suspendedUntil) {
+		this.suspendedUntil = suspendedUntil;
+	}
+
+	public void setSuspendedUntilTemp(String iso8601) {
+		try {
+			suspendedUntil = ISO8601.toCalendar(iso8601);
+		} catch (ParseException e) {
+			BugSenseHandler.log(TAG, e);
+		}
+	}
+
+	public void setReasonForSuspension(String reasonForSuspension) {
+		this.reasonForSuspension = reasonForSuspension;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setAvatar(AvatarContainer avatar) {
+		this.avatar = avatar;
+	}
+
+	public void setRegistered(boolean isRegistered) {
+		this.isRegistered = isRegistered;
+	}
+
+	public void setTransientStatus(boolean transientStatus) {
+		this.transientStatus = transientStatus;
+	}
+
+	public void setBanStatus(boolean banStatus) {
+		this.banStatus = banStatus;
+	}
+
+	public void setMemberOfACloud(boolean memberOfACloud) {
+		this.memberOfACloud = memberOfACloud;
+	}
+
+	public void setHasAvatar(boolean hasAvatar) {
+		this.hasAvatar = hasAvatar;
+	}
+
+	public void setHasReadTnC(boolean hasReadTnC) {
+		this.hasReadTnC = hasReadTnC;
+	}
+
+	public void setRoleTemp(String roleTemp) {
+		if (roleTemp.toLowerCase().equals("creator")) {
+			userRole = Role.CREATOR;
+		} else if (roleTemp.toLowerCase().equals("admin")) {
+			userRole = Role.ADMIN;
+		} else if (roleTemp.toLowerCase().equals("moderator")) {
+			userRole = Role.MODERATOR;
+		} else if (roleTemp.toLowerCase().equals("donor")) {
+			userRole = Role.DONOR;
+		} else {
+			userRole = Role.NORMAL;
+		}
+	}
+
+	public void setProsecutions(Prosecution[] prosecutions) {
+		this.prosecutions = prosecutions;
+	}
+
+	public void setAuthToken(String authToken) {
+		this.authToken = authToken;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setNeedsToConfirmRegistration(boolean needsToConfirmRegistration) {
+		this.needsToConfirmRegistration = needsToConfirmRegistration;
+	}
+
+	public void setNeedsToChangePassword(boolean needsToChangePassword) {
+		this.needsToChangePassword = needsToChangePassword;
+	}
+
+	public void setNeedsToChangeName(boolean needsToChangeName) {
+		this.needsToChangeName = needsToChangeName;
+	}
+
+	public void setClouds(ArrayList<Cloud> clouds) {
+		this.clouds = clouds;
+	}
+
 }

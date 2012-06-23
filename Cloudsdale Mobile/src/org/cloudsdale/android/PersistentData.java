@@ -17,15 +17,14 @@ import com.google.gson.Gson;
 
 /**
  * Persistent Data object for Cloudsdale
- * 
  * Stores items in the flat file system on external memory, writes to the DB on
  * app death
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 public class PersistentData {
-	
-	private final static String TAG = "Persistant Data";
+
+	private final static String	TAG	= "Persistant Data";
 
 	/**
 	 * Gets the proper external storage location according to the systems API
@@ -61,10 +60,10 @@ public class PersistentData {
 		}
 
 		// Create the app folder if it doesn't exist
-		if(!externalDir.exists()) {
+		if (!externalDir.exists()) {
 			externalDir.mkdir();
 		}
-		
+
 		return externalDir;
 	}
 
@@ -80,7 +79,7 @@ public class PersistentData {
 			if (!external.exists()) {
 				external.createNewFile();
 			}
-			
+
 			// Serialize and store the user
 			Gson gson = new Gson();
 			BufferedWriter bw = new BufferedWriter(new FileWriter(external));
@@ -97,12 +96,9 @@ public class PersistentData {
 		File external;
 
 		try {
-			Log.d(TAG, getExternalStorage(context) + "/me");
 			external = new File(getExternalStorage(context) + "/me");
-			if (!external.exists()) {
-				return me;
-			}
-			
+			if (!external.exists()) { return me; }
+
 			// Deserialize the user
 			Gson gson = new Gson();
 			BufferedReader br = new BufferedReader(new FileReader(external));
@@ -116,5 +112,10 @@ public class PersistentData {
 		}
 
 		return me;
+	}
+
+	public static void storeCloudAvatar(String cloudId, Context context) {
+		File external = new File(getExternalStorage(context) + "/clouds/"
+				+ cloudId + ".png");
 	}
 }

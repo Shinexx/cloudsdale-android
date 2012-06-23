@@ -1,204 +1,117 @@
 package org.cloudsdale.android.models;
 
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.util.Calendar;
+
+import com.bugsense.trace.BugSenseHandler;
+import com.google.gson.annotations.SerializedName;
 
 public class Cloud {
 
-	// Object properties
-	private String			id;
-	private String			name;
-	private String			description;
-	private boolean			hidden;
-	private boolean			locked;
-	private boolean			featured;
+	private static final String	TAG	= "Cloudsdale Cloud Model";
 
-	// Relationships
-	private ArrayList<User>	users;
-	private Chat			chat;
-	private User			owner;
+	private String				id;
+	private String				name;
+	private String				description;
+	@SuppressWarnings("unused")
+	@SerializedName("created_at")
+	private String				createdTemp;
+	private Calendar			createdAt;
+	private String				rules;
+	private AvatarContainer		avatar;
+	@SerializedName("is_transient")
+	private boolean				isTransient;
+	@SerializedName("owner")
+	private User				ownerId;
+	private User[]				moderators;
+	private Chat				chat;
 
-	/**
-	 * Default constructor
-	 */
-	public Cloud() {
-		name = "";
-		description = "";
-		hidden = false;
-		locked = false;
-		featured = false;
-
-		users = new ArrayList<User>();
-		chat = new Chat();
-		owner = null;
-	}
-
-	/**
-	 * Basic cloud constructor
-	 * 
-	 * @param owner
-	 *            the owner of the cloud
-	 */
-	public Cloud(User owner) {
-		name = "";
-		description = "";
-		hidden = false;
-		locked = false;
-		featured = false;
-
-		users = new ArrayList<User>();
-		chat = new Chat();
-		this.owner = owner;
-	}
-
-	/**
-	 * @return the id
-	 */
 	public String getId() {
 		return id;
 	}
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * @return the description
-	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * @param description
-	 *            the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
+	public Calendar getCreatedAt() {
+		return createdAt;
 	}
 
-	/**
-	 * @return the hidden
-	 */
-	public boolean isHidden() {
-		return hidden;
+	public String getRules() {
+		return rules;
 	}
 
-	/**
-	 * @param hidden
-	 *            the hidden to set
-	 */
-	public void setHidden(boolean hidden) {
-		this.hidden = hidden;
+	public AvatarContainer getAvatar() {
+		return avatar;
 	}
 
-	/**
-	 * @return the locked
-	 */
-	public boolean isLocked() {
-		return locked;
+	public boolean isTransient() {
+		return isTransient;
 	}
 
-	/**
-	 * @param locked
-	 *            the locked to set
-	 */
-	public void setLocked(boolean locked) {
-		this.locked = locked;
+	public User getOwnerId() {
+		return ownerId;
 	}
 
-	/**
-	 * @return the featured
-	 */
-	public boolean isFeatured() {
-		return featured;
+	public User[] getModerators() {
+		return moderators;
 	}
 
-	/**
-	 * @param featured
-	 *            the featured to set
-	 */
-	public void setFeatured(boolean featured) {
-		this.featured = featured;
-	}
-
-	/**
-	 * @return the users
-	 */
-	public ArrayList<User> getUsers() {
-		return users;
-	}
-
-	/**
-	 * @param users
-	 *            the users to set
-	 */
-	public void setUsers(ArrayList<User> users) {
-		this.users = users;
-	}
-
-	/**
-	 * @return the chat
-	 */
 	public Chat getChat() {
 		return chat;
 	}
 
-	/**
-	 * @return the owner
-	 */
-	public User getOwner() {
-		return owner;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	/**
-	 * Adds a user to the cloud
-	 * 
-	 * @param user
-	 *            the user to add
-	 */
-	public void addUser(User user) {
-		users.add(user);
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	/**
-	 * Remove a user from the cloud
-	 * 
-	 * @param user
-	 *            the user to remove
-	 */
-	public void removeUser(User user) {
-		if (users.contains(user)) {
-			users.remove(user);
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setCreatedTemp(String createdTemp) {
+		try {
+			createdAt = ISO8601.toCalendar(createdTemp);
+		} catch (ParseException e) {
+			BugSenseHandler.log(TAG, e);
 		}
 	}
 
-	/**
-	 * Check to see if a user is a member of the cloud
-	 * 
-	 * @param user
-	 *            the user to check
-	 * @return whether the user is a member of the cloud
-	 */
-	public boolean checkIfUserIsMember(User user) {
-		return users.contains(user);
+	public void setCreatedAt(Calendar createdAt) {
+		this.createdAt = createdAt;
 	}
+
+	public void setRules(String rules) {
+		this.rules = rules;
+	}
+
+	public void setAvatar(AvatarContainer avatar) {
+		this.avatar = avatar;
+	}
+
+	public void setTransient(boolean isTransient) {
+		this.isTransient = isTransient;
+	}
+
+	public void setOwnerId(User ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	public void setModerators(User[] moderators) {
+		this.moderators = moderators;
+	}
+
+	public void setChat(Chat chat) {
+		this.chat = chat;
+	}
+
 }
