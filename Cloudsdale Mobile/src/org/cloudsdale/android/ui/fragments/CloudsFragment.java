@@ -8,8 +8,8 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.Cloud;
 import org.cloudsdale.android.queries.UserCloudQuery;
 import org.cloudsdale.android.ui.CloudListAdapter;
-import org.cloudsdale.android.ui.MainViewActivity.ChatActivity;
-import org.cloudsdale.android.ui.MainViewActivity.ChatFragment;
+import org.cloudsdale.android.ui.fragments.CloudListActivity.ChatActivity;
+import org.cloudsdale.android.ui.fragments.CloudListActivity.ChatFragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -41,9 +41,9 @@ public class CloudsFragment extends SherlockFragment {
 		super.onActivityCreated(savedInstanceState);
 
 		// Check to see if we're in dual pane mode
-		View chatFrame = getActivity().findViewById(R.id.chat_view);
-		mDualPane = chatFrame != null
-				&& chatFrame.getVisibility() == View.VISIBLE;
+//		View chatFrame = getActivity().findViewById(R.id.chat_view);
+//		mDualPane = chatFrame != null
+//				&& chatFrame.getVisibility() == View.VISIBLE;
 
 		// Get the cloud view
 		View cloudView = getActivity().findViewById(R.id.clouds_view);
@@ -60,9 +60,9 @@ public class CloudsFragment extends SherlockFragment {
 		}
 
 		// Make selection visible is dual pane
-		if (mDualPane) {
-			showChat(mSelectedCloud);
-		}
+//		if (mDualPane) {
+//			showChat(mSelectedCloud);
+//		}
 	}
 
 	@Override
@@ -88,28 +88,28 @@ public class CloudsFragment extends SherlockFragment {
 	private void showChat(int index) {
 		mSelectedCloud = index;
 
-		if (mDualPane) {
-			// Check the fragment, replace as needed
-			ChatFragment chatFrame = (ChatFragment) getFragmentManager()
-					.findFragmentById(R.id.chat_view);
-			if (chatFrame == null || chatFrame.getShownCloud() != index) {
-				// Make the new fragment to show
-				chatFrame = ChatFragment.newInstance(index);
-
-				// Execute the transaction, replace whatever fragment is
-				// showing
-				FragmentTransaction ft = getFragmentManager()
-						.beginTransaction();
-				ft.replace(R.id.chat_view, chatFrame);
-				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-				ft.commit();
-			} else {
-				// Launch the activity
-				Intent intent = new Intent();
-				intent.setClass(getSherlockActivity(), ChatActivity.class);
-				intent.putExtra("index", index);
-			}
-		}
+//		if (mDualPane) {
+//			// Check the fragment, replace as needed
+//			ChatFragment chatFrame = (ChatFragment) getFragmentManager()
+//					.findFragmentById(R.id.chat_view);
+//			if (chatFrame == null || chatFrame.getShownCloud() != index) {
+//				// Make the new fragment to show
+//				chatFrame = ChatFragment.newInstance(index);
+//
+//				// Execute the transaction, replace whatever fragment is
+//				// showing
+//				FragmentTransaction ft = getFragmentManager()
+//						.beginTransaction();
+//				ft.replace(R.id.chat_view, chatFrame);
+//				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//				ft.commit();
+//			} else {
+//				// Launch the activity
+//				Intent intent = new Intent();
+//				intent.setClass(getSherlockActivity(), ChatActivity.class);
+//				intent.putExtra("index", index);
+//			}
+//		}
 	}
 
 	private void addPtrClouds() {

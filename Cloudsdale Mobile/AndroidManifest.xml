@@ -42,8 +42,10 @@
                     android:scheme="app" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.MainViewActivity" >
+        </activity>
         <activity
-            android:name=".ui.MainViewActivity"
+            android:name=".ui.fragments.CloudListActivity"
             android:label="@string/app_name" >
         </activity>
     </application>

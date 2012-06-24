@@ -1,85 +1,63 @@
 package org.cloudsdale.android.ui;
 
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.ui.fragments.HomeFragment;
 
-import android.content.res.Configuration;
+import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.widget.ArrayAdapter;
 
-import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class MainViewActivity extends SherlockFragmentActivity {
-	
+public class MainViewActivity extends SherlockFragmentActivity implements
+		ActionBar.OnNavigationListener {
+
+	private String[]	mLocations;
+
+	/**
+	 * Life cycle method for the creation of the activity
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// Get the locations available
+		mLocations = getResources().getStringArray(R.array.view_locations);
+
+		// Create the array adapter for the locations
+		Context context = getSupportActionBar().getThemedContext();
+		ArrayAdapter<CharSequence> list = ArrayAdapter
+				.createFromResource(context, R.array.view_locations,
+						R.layout.sherlock_spinner_item);
+		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+
+		// Set the navigation mode to the list dropdown mode
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		getSupportActionBar().setListNavigationCallbacks(list, this);
+
+		// Set the content view
 		setContentView(R.layout.main_view);
+
+		// Setup the home fragment if no previous state to restore
+		if (savedInstanceState == null) {
+			HomeFragment home = new HomeFragment();
+			FragmentTransaction ft = getSupportFragmentManager()
+					.beginTransaction();
+			ft.add(R.id.embedded_view, home);
+			ft.commit();
+		}
 	}
 
 	/**
-	 * Secondary activity to show chat when the screen isn't large enough to
-	 * show it with the sources list (e.g. phones)
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com)
+	 * Callback method to handle list navigation. Takes the selected item and
+	 * displays the proper fragment for it
 	 */
-	public static class ChatActivity extends SherlockFragmentActivity {
-
-		@Override
-		protected void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-
-			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-				finish();
-				return;
-			}
-
-			if (savedInstanceState == null) {
-				ChatFragment chat = new ChatFragment();
-				chat.setArguments(getIntent().getExtras());
-				getSupportFragmentManager().beginTransaction()
-						.add(android.R.id.content, chat).commit();
-			}
-		}
-
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		return false;
 	}
-	
-	public static class ChatFragment extends SherlockFragment {
 
-		/**
-		 * Create a new instance of the fragment
-		 * 
-		 * @param index
-		 *            Index of the selected cloud
-		 * @return
-		 */
-		public static ChatFragment newInstance(int index) {
-			ChatFragment cf = new ChatFragment();
-
-			// Supply the index to the fragment
-			Bundle args = new Bundle();
-			args.putInt("index", index);
-			cf.setArguments(args);
-
-			return cf;
-		}
-
-		public int getShownCloud() {
-			return getArguments().getInt("index", 0);
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			if (container == null) {
-				return null;
-			}
-
-			// TODO implement layout logic here
-			return null;
-		}
-	}
 }

@@ -7,12 +7,6 @@
         android:id="@+id/clouds_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="org.cloudsdale.android.ui.MainViewFragmentActivity$CloudsFragment" />
-    
-    <fragment
-        android:id="@+id/chat_view"
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        class="org.cloudsdale.android.ui.MainViewFragmentActivity$ChatFragment" />
-    
+        class="org.cloudsdale.android.ui.fragments.CloudsFragment" />
+
 </FrameLayout>

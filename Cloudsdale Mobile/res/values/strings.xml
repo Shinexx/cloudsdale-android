@@ -23,5 +23,12 @@
     <string name="twitter_request_url">https://api.twitter.com/oauth/request_token</string>
     <string name="twitter_access_token_url">https://api.twitter.com/oauth/access_token</string>
     <string name="twitter_auth_url">https://api.twitter.com/oauth/authorize</string>
+    <string name="home_settings_button_text">Settings</string>
+    <string name="home_logout_button_text">Logout</string>
+    <string name="home_user_icon_description">User avatar</string>
+    <string-array name="view_locations">
+        <item >Home</item>
+        <item >Clouds</item>
+    </string-array>
 
 </resources>

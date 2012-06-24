@@ -11,7 +11,6 @@ import org.cloudsdale.android.models.User;
 
 import android.content.Context;
 import android.os.Environment;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -23,8 +22,6 @@ import com.google.gson.Gson;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 public class PersistentData {
-
-	private final static String	TAG	= "Persistant Data";
 
 	/**
 	 * Gets the proper external storage location according to the systems API
@@ -113,9 +110,5 @@ public class PersistentData {
 
 		return me;
 	}
-
-	public static void storeCloudAvatar(String cloudId, Context context) {
-		File external = new File(getExternalStorage(context) + "/clouds/"
-				+ cloudId + ".png");
-	}
+	
 }

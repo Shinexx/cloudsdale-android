@@ -21,7 +21,6 @@ public class User {
 	private String				name;
 	@SerializedName("time_zone")
 	private String				timeZone;
-	@SuppressWarnings("unused")
 	@SerializedName("member_since")
 	private String				memberSinceTemp;
 	private Calendar			memberSince;
@@ -45,7 +44,6 @@ public class User {
 	private boolean				hasAvatar;
 	@SerializedName("has_read_tnc")
 	private boolean				hasReadTnC;
-	@SuppressWarnings("unused")
 	@SerializedName("role")
 	private String				roleTemp;
 	private Role				userRole;
@@ -129,8 +127,28 @@ public class User {
 		return hasReadTnC;
 	}
 
+	public String getRoleTemp() {
+		return roleTemp;
+	}
+
 	public Role getRole() {
-		return userRole;
+		if (userRole != null) {
+			return userRole;
+		} else {
+			if (roleTemp.toLowerCase().equals("creator")) {
+				userRole = Role.CREATOR;
+			} else if (roleTemp.toLowerCase().equals("admin")) {
+				userRole = Role.ADMIN;
+			} else if (roleTemp.toLowerCase().equals("moderator")) {
+				userRole = Role.MODERATOR;
+			} else if (roleTemp.toLowerCase().equals("donor")) {
+				userRole = Role.DONOR;
+			} else {
+				userRole = Role.NORMAL;
+			}
+
+			return userRole;
+		}
 	}
 
 	public Prosecution[] getProsecutions() {
@@ -161,8 +179,21 @@ public class User {
 		return clouds;
 	}
 
+	public String getMemberSinceTemp() {
+		return memberSinceTemp;
+	}
+
 	public Calendar getMemberSince() {
-		return memberSince;
+		if (memberSince != null) {
+			return memberSince;
+		} else {
+			try {
+				return ISO8601.toCalendar(memberSinceTemp);
+			} catch (ParseException e) {
+				BugSenseHandler.log(TAG, e);
+				return null;
+			}
+		}
 	}
 
 	public Calendar getSuspendedUntil() {
@@ -183,6 +214,7 @@ public class User {
 
 	public void setMemberSinceTemp(String iso8601) {
 		try {
+			memberSinceTemp = iso8601;
 			memberSince = ISO8601.toCalendar(iso8601);
 		} catch (ParseException e) {
 			BugSenseHandler.log(TAG, e);
@@ -238,6 +270,7 @@ public class User {
 	}
 
 	public void setRoleTemp(String roleTemp) {
+		this.roleTemp = roleTemp;
 		if (roleTemp.toLowerCase().equals("creator")) {
 			userRole = Role.CREATOR;
 		} else if (roleTemp.toLowerCase().equals("admin")) {
@@ -249,6 +282,10 @@ public class User {
 		} else {
 			userRole = Role.NORMAL;
 		}
+	}
+
+	public void setUserRole(Role userRole) {
+		this.userRole = userRole;
 	}
 
 	public void setProsecutions(Prosecution[] prosecutions) {

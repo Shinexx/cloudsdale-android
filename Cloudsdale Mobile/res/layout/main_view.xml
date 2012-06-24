@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <FrameLayout 
+        android:id="@+id/embedded_view"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent" />
+    
 
-    <fragment
-        android:id="@+id/clouds_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        class="org.cloudsdale.android.ui.fragments.CloudsFragment" />
-
-</FrameLayout>
+</LinearLayout>
