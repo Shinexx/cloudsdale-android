@@ -29,10 +29,14 @@ public class StartActivity extends SherlockActivity {
 		if(PersistentData.getMe(this) != null) {
 			Intent intent = new Intent();
 			intent.setClass(this, MainViewActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
 		} else {
 			Intent intent = new Intent();
 			intent.setClass(this, LoginActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
 		}
 	}

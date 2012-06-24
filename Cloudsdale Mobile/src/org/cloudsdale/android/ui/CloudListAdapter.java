@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.Cloud;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -59,7 +61,8 @@ public class CloudListAdapter extends BaseAdapter {
 		TextView tv = (TextView) cloudView.findViewById(R.id.cloud_name);
 
 		// Set view properties
-		icon.setImageResource(R.drawable.unknown_cloud);
+		UrlImageViewHelper.setUrlDrawable(icon, cloud.getAvatar().getPreview(),
+				R.drawable.unknown_cloud, 60000 * 60);
 		tv.setText(cloud.getName());
 		return cloudView;
 	}

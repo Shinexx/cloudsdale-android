@@ -48,26 +48,25 @@ import com.google.gson.Gson;
  * Controller for the login view
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
- * 
  */
 public class LoginActivity extends SherlockActivity {
-	public static final String TAG = "Cloudsdale LoginViewActivity";
-	public static final int FACEBOOK_ACTIVITY_CODE = 10298;
+	public static final String			TAG						= "Cloudsdale LoginViewActivity";
+	public static final int				FACEBOOK_ACTIVITY_CODE	= 10298;
 
 	@SuppressWarnings("unused")
-	private static final String FILENAME = "AndroidSSO_data";
+	private static final String			FILENAME				= "AndroidSSO_data";
 
-	private EditText emailField;
-	private EditText passwordField;
-	private Button cdButton;
-	private Button fbButton;
-	private Button twitterButton;
-	private ProgressDialog progress;
+	private EditText					emailField;
+	private EditText					passwordField;
+	private Button						cdButton;
+	private Button						fbButton;
+	private Button						twitterButton;
+	private ProgressDialog				progress;
 
-	private Facebook facebook;
-	private SharedPreferences mPrefs;
-	private CommonsHttpOAuthConsumer httpOauthConsumer;
-	private OAuthProvider httpOauthProvider;
+	private Facebook					facebook;
+	private SharedPreferences			mPrefs;
+	private CommonsHttpOAuthConsumer	httpOauthConsumer;
+	private OAuthProvider				httpOauthProvider;
 
 	/**
 	 * Lifetime method for the creation of the controller
@@ -195,10 +194,11 @@ public class LoginActivity extends SherlockActivity {
 		// Only call auth if access has expired
 		if (!facebook.isSessionValid()) {
 			facebook.authorize(this, new String[] { "email" }, new FbListener());
+		} else {
+			// Start CD Auth flow
+			startCdAuthFromFb();
 		}
 
-		// Start CD Auth flow
-		startCdAuthFromFb();
 	}
 
 	public void startCdAuthFromFb() {
@@ -282,6 +282,8 @@ public class LoginActivity extends SherlockActivity {
 				PersistentData.StoreMe(result, LoginActivity.this);
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, MainViewActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
 			} else {
 				Toast.makeText(LoginActivity.this,
@@ -296,9 +298,9 @@ public class LoginActivity extends SherlockActivity {
 		@Override
 		protected String doInBackground(String... params) {
 			try {
-				params[0] = httpOauthProvider
-						.retrieveRequestToken(httpOauthConsumer,
-								getString(R.string.twitter_callback_url));
+				params[0] = httpOauthProvider.retrieveRequestToken(
+						httpOauthConsumer,
+						getString(R.string.twitter_callback_url));
 			} catch (OAuthMessageSignerException e) {
 				BugSenseHandler.log(TAG, e);
 			} catch (OAuthNotAuthorizedException e) {
@@ -322,6 +324,7 @@ public class LoginActivity extends SherlockActivity {
 			editor.putString("access_token", facebook.getAccessToken());
 			editor.putLong("access_expires", facebook.getAccessExpires());
 			editor.commit();
+			startCdAuthFromFb();
 		}
 
 		@Override

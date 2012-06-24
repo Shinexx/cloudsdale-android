@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/cloud_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_centerVertical="true"
         android:layout_margin="8dp"
         android:contentDescription="@string/cloud_list_item_icon_description" />
@@ -15,8 +15,9 @@
         android:id="@+id/cloud_name"
         android:layout_width="fill_parent"
         android:layout_height="32dp"
-        android:layout_margin="8dp"
         android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="8dp"
         android:layout_toRightOf="@+id/cloud_icon"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 

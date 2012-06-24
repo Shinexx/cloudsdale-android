@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <com.handmark.pulltorefresh.library.PullToRefreshListView
-        android:id="@+id/cloud_ptr"
+    <ListView
+        android:id="@+id/cloud_list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 
