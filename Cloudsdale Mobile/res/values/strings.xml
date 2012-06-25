@@ -2,12 +2,8 @@
 <resources>
 
     <string name="app_name">Cloudsdale</string>
-    <string name="cloudsdale_api_url">http://www.cloudsdale.org/v1/</string>
-    <string name="cloudsdale_auth_token">$2a$10$7Pfcv89Q9c/9WMAk6ySfhu</string>
     <string name="cloudsdale_logo_description">Cloudsdale logo</string>
     <string name="cloud_list_item_icon_description">Cloud icon</string>
-    <string name="facebook_api_token">213007855430354</string>
-    <string name="facebook_graph_api_base_path">http://graph.facebook.com/</string>
     <string name="login_dialog_wait_string">Logging in, please wait</string>
     <string name="login_view_facebook_button_text">Facebook</string>
     <string name="login_view_email_hint">Email Address</string>
@@ -18,17 +14,11 @@
     <string name="login_view_username_hint">Username</string>
     <string name="login_view_seperator_text">or</string>
     <string name="login_view_twitter_button_text">Twitter</string>
-    <string name="twitter_consumer_key">mHnUVYK5NUfk0IHbqruZcA</string>
-    <string name="twitter_consumer_secret">Jlz13rBFDrPMKvr5EcWmNHaB6YwYHH1FCCASGFdOSkY</string>    <string name="twitter_callback_url">app://twitter</string>
-    <string name="twitter_request_url">https://api.twitter.com/oauth/request_token</string>
-    <string name="twitter_access_token_url">https://api.twitter.com/oauth/access_token</string>
-    <string name="twitter_auth_url">https://api.twitter.com/oauth/authorize</string>
     <string name="home_settings_button_text">Settings</string>
     <string name="home_logout_button_text">Logout</string>
     <string name="home_user_icon_description">User avatar</string>
-    <string-array name="view_locations">
-        <item >Home</item>
-        <item >Clouds</item>
-    </string-array>
-
+    <string name="home_register_date_text">You registered on</string>	<string name="home_cloud_count_text">You\'re a member of %1$s clouds</string>
+	<string name="home_site_role_text">You are %1$s the site</string>
+	<string name="home_warning_count_text">You have %1$s warnings</string>
+    
 </resources>

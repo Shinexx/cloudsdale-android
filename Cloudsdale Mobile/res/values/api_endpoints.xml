@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="sessions_endpoint">sessions</string>
+    <string name="user_endpoint">user/%1$s</string>
+    <string name="user_clouds_endpoint">%1$s/clouds.json</string>
+
+</resources>

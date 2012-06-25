@@ -8,6 +8,7 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.Role;
 import org.cloudsdale.android.models.User;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +47,7 @@ public class HomeFragment extends SherlockFragment {
 		// Setup the proper date string
 		Calendar registered = me.getMemberSince();
 		SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy");
-		String registeredDate = sdf.format(registered.getTime());
+		String registeredDate = " " + sdf.format(registered.getTime());
 
 		// Setup the proper role string
 		Role userRole = me.getRole();
@@ -56,26 +57,31 @@ public class HomeFragment extends SherlockFragment {
 			case DONOR:
 			case MODERATOR:
 			case PLACEHOLDER:
-				roleString = " a " + userRole.toString();
+				roleString = " a " + userRole.toString() + " on ";
 				break;
 			case ADMIN:
-				roleString = " an " + userRole.toString();
+				roleString = " an " + userRole.toString() + " on ";
 				break;
 			case CREATOR:
-				roleString = " the " + userRole.toString();
+				roleString = " the " + userRole.toString() + " of ";
 				break;
 		}
+
+		// Grab the resources object
+		Resources res = getActivity().getResources();
 
 		// Set the properties
 		UrlImageViewHelper.setUrlDrawable(userIcon, me.getAvatar().getNormal(),
 				R.drawable.unknown_user, 60000 * 10);
 		userName.setText(me.getName());
-		registeredText.setText("You registered on " + registeredDate);
-		cloudCount.setText("You're a member of " + me.getClouds().size()
-				+ " clouds");
-		siteRole.setText("Your are" + roleString);
-		warningCount.setText("You have " + me.getProsecutions().length
-				+ " warnings");
+		registeredText.setText(res.getString(R.string.home_register_date_text)
+				+ registeredDate);
+		cloudCount.setText(res.getString(R.string.home_cloud_count_text, me
+				.getClouds().size()));
+		siteRole.setText(res
+				.getString(R.string.home_site_role_text, roleString));
+		warningCount.setText(res.getString(R.string.home_warning_count_text,
+				me.getProsecutions().length));
 
 		// Send the view back to the caller
 		return homeView;

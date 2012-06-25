@@ -41,5 +41,12 @@ public class CloudListFragment extends SherlockFragment {
 
 		return cloudListView;
 	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		// Get the user's clouds
+	}
 
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="cloudsdale_api_url">http://www.cloudsdale.org/v1/</string>
+    <string name="cloudsdale_auth_token">$2a$10$7Pfcv89Q9c/9WMAk6ySfhu</string>
+    <string name="facebook_api_token">213007855430354</string>
+    <string name="facebook_graph_api_base_path">http://graph.facebook.com/</string>
+    <string name="twitter_consumer_key">mHnUVYK5NUfk0IHbqruZcA</string>
+    <string name="twitter_consumer_secret">Jlz13rBFDrPMKvr5EcWmNHaB6YwYHH1FCCASGFdOSkY</string>
+    <string name="twitter_callback_url">app://twitter</string>
+    <string name="twitter_request_url">https://api.twitter.com/oauth/request_token</string>
+    <string name="twitter_access_token_url">https://api.twitter.com/oauth/access_token</string>
+    <string name="twitter_auth_url">https://api.twitter.com/oauth/authorize</string>
+
+</resources>
