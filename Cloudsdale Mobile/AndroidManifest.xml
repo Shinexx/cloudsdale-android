@@ -18,6 +18,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.CloudsdaleLight" >
+
+        <!-- Activities -->
         <activity
             android:name=".StartActivity"
             android:label="@string/app_name"
@@ -50,6 +52,10 @@
             android:launchMode="singleTop"
             android:taskAffinity="org.cloudsdale.android.startViews" >
         </activity>
+
+        <!-- Services -->
+        <service android:name="com.b3rwynmobile.fayeclient.FayeService" >
+        </service>
     </application>
 
 </manifest>

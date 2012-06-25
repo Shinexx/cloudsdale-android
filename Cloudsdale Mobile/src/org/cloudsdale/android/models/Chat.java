@@ -3,7 +3,7 @@ package org.cloudsdale.android.models;
 public class Chat {
 
 	// Relationships
-	private Cloud cloud;
+	private Cloud	cloud;
 
 	/**
 	 * Default constructor
@@ -20,6 +20,10 @@ public class Chat {
 	 */
 	public Chat(Cloud cloud) {
 		this.cloud = cloud;
+	}
+
+	public Cloud getCloud() {
+		return cloud;
 	}
 
 	/**

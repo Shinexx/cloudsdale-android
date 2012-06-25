@@ -6,8 +6,13 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.ui.fragments.CloudListFragment;
 import org.cloudsdale.android.ui.fragments.HomeFragment;
 
+import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -18,12 +23,19 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.b3rwynmobile.fayeclient.FayeService;
 
+/**
+ * Activity controller for the primary app view
+ * 
+ * @author Jamison Greeley (atomicrat2552@gmail.com)
+ */
 public class MainViewActivity extends SherlockFragmentActivity {
 
 	private TabHost		mTabHost;
 	private ViewPager	mViewPager;
 	private TabsAdapter	mTabsAdapter;
+	private FayeService mFayeService;
 
 	/**
 	 * Life cycle method for the creation of the activity
@@ -32,7 +44,10 @@ public class MainViewActivity extends SherlockFragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// Set the layout
 		setContentView(R.layout.main_view);
+
+		// Setup the tabs
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
 		mTabHost.setup();
 
@@ -40,22 +55,37 @@ public class MainViewActivity extends SherlockFragmentActivity {
 
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
-		mTabsAdapter.addTab(mTabHost.newTabSpec("home")
-				.setIndicator("Home"),
+		// Add the fragments to the tab
+		mTabsAdapter.addTab(mTabHost.newTabSpec("home").setIndicator("Home"),
 				HomeFragment.class, null);
-		mTabsAdapter.addTab(
-				mTabHost.newTabSpec("clouds").setIndicator("Clouds"),
-				CloudListFragment.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec("clouds")
+				.setIndicator("Clouds"), CloudListFragment.class, null);
 
+		// Create an instance state if it doesn't exist
 		if (savedInstanceState != null) {
 			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
 		}
+
+		// Start Faye
+		startService(new Intent(this, FayeService.class));
 	}
 
+	/**
+	 * Save the instance of the view on exit
+	 */
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putString("tab", mTabHost.getCurrentTabTag());
+	}
+
+	/**
+	 * Life cycle method to handle killing Faye when the app is destroyed
+	 */
+	@Override
+	public boolean isFinishing() {
+		stopService(new Intent(this, FayeService.class));
+		return super.isFinishing();
 	}
 
 	/**
@@ -78,6 +108,7 @@ public class MainViewActivity extends SherlockFragmentActivity {
 		private final ArrayList<TabInfo>	mTabs	= new ArrayList<TabInfo>();
 
 		static final class TabInfo {
+			@SuppressWarnings("unused")
 			private final String	tag;
 			private final Class<?>	clss;
 			private final Bundle	args;
