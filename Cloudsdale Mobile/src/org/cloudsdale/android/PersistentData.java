@@ -49,11 +49,7 @@ public class PersistentData {
 		}
 
 		if (externalAvailible && externalWriteable) {
-			if (android.os.Build.VERSION.SDK_INT >= 8) {
-				externalDir = context.getExternalFilesDir(null);
-			} else {
-				externalDir = Environment.getExternalStorageDirectory();
-			}
+			externalDir = context.getExternalFilesDir(null);
 		}
 
 		// Create the app folder if it doesn't exist
@@ -110,5 +106,5 @@ public class PersistentData {
 
 		return me;
 	}
-	
+
 }

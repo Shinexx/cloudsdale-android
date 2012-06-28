@@ -271,7 +271,7 @@ public class LoginActivity extends SherlockActivity {
 			LoginActivity.this.cancelDialog();
 			Toast.makeText(LoginActivity.this,
 					"There was an error logging in, please try again",
-					Toast.LENGTH_LONG);
+					Toast.LENGTH_LONG).show();
 		}
 
 		@Override
@@ -288,7 +288,7 @@ public class LoginActivity extends SherlockActivity {
 			} else {
 				Toast.makeText(LoginActivity.this,
 						"There was an error, please try again",
-						Toast.LENGTH_LONG);
+						Toast.LENGTH_LONG).show();
 			}
 		}
 	}

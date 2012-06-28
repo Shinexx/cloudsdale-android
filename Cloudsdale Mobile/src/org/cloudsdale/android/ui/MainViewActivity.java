@@ -6,7 +6,6 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.ui.fragments.CloudListFragment;
 import org.cloudsdale.android.ui.fragments.HomeFragment;
 
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +22,10 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.b3rwynmobile.fayeclient.FayeClient;
+import com.b3rwynmobile.fayeclient.FayeListener;
 import com.b3rwynmobile.fayeclient.FayeService;
+import com.b3rwynmobile.fayeclient.FayeService.FayeBinder;
 
 /**
  * Activity controller for the primary app view
@@ -32,10 +34,14 @@ import com.b3rwynmobile.fayeclient.FayeService;
  */
 public class MainViewActivity extends SherlockFragmentActivity {
 
-	private TabHost		mTabHost;
-	private ViewPager	mViewPager;
-	private TabsAdapter	mTabsAdapter;
-	private FayeService mFayeService;
+	private TabHost			tabHost;
+	private ViewPager		viewPager;
+	private TabsAdapter		tabsAdapter;
+	private FayeConnection	fayeConnection;
+	private FayeClient		fayeClient;
+	private FayeListener	fayeListener;
+
+	private boolean			serviceBound;
 
 	/**
 	 * Life cycle method for the creation of the activity
@@ -48,26 +54,39 @@ public class MainViewActivity extends SherlockFragmentActivity {
 		setContentView(R.layout.main_view);
 
 		// Setup the tabs
-		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
-		mTabHost.setup();
+		tabHost = (TabHost) findViewById(android.R.id.tabhost);
+		tabHost.setup();
 
-		mViewPager = (ViewPager) findViewById(R.id.pager);
+		viewPager = (ViewPager) findViewById(R.id.pager);
 
-		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
+		tabsAdapter = new TabsAdapter(this, tabHost, viewPager);
 
 		// Add the fragments to the tab
-		mTabsAdapter.addTab(mTabHost.newTabSpec("home").setIndicator("Home"),
+		tabsAdapter.addTab(tabHost.newTabSpec("home").setIndicator("Home"),
 				HomeFragment.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("clouds")
-				.setIndicator("Clouds"), CloudListFragment.class, null);
+		tabsAdapter.addTab(tabHost.newTabSpec("clouds").setIndicator("Clouds"),
+				CloudListFragment.class, null);
 
 		// Create an instance state if it doesn't exist
 		if (savedInstanceState != null) {
-			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
+			tabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
 		}
 
+	}
+
+	/**
+	 * Life cycle method for view starting, having already been created
+	 */
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		// Create the Faye Connection
+		fayeConnection = new FayeConnection();
+
 		// Start Faye
-		startService(new Intent(this, FayeService.class));
+		bindService(new Intent(this, FayeService.class), fayeConnection,
+				Context.BIND_AUTO_CREATE);
 	}
 
 	/**
@@ -76,7 +95,7 @@ public class MainViewActivity extends SherlockFragmentActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString("tab", mTabHost.getCurrentTabTag());
+		outState.putString("tab", tabHost.getCurrentTabTag());
 	}
 
 	/**
@@ -86,6 +105,15 @@ public class MainViewActivity extends SherlockFragmentActivity {
 	public boolean isFinishing() {
 		stopService(new Intent(this, FayeService.class));
 		return super.isFinishing();
+	}
+
+	/**
+	 * Returns the status of the bound service
+	 * 
+	 * @return Whether the service is bound or not
+	 */
+	public boolean isServiceBound() {
+		return serviceBound;
 	}
 
 	/**
@@ -199,4 +227,32 @@ public class MainViewActivity extends SherlockFragmentActivity {
 		}
 	}
 
+	private class FayeConnection implements ServiceConnection {
+
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder binder) {
+			// Cast the binder so it's usable
+			FayeBinder _binder = (FayeBinder) binder;
+
+			// Bind the faye objects
+			MainViewActivity.this.fayeClient = _binder.getFayeClient();
+			MainViewActivity.this.fayeListener = MainViewActivity.this.fayeClient
+					.getFayeListener();
+
+			// Set the bound status
+			MainViewActivity.this.serviceBound = true;
+			
+			// Open the socket connection
+			MainViewActivity.this.fayeClient.openSocketConnection();
+			
+			// Open the push connection
+			MainViewActivity.this.fayeClient.connectFaye();
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName className) {
+			MainViewActivity.this.serviceBound = false;
+		}
+
+	}
 }
