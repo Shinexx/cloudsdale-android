@@ -14,12 +14,12 @@ import oauth.signpost.exception.OAuthNotAuthorizedException;
 
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.authentication.CloudsdaleAsyncAuth;
-import org.cloudsdale.android.authentication.LoginBundle;
-import org.cloudsdale.android.authentication.OAuthBundle;
-import org.cloudsdale.android.authentication.Provider;
-import org.cloudsdale.android.models.FacebookResponse;
-import org.cloudsdale.android.models.User;
+import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.models.authentication.CloudsdaleAsyncAuth;
+import org.cloudsdale.android.models.authentication.LoginBundle;
+import org.cloudsdale.android.models.authentication.OAuthBundle;
+import org.cloudsdale.android.models.authentication.Provider;
+import org.cloudsdale.android.models.network_models.FacebookResponse;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -67,6 +67,10 @@ public class LoginActivity extends SherlockActivity {
 	private SharedPreferences			mPrefs;
 	private CommonsHttpOAuthConsumer	httpOauthConsumer;
 	private OAuthProvider				httpOauthProvider;
+
+	// Fields for Facebook login;
+	private boolean						fbRunnerWorking;
+	private String						fbId;
 
 	/**
 	 * Lifetime method for the creation of the controller
@@ -132,8 +136,9 @@ public class LoginActivity extends SherlockActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		// Create the register menu option
 		menu.add("Register")
-				.setIcon(R.drawable.user_add)
+				.setIcon(R.drawable.ic_register_user)
 				.setShowAsAction(
 						MenuItem.SHOW_AS_ACTION_IF_ROOM
 								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
@@ -180,45 +185,68 @@ public class LoginActivity extends SherlockActivity {
 	}
 
 	public void startFbAuthFlow() {
-		// Get existing token if it exists
-		mPrefs = getPreferences(MODE_PRIVATE);
-		String access_token = mPrefs.getString("access_token", null);
-		long expires = mPrefs.getLong("access_expires", 0);
-		if (access_token != null) {
-			facebook.setAccessToken(access_token);
-		}
-		if (expires != 0) {
-			facebook.setAccessExpires(expires);
-		}
-
-		// Only call auth if access has expired
-		if (!facebook.isSessionValid()) {
-			facebook.authorize(this, new String[] { "email" }, new FbListener());
-		} else {
-			// Start CD Auth flow
-			startCdAuthFromFb();
-		}
-
-	}
-
-	public void startCdAuthFromFb() {
 		// Show the dialog
 		showDialog();
 
-		// Get the user's uid from FB
-		FbAsyncRunner runner = new FbAsyncRunner(facebook);
-		runner.request("me", new Bundle(), new FbAsyncListener());
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// Get existing token if it exists
+				mPrefs = getPreferences(MODE_PRIVATE);
+				String access_token = mPrefs.getString("access_token", null);
+				long expires = mPrefs.getLong("access_expires", 0);
+
+				// Set items
+				if (access_token != null) {
+					facebook.setAccessToken(access_token);
+				}
+				if (expires != 0) {
+					facebook.setAccessExpires(expires);
+				}
+
+				// Only call auth if access has expired
+				if (!facebook.isSessionValid()) {
+					facebook.authorize(LoginActivity.this, new String[] {},
+							new FbListener());
+				}
+
+				// Start CD Auth flow
+				getFbUserId();
+
+				// Send the credentials to Cloudsdale
+				sendFbCredentials();
+			}
+		}).start();
 	}
 
-	public void sendFbCredentials(LoginBundle bundle) {
-		Auth auth = new Auth();
-		auth.execute(bundle);
+	public void getFbUserId() {
+		Log.d(TAG, "Getting FBID");
 
-		while (auth.getStatus() == AsyncTask.Status.RUNNING) {
+		// Get the user's uid from FB
+		fbRunnerWorking = true;
+		FbAsyncRunner runner = new FbAsyncRunner(facebook);
+		runner.request("me", new Bundle(), new FbAsyncListener());
+
+		while (fbRunnerWorking) {
 			continue;
 		}
+	}
 
-		cancelDialog();
+	public void sendFbCredentials() {
+		// Create the oAuth bundle
+		OAuthBundle oAuth = new OAuthBundle(Provider.FACEBOOK, fbId,
+				getString(R.string.cloudsdale_auth_token));
+
+		// Build the login bundle with the oAuth bundle
+		LoginBundle bundle = new LoginBundle(null, null,
+				getString(R.string.cloudsdale_api_url) + "sessions",
+				getString(R.string.cloudsdale_auth_token), oAuth);
+
+		// Send the credentials to Cloudsdale
+		Log.d(TAG, "Sending credentials");
+		Auth auth = new Auth();
+		auth.execute(bundle);
 	}
 
 	public void startTwitterAuthFlow() {
@@ -257,16 +285,10 @@ public class LoginActivity extends SherlockActivity {
 		}
 	}
 
-	public class Auth extends CloudsdaleAsyncAuth {
+	private class Auth extends CloudsdaleAsyncAuth {
 
 		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			LoginActivity.this.showDialog();
-		}
-
-		@Override
-		protected void onCancelled(User result) {
+		protected void onCancelled(LoggedUser result) {
 			super.onCancelled(result);
 			LoginActivity.this.cancelDialog();
 			Toast.makeText(LoginActivity.this,
@@ -275,13 +297,18 @@ public class LoginActivity extends SherlockActivity {
 		}
 
 		@Override
-		protected void onPostExecute(User result) {
+		protected void onPostExecute(LoggedUser result) {
 			LoginActivity.this.cancelDialog();
+			Log.d(TAG, "PostExecute hit");
 
 			if (result != null) {
-				PersistentData.StoreMe(result, LoginActivity.this);
+				Log.d(TAG, "Storing the user");
+				// Store the user
+				PersistentData.StoreMe(LoginActivity.this, result);
+
+				Log.d(TAG, "Forwarding to main view");
 				Intent intent = new Intent();
-				intent.setClass(LoginActivity.this, MainViewActivity.class);
+				intent.setClass(LoginActivity.this, CloudListActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
@@ -324,7 +351,6 @@ public class LoginActivity extends SherlockActivity {
 			editor.putString("access_token", facebook.getAccessToken());
 			editor.putLong("access_expires", facebook.getAccessExpires());
 			editor.commit();
-			startCdAuthFromFb();
 		}
 
 		@Override
@@ -358,17 +384,15 @@ public class LoginActivity extends SherlockActivity {
 		@Override
 		public void onComplete(String response, Object state) {
 			Looper.prepare();
+
+			// Deserialize the response
 			Gson gson = new Gson();
 			FacebookResponse fbr = gson.fromJson(response,
 					FacebookResponse.class);
-			String id = fbr.getId();
-			OAuthBundle oAuth = new OAuthBundle(Provider.FACEBOOK, id,
-					getString(R.string.cloudsdale_auth_token));
-			LoginBundle bundle = new LoginBundle(null, null,
-					getString(R.string.cloudsdale_api_url) + "sessions",
-					getString(R.string.cloudsdale_auth_token), oAuth);
 
-			sendFbCredentials(bundle);
+			// Set the fields
+			LoginActivity.this.fbId = fbr.getId();
+			LoginActivity.this.fbRunnerWorking = false;
 		}
 
 		@Override

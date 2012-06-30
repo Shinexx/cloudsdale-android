@@ -1,7 +1,7 @@
 package org.cloudsdale.android;
 
+import org.cloudsdale.android.ui.CloudListActivity;
 import org.cloudsdale.android.ui.LoginActivity;
-import org.cloudsdale.android.ui.MainViewActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,7 +28,7 @@ public class StartActivity extends SherlockActivity {
 		
 		if(PersistentData.getMe(this) != null) {
 			Intent intent = new Intent();
-			intent.setClass(this, MainViewActivity.class);
+			intent.setClass(this, CloudListActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);

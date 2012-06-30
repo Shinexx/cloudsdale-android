@@ -2,7 +2,9 @@
 <resources>
 
     <style name="Theme.CloudsdaleLight" parent="Theme.HoloEverywhereLight.Sherlock"></style>
-	<style name="Theme.CloudsdaleLightNoActionBar" parent="Theme.HoloEverywhereLight"></style>
+
+    <style name="Theme.CloudsdaleLightNoActionBar" parent="Theme.HoloEverywhereLight"></style>
+
     <style name="Theme.CloudsdaleDark" parent="Theme.HoloEverywhereDark.Sherlock"></style>
 
 </resources>

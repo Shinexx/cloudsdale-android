@@ -1,6 +1,6 @@
 package org.cloudsdale.android.models;
 
-public class AvatarContainer {
+public class AvatarContainer extends Model {
 
 	// Private attributes
 	private String	normal;

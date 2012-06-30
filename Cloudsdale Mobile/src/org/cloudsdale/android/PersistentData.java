@@ -6,22 +6,28 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import org.cloudsdale.android.models.User;
+import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.models.api_models.Cloud;
+import org.cloudsdale.android.models.api_models.User;
 
 import android.content.Context;
 import android.os.Environment;
 
+import com.bugsense.trace.BugSenseHandler;
 import com.google.gson.Gson;
 
 /**
- * Persistent Data object for Cloudsdale
- * Stores items in the flat file system on external memory, writes to the DB on
- * app death
+ * Persistent Data object for Cloudsdale. Stores items in the flat file system
+ * on external memory through basic CRUD operations
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 public class PersistentData {
+
+	private static final String	TAG	= "Cloudsdale PersistentData";
 
 	/**
 	 * Gets the proper external storage location according to the systems API
@@ -66,7 +72,7 @@ public class PersistentData {
 	 * @param me
 	 *            The logged in user
 	 */
-	public static void StoreMe(User me, Context context) {
+	public static void StoreMe(Context context, LoggedUser me) {
 		try {
 			File external = new File(getExternalStorage(context) + "/me");
 			if (!external.exists()) {
@@ -80,12 +86,19 @@ public class PersistentData {
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			BugSenseHandler.log(TAG, e);
 		}
 	}
 
-	public static User getMe(Context context) {
-		User me = null;
+	/**
+	 * Get the logged in user off of the file system
+	 * 
+	 * @param context
+	 *            The activity context
+	 * @return The logged in user
+	 */
+	public static LoggedUser getMe(Context context) {
+		LoggedUser me = null;
 		File external;
 
 		try {
@@ -98,13 +111,191 @@ public class PersistentData {
 			String json = br.readLine();
 			br.close();
 
-			me = gson.fromJson(json, User.class);
+			me = gson.fromJson(json, LoggedUser.class);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return me;
+	}
+
+	/**
+	 * Delete the logged in user stored on the file system
+	 * 
+	 * @param context
+	 *            The activity context
+	 */
+	public static void deleteMe(Context context) {
+		// Get the me file
+		File external = new File(getExternalStorage(context) + "/me");
+
+		// If it's there, delete it
+		// LAWL DEFENSIVE CODE, EVEN IF NO ONE WILL EVER TOUCH THIS :D
+		if (external.exists()) {
+			external.delete();
+		}
+	}
+
+	/**
+	 * Store a cloud on the file system
+	 * 
+	 * @param cloud
+	 *            The cloud to be stored
+	 * @param context
+	 *            The activity context
+	 */
+	public static void storeCloud(Context context, Cloud cloud) {
+		try {
+			// Get the external file
+			File external = new File(getExternalStorage(context) + "/clouds");
+			if (!external.exists()) {
+				external.createNewFile();
+			}
+
+			// Get any existing clouds
+			ArrayList<Cloud> clouds = getClouds(context);
+
+			// If there aren't any existing clouds, create the data object
+			if (clouds == null) {
+				clouds = new ArrayList<Cloud>();
+			}
+
+			// Add the cloud
+			clouds.add(cloud);
+
+			// Serialize and store the cloud object
+			Gson gson = new Gson();
+			BufferedWriter bw = new BufferedWriter(new FileWriter(external));
+			bw.write(gson.toJson(clouds.toArray()));
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			BugSenseHandler.log(TAG, e);
+		}
+	}
+
+	/**
+	 * Get an array list of all the clouds stored on the file system
+	 * 
+	 * @param context
+	 *            The context of the activity
+	 * @return An ArrayList of all clouds on the file system
+	 */
+	public static ArrayList<Cloud> getClouds(Context context) {
+		ArrayList<Cloud> clouds = null;
+		File external;
+
+		try {
+			// Get the external file
+			external = new File(getExternalStorage(context) + "/clouds");
+			if (!external.exists()) { return clouds; }
+
+			// Build the JSON
+			Gson gson = new Gson();
+			BufferedReader br = new BufferedReader(new FileReader(external));
+			String json = br.readLine();
+			br.close();
+
+			// Deserialize the array
+			Cloud[] clouds_temp = gson.fromJson(json, Cloud[].class);
+
+			// Convert the array to a list
+			if (clouds_temp != null) {
+				clouds = new ArrayList<Cloud>(Arrays.asList(clouds_temp));
+			} else {
+				User me = getMe(context);
+				clouds = new ArrayList<Cloud>(me.getClouds());
+			}
+		} catch (IOException e) {
+			BugSenseHandler.log(TAG, e);
+		}
+
+		return clouds;
+	}
+
+	/**
+	 * Get a specific cloud off of the file system
+	 * 
+	 * @param cloudId
+	 *            The string ID of the cloud to search for
+	 * @param context
+	 *            The activity context
+	 * @return The cloud with the passed ID
+	 */
+	public static Cloud getCloud(Context context, String cloudId) {
+		Cloud cloud = null;
+		File external;
+
+		try {
+			// Get the external file
+			external = new File(getExternalStorage(context) + "/clouds");
+			if (!external.exists()) { return cloud; }
+
+			// Build the JSON
+			Gson gson = new Gson();
+			BufferedReader br = new BufferedReader(new FileReader(external));
+			String json = br.readLine();
+			br.close();
+
+			// Deserialize the array
+			Cloud[] clouds_temp = gson.fromJson(json, Cloud[].class);
+
+			// Get the cloud by id
+			if (clouds_temp != null) {
+				for (Cloud _cloud : clouds_temp) {
+					if (_cloud.getId().equals(cloudId)) {
+						cloud = _cloud;
+						break;
+					}
+				}
+			}
+		} catch (IOException e) {
+			BugSenseHandler.log(TAG, e);
+		}
+
+		return cloud;
+	}
+
+	/**
+	 * Deletes a cloud out of the stored list
+	 * 
+	 * @param context
+	 *            The activity context
+	 * @param cloud
+	 *            The cloud to be deleted
+	 */
+	public static void deleteCloud(Context context, Cloud cloud) {
+		// Get all the clouds
+		ArrayList<Cloud> clouds = getClouds(context);
+
+		// If the cloud is in the list, delete it
+		if (clouds != null) {
+			if (clouds.contains(cloud)) {
+				clouds.remove(cloud);
+			}
+		}
+	}
+
+	/**
+	 * Delete a cloud from the stored list
+	 * 
+	 * @param context
+	 *            The activity context
+	 * @param cloudId
+	 *            The string ID of the cloud to be deleted
+	 */
+	public static void deleteCloud(Context context, String cloudId) {
+		// Get all the clouds
+		ArrayList<Cloud> clouds = getClouds(context);
+
+		// Get the cloud
+		Cloud cloud = getCloud(context, cloudId);
+
+		// If the cloud is in the list, delete it
+		if (clouds != null && cloud != null && clouds.contains(cloud)) {
+			clouds.remove(cloud);
+		}
 	}
 
 }

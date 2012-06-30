@@ -10,3 +10,5 @@ json
 serializer
 writeable
 app
+faye
+deserialize
