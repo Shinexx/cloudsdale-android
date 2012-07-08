@@ -4,7 +4,6 @@ public class ApiResponse extends Response {
 
 	private ApiResult	result;
 
-	@Override
 	public ApiResult getResult() {
 		return result;
 	}

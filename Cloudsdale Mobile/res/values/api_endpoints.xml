@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="sessions_endpoint">sessions</string>
-    <string name="user_endpoint">user/%1$s</string>
+    <string name="sessions_endpoint">sessions.json</string>
+    <string name="user_endpoint">user/%1$s.json</string>
     <string name="user_clouds_endpoint">%1$s/clouds.json</string>
+    <string name="api_base">http://www.cloudsdale.org/v1/</string>
 
 </resources>

@@ -40,30 +40,37 @@ public class CloudListActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 
-		LoggedUser me = PersistentData.getMe(this);
+		final LoggedUser me = PersistentData.getMe(this);
 
-		// data objects
-		Resources res = getResources();
-		QueryData data = new QueryData();
-		ArrayList<BasicNameValuePair> headers = new ArrayList<BasicNameValuePair>();
+		if (me == null) {
+			Intent intent = new Intent();
+			intent.setClass(this, LoginActivity.class);
+			startActivity(intent);
+		}
 
-		// Build the headers
-		headers.add(new BasicNameValuePair("X-Auth-Token", me.getClientId()));
-
-		// Put the data in the query object
-		data.setUrl(res.getString(R.string.user_endpoint, me.getId()));
-		data.setHeaders(headers);
-
-		// Get the user from the API
-		final UserGetQuery query = new UserGetQuery();
-		final LoggedUser u = (LoggedUser) query.execute(data);
-		u.setClientId(me.getClientId());
-
-		// Write the user's cloud to the file system
+		// Get and write the user to the file system
 		Thread t = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
+				// data objects
+				Resources res = CloudListActivity.this.getResources();
+				QueryData data = new QueryData();
+				ArrayList<BasicNameValuePair> headers = new ArrayList<BasicNameValuePair>();
+
+				// Build the headers
+				headers.add(new BasicNameValuePair("X-Auth-Token", me
+						.getClientId()));
+
+				// Put the data in the query object
+				data.setUrl(res.getString(R.string.api_base)
+						+ res.getString(R.string.user_endpoint, me.getId()));
+				data.setHeaders(headers);
+
+				// Get the user from the API
+				UserGetQuery query = new UserGetQuery();
+				LoggedUser u = (LoggedUser) query.execute(data);
+
 				// Show the progress bar
 				CloudListActivity.this.getSherlock()
 						.setProgressBarIndeterminateVisibility(true);
@@ -72,6 +79,9 @@ public class CloudListActivity extends SherlockFragmentActivity implements
 				while (query.isAlive()) {
 					continue;
 				}
+
+				// Set the temp user's client id
+				u.setClientId(me.getClientId());
 
 				// Store all the user's clouds
 				for (Cloud cloud : u.getClouds()) {

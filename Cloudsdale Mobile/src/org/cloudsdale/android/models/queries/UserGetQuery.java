@@ -1,12 +1,10 @@
 package org.cloudsdale.android.models.queries;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.params.HttpParams;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api_models.User;
@@ -32,12 +30,13 @@ public class UserGetQuery extends GetQuery {
 				// Setup HTTP components
 				setupHttpObjects(data.getUrl());
 
-				// Set parameters
-				try {
-					httpGet.setParams((HttpParams) new UrlEncodedFormEntity(
-							data.getHeaders()));
-				} catch (UnsupportedEncodingException e) {
-					BugSenseHandler.log(TAG, e);
+				// Set the headers
+				if (data.getHeaders() != null) {
+					for (BasicNameValuePair nvp : data.getHeaders()) {
+						if (nvp.getName().equals("X-Auth-Token")) {
+							httpGet.setHeader(nvp.getName(), nvp.getValue());
+						}
+					}
 				}
 
 				// Query the API
@@ -51,6 +50,7 @@ public class UserGetQuery extends GetQuery {
 
 					// Build the json
 					json = EntityUtils.toString(httpResponse.getEntity());
+					json = stripHtml(json);
 
 					// Deserialize
 					Gson gson = new Gson();

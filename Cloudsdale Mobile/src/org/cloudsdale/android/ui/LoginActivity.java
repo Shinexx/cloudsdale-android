@@ -24,6 +24,7 @@ import org.cloudsdale.android.models.network_models.FacebookResponse;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -103,15 +104,7 @@ public class LoginActivity extends SherlockActivity {
 
 			@Override
 			public void onClick(View v) {
-				String email = emailField.getText().toString();
-				String pass = passwordField.getText().toString();
-				if (email != null && !email.equals("") && pass != null
-						&& !pass.equals("")) {
-					new Auth()
-							.execute(new LoginBundle(email, pass,
-									getString(R.string.cloudsdale_api_url)
-											+ "sessions", null, null));
-				}
+				sendCdCredentials();
 			}
 		});
 
@@ -192,6 +185,8 @@ public class LoginActivity extends SherlockActivity {
 
 			@Override
 			public void run() {
+				Looper.prepare();
+
 				// Get existing token if it exists
 				mPrefs = getPreferences(MODE_PRIVATE);
 				String access_token = mPrefs.getString("access_token", null);
@@ -214,39 +209,15 @@ public class LoginActivity extends SherlockActivity {
 				// Start CD Auth flow
 				getFbUserId();
 
+				// Chill while FB does its thing
+				while (fbRunnerWorking) {
+					continue;
+				}
+
 				// Send the credentials to Cloudsdale
 				sendFbCredentials();
 			}
 		}).start();
-	}
-
-	public void getFbUserId() {
-		Log.d(TAG, "Getting FBID");
-
-		// Get the user's uid from FB
-		fbRunnerWorking = true;
-		FbAsyncRunner runner = new FbAsyncRunner(facebook);
-		runner.request("me", new Bundle(), new FbAsyncListener());
-
-		while (fbRunnerWorking) {
-			continue;
-		}
-	}
-
-	public void sendFbCredentials() {
-		// Create the oAuth bundle
-		OAuthBundle oAuth = new OAuthBundle(Provider.FACEBOOK, fbId,
-				getString(R.string.cloudsdale_auth_token));
-
-		// Build the login bundle with the oAuth bundle
-		LoginBundle bundle = new LoginBundle(null, null,
-				getString(R.string.cloudsdale_api_url) + "sessions",
-				getString(R.string.cloudsdale_auth_token), oAuth);
-
-		// Send the credentials to Cloudsdale
-		Log.d(TAG, "Sending credentials");
-		Auth auth = new Auth();
-		auth.execute(bundle);
 	}
 
 	public void startTwitterAuthFlow() {
@@ -274,18 +245,78 @@ public class LoginActivity extends SherlockActivity {
 		}
 	}
 
+	public void getFbUserId() {
+		Log.d(TAG, "Getting FBID");
+
+		// Get the user's uid from FB
+		fbRunnerWorking = true;
+		FbAsyncRunner runner = new FbAsyncRunner(facebook);
+		runner.request("me", new Bundle(), new FbAsyncListener());
+	}
+
+	public void sendCdCredentials() {
+		// Get inputted email and password
+		String email = emailField.getText().toString();
+		String pass = passwordField.getText().toString();
+
+		// Check that neither is null
+		if (email != null && !email.equals("") && pass != null
+				&& !pass.equals("")) {
+			showDialog();
+			
+			// Get the api resources
+			Resources res = getResources();
+			String apiUrl = res.getString(R.string.api_base)
+					+ res.getString(R.string.sessions_endpoint);
+
+			// Build the login bundle and execute auth
+			LoginBundle login = new LoginBundle(email, pass, apiUrl, null, null);
+			Auth auth = new Auth();
+			auth.execute(login);
+		} else {
+			Toast.makeText(
+					this,
+					"You must fill out both the email and password fields to log in",
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	public void sendFbCredentials() {
+		Log.d(TAG, "Sending credentials");
+
+		// Create the oAuth bundle
+		OAuthBundle oAuth = new OAuthBundle(Provider.FACEBOOK, fbId,
+				getString(R.string.cloudsdale_auth_token));
+
+		// Build the login bundle with the oAuth bundle
+		LoginBundle bundle = new LoginBundle(null, null,
+				getString(R.string.cloudsdale_api_url) + "sessions",
+				getString(R.string.cloudsdale_auth_token), oAuth);
+
+		// Send the credentials to Cloudsdale
+		Auth auth = new Auth();
+		auth.execute(bundle);
+	}
+
 	public void showDialog() {
 		progress = ProgressDialog.show(this, "",
 				getString(R.string.login_dialog_wait_string));
 	}
 
 	public void cancelDialog() {
-		if (progress.isShowing()) {
+		if (progress != null && progress.isShowing()) {
 			progress.dismiss();
 		}
 	}
 
 	private class Auth extends CloudsdaleAsyncAuth {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+
+			Log.d(TAG, "Auth class is pre-executing");
+		}
 
 		@Override
 		protected void onCancelled(LoggedUser result) {

@@ -16,13 +16,18 @@ public abstract class Query {
 	abstract Model execute(QueryData data);
 
 	abstract void setupHttpObjects(String url);
-	
+
 	public final Thread.State getThreadState() {
 		return thread.getState();
 	}
-	
+
 	public final boolean isAlive() {
+		if (thread == null) { return false; }
 		return thread.isAlive();
+	}
+
+	public final String stripHtml(String htmlString) {
+		return android.text.Html.fromHtml(htmlString).toString();
 	}
 
 }

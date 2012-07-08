@@ -1,13 +1,15 @@
 package org.cloudsdale.android.models.network_models;
 
+import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.api_models.User;
 
 import com.google.gson.annotations.SerializedName;
 
 public class LoginResult extends Result {
-	private User		user;
+
 	@SerializedName("client_id")
-	protected String	clientId;
+	private String		clientId;
+	private LoggedUser	user;
 
 	/**
 	 * @return the user
@@ -20,7 +22,7 @@ public class LoginResult extends Result {
 	 * @param user
 	 *            the user to set
 	 */
-	public void setUser(User user) {
+	public void setUser(LoggedUser user) {
 		this.user = user;
 	}
 

@@ -11,15 +11,14 @@ import org.cloudsdale.android.models.api_models.Flash;
  */
 public class Response extends Model {
 	// Data objects
-	protected String	status;
+	protected int		status;
 	protected Error[]	errors;
 	protected Flash		flash;
-	protected Result	result;
 
 	/**
 	 * @return the status
 	 */
-	public String getStatus() {
+	public int getStatus() {
 		return status;
 	}
 
@@ -27,7 +26,7 @@ public class Response extends Model {
 	 * @param status
 	 *            the status to set
 	 */
-	public void setStatus(String status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 
@@ -59,14 +58,6 @@ public class Response extends Model {
 	 */
 	public void setFlash(Flash flash) {
 		this.flash = flash;
-	}
-
-	public Result getResult() {
-		return result;
-	}
-
-	public void setResult(Result result) {
-		this.result = result;
 	}
 
 }

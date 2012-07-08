@@ -7,21 +7,24 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
+import org.cloudsdale.android.models.annotations.GsonIgnoreExclusionStrategy;
 import org.cloudsdale.android.models.network_models.LoginResponse;
+
+import android.util.Log;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class SessionQuery extends PostQuery {
 
 	private static final String	TAG	= "Session Query";
+
 	private String				json;
 	private LoggedUser			user;
-	private Thread				thread;
 
 	@Override
 	public LoggedUser execute(final QueryData data) {
@@ -36,15 +39,14 @@ public class SessionQuery extends PostQuery {
 				// Set the entity
 				if (data.getHeaders() != null) {
 					try {
-						httpPost.setParams((HttpParams) new UrlEncodedFormEntity(
-								data.getHeaders()));
+						httpPost.setEntity(new UrlEncodedFormEntity(data
+								.getHeaders()));
 					} catch (UnsupportedEncodingException e) {
 						BugSenseHandler.log(TAG, e);
 					}
 				} else if (data.getJson() != null) {
 					try {
-						httpPost.setParams((HttpParams) new StringEntity(data
-								.getJson()));
+						httpPost.setEntity(new StringEntity(data.getJson()));
 					} catch (UnsupportedEncodingException e) {
 						BugSenseHandler.log(TAG, e);
 					}
@@ -61,14 +63,22 @@ public class SessionQuery extends PostQuery {
 
 					// Build the json
 					json = EntityUtils.toString(httpResponse.getEntity());
+					json = stripHtml(json);
+
+					Log.d(TAG, "Session API response: " + json);
 
 					// Deserialize
-					Gson gson = new Gson();
+					GsonBuilder gb = new GsonBuilder();
+					gb.setExclusionStrategies(new GsonIgnoreExclusionStrategy(
+							String[].class));
+					Gson gson = gb.create();
 					if (json != null) {
 						LoginResponse resp = gson.fromJson(json,
 								LoginResponse.class);
-						user = (LoggedUser) resp.getResult().getUser();
-						user.setClientId(resp.getResult().getClientId());
+						SessionQuery.this.user = (LoggedUser) resp.getResult()
+								.getUser();
+						SessionQuery.this.user.setClientId(resp.getResult()
+								.getClientId());
 					}
 				} catch (ClientProtocolException e) {
 					BugSenseHandler.log(TAG, e);
@@ -77,10 +87,15 @@ public class SessionQuery extends PostQuery {
 				}
 			}
 		});
-		
 		thread.start();
+
+		while (thread.isAlive()) {
+			continue;
+		}
+
+		Log.d(TAG, "User: " + (user == null ? "Null" : "Not Null"));
 
 		return user;
 	}
-	
+
 }

@@ -8,7 +8,6 @@ public class LoginResponse extends Response {
 	/**
 	 * @return the result
 	 */
-	@Override
 	public LoginResult getResult() {
 		return result;
 	}
