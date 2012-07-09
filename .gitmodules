@@ -16,3 +16,6 @@
 [submodule "submodules/Faye-Android"]
 	path = submodules/Faye-Android
 	url = git@github.com:IOMUSE/Faye-Android.git
+[submodule "submodules/UrlImageViewHelper"]
+	path = submodules/UrlImageViewHelper
+	url = git://github.com/koush/UrlImageViewHelper.git
