@@ -1,26 +1,5 @@
 package org.cloudsdale.android.ui;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-
-import oauth.signpost.OAuthProvider;
-import oauth.signpost.basic.DefaultOAuthProvider;
-import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
-import oauth.signpost.exception.OAuthCommunicationException;
-import oauth.signpost.exception.OAuthExpectationFailedException;
-import oauth.signpost.exception.OAuthMessageSignerException;
-import oauth.signpost.exception.OAuthNotAuthorizedException;
-
-import org.cloudsdale.android.PersistentData;
-import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.LoggedUser;
-import org.cloudsdale.android.models.authentication.CloudsdaleAsyncAuth;
-import org.cloudsdale.android.models.authentication.LoginBundle;
-import org.cloudsdale.android.models.authentication.OAuthBundle;
-import org.cloudsdale.android.models.authentication.Provider;
-import org.cloudsdale.android.models.network_models.FacebookResponse;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,6 +23,27 @@ import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.google.gson.Gson;
+
+import oauth.signpost.OAuthProvider;
+import oauth.signpost.basic.DefaultOAuthProvider;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
+import oauth.signpost.exception.OAuthNotAuthorizedException;
+
+import org.cloudsdale.android.PersistentData;
+import org.cloudsdale.android.R;
+import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.models.authentication.CloudsdaleAsyncAuth;
+import org.cloudsdale.android.models.authentication.LoginBundle;
+import org.cloudsdale.android.models.authentication.OAuthBundle;
+import org.cloudsdale.android.models.authentication.Provider;
+import org.cloudsdale.android.models.network_models.FacebookResponse;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 
 /**
  * Controller for the login view
@@ -177,6 +177,17 @@ public class LoginActivity extends SherlockActivity {
 		}
 	}
 
+	public void showDialog() {
+		progress = ProgressDialog.show(this, "",
+				getString(R.string.login_dialog_wait_string));
+	}
+
+	public void cancelDialog() {
+		if (progress != null && progress.isShowing()) {
+			progress.dismiss();
+		}
+	}
+
 	public void startFbAuthFlow() {
 		// Show the dialog
 		showDialog();
@@ -246,12 +257,10 @@ public class LoginActivity extends SherlockActivity {
 	}
 
 	public void getFbUserId() {
-		Log.d(TAG, "Getting FBID");
-
 		// Get the user's uid from FB
 		fbRunnerWorking = true;
 		FbAsyncRunner runner = new FbAsyncRunner(facebook);
-		runner.request("me", new Bundle(), new FbAsyncListener());
+		runner.request("me?fields=id", new Bundle(), new FbAsyncListener());
 	}
 
 	public void sendCdCredentials() {
@@ -263,7 +272,7 @@ public class LoginActivity extends SherlockActivity {
 		if (email != null && !email.equals("") && pass != null
 				&& !pass.equals("")) {
 			showDialog();
-			
+
 			// Get the api resources
 			Resources res = getResources();
 			String apiUrl = res.getString(R.string.api_base)
@@ -282,8 +291,6 @@ public class LoginActivity extends SherlockActivity {
 	}
 
 	public void sendFbCredentials() {
-		Log.d(TAG, "Sending credentials");
-
 		// Create the oAuth bundle
 		OAuthBundle oAuth = new OAuthBundle(Provider.FACEBOOK, fbId,
 				getString(R.string.cloudsdale_auth_token));
@@ -298,25 +305,7 @@ public class LoginActivity extends SherlockActivity {
 		auth.execute(bundle);
 	}
 
-	public void showDialog() {
-		progress = ProgressDialog.show(this, "",
-				getString(R.string.login_dialog_wait_string));
-	}
-
-	public void cancelDialog() {
-		if (progress != null && progress.isShowing()) {
-			progress.dismiss();
-		}
-	}
-
 	private class Auth extends CloudsdaleAsyncAuth {
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-
-			Log.d(TAG, "Auth class is pre-executing");
-		}
 
 		@Override
 		protected void onCancelled(LoggedUser result) {
@@ -330,14 +319,11 @@ public class LoginActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(LoggedUser result) {
 			LoginActivity.this.cancelDialog();
-			Log.d(TAG, "PostExecute hit");
 
 			if (result != null) {
-				Log.d(TAG, "Storing the user");
 				// Store the user
 				PersistentData.StoreMe(LoginActivity.this, result);
 
-				Log.d(TAG, "Forwarding to main view");
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, CloudListActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -386,17 +372,25 @@ public class LoginActivity extends SherlockActivity {
 
 		@Override
 		public void onFacebookError(FacebookError e) {
-
+			BugSenseHandler.log(TAG, e);
+			cancelDialog();
+			Toast.makeText(
+					LoginActivity.this,
+					"There was an error communicating with Facebook, please try again",
+					Toast.LENGTH_LONG).show();
 		}
 
 		@Override
 		public void onError(DialogError e) {
-
+			cancelDialog();
+			Toast.makeText(LoginActivity.this,
+					"Facebook encountered an error,  please try again",
+					Toast.LENGTH_LONG).show();
 		}
 
 		@Override
 		public void onCancel() {
-
+			cancelDialog();
 		}
 
 	}

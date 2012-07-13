@@ -32,18 +32,11 @@ public class CloudsdaleAsyncAuth extends
 
 	@Override
 	protected LoggedUser doInBackground(LoginBundle... params) {
-		// Build the json serializer
-		GsonBuilder gb = new GsonBuilder();
-		gb.serializeNulls();
-		gb.setExclusionStrategies(new GsonIgnoreExclusionStrategy(
-				String[].class));
-		gson = gb.create();
-
 		// Create the post object
 		QueryData data = new QueryData();
 		data.setUrl(params[0].getLoginUrl());
 
-		// Set email/password if supplied
+		// Set email/password if supplied, else set the json
 		if (params[0].getUsernameInput() != null
 				&& params[0].getPasswordInput() != null) {
 			ArrayList<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>(
@@ -54,10 +47,15 @@ public class CloudsdaleAsyncAuth extends
 					.getPasswordInput()));
 
 			data.setHeaders(nameValuePairs);
-		}
-
-		// Else set json
-		else if (params[0].getoAuthBundle() != null) {
+		} else if (params[0].getoAuthBundle() != null) {
+			// Build the json serializer
+			GsonBuilder gb = new GsonBuilder();
+			gb.serializeNulls();
+			gb.setExclusionStrategies(new GsonIgnoreExclusionStrategy(
+					String[].class));
+			gson = gb.create();
+			
+			// Build the json to send off
 			String oAuthJson = " { \"oauth\": "
 					+ gson.toJson(params[0].getoAuthBundle(), OAuthBundle.class)
 					+ "}";
@@ -68,10 +66,6 @@ public class CloudsdaleAsyncAuth extends
 		// Query the server and return the User to the caller
 		SessionQuery query = new SessionQuery();
 		LoggedUser u = query.execute(data);
-
-		while (query.isAlive()) {
-			continue;
-		}
 
 		return u;
 	}

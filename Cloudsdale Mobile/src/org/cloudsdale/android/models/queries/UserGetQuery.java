@@ -22,13 +22,16 @@ public class UserGetQuery extends GetQuery {
 
 	@Override
 	public User execute(final QueryData data) {
+		// Mark the query as alive
+		isAlive = true;
+
+		// Setup HTTP components
+		setupHttpObjects(data.getUrl());
 
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				// Setup HTTP components
-				setupHttpObjects(data.getUrl());
 
 				// Set the headers
 				if (data.getHeaders() != null) {
@@ -69,5 +72,4 @@ public class UserGetQuery extends GetQuery {
 
 		return u;
 	}
-
 }
