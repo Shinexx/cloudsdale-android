@@ -4,12 +4,10 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -22,15 +20,12 @@ import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
+import com.google.api.client.auth.oauth.OAuthAuthorizeTemporaryTokenUrl;
+import com.google.api.client.auth.oauth.OAuthCredentialsResponse;
+import com.google.api.client.auth.oauth.OAuthGetTemporaryToken;
+import com.google.api.client.auth.oauth.OAuthHmacSigner;
+import com.google.api.client.http.apache.ApacheHttpTransport;
 import com.google.gson.Gson;
-
-import oauth.signpost.OAuthProvider;
-import oauth.signpost.basic.DefaultOAuthProvider;
-import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
-import oauth.signpost.exception.OAuthCommunicationException;
-import oauth.signpost.exception.OAuthExpectationFailedException;
-import oauth.signpost.exception.OAuthMessageSignerException;
-import oauth.signpost.exception.OAuthNotAuthorizedException;
 
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
@@ -51,27 +46,25 @@ import java.net.MalformedURLException;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 public class LoginActivity extends SherlockActivity {
-	public static final String			TAG						= "Cloudsdale LoginViewActivity";
-	public static final int				FACEBOOK_ACTIVITY_CODE	= 10298;
+	public static final String	TAG						= "Cloudsdale LoginViewActivity";
+	public static final int		FACEBOOK_ACTIVITY_CODE	= 10298;
 
 	@SuppressWarnings("unused")
-	private static final String			FILENAME				= "AndroidSSO_data";
+	private static final String	FILENAME				= "AndroidSSO_data";
 
-	private EditText					emailField;
-	private EditText					passwordField;
-	private Button						cdButton;
-	private Button						fbButton;
-	private Button						twitterButton;
-	private ProgressDialog				progress;
+	private EditText			emailField;
+	private EditText			passwordField;
+	private Button				cdButton;
+	private Button				fbButton;
+	private Button				twitterButton;
+	private ProgressDialog		progress;
 
-	private Facebook					facebook;
-	private SharedPreferences			mPrefs;
-	private CommonsHttpOAuthConsumer	httpOauthConsumer;
-	private OAuthProvider				httpOauthProvider;
+	private Facebook			facebook;
+	private SharedPreferences	mPrefs;
 
 	// Fields for Facebook login;
-	private boolean						fbRunnerWorking;
-	private String						fbId;
+	private boolean				fbRunnerWorking;
+	private String				fbId;
 
 	/**
 	 * Lifetime method for the creation of the controller
@@ -147,33 +140,37 @@ public class LoginActivity extends SherlockActivity {
 		facebook.authorizeCallback(requestCode, resultCode, data);
 	}
 
-	protected void onResume(Intent intent) {
-		super.onNewIntent(intent);
+	@Override
+	protected void onResume() {
+		super.onResume();
+		WebView webview = new WebView(this);
+		webview.getSettings().setJavaScriptEnabled(true);
+		webview.setVisibility(View.VISIBLE);
+		setContentView(webview);
 
-		Uri uri = intent.getData();
-		showDialog();
+		final OAuthHmacSigner signer = new OAuthHmacSigner();
+		signer.clientSharedSecret = getString(R.string.twitter_consumer_secret);
 
-		// Handle twitter login when url is for Twitter
-		if (uri != null
-				&& uri.toString().startsWith(
-						getString(R.string.twitter_callback_url))) {
-			String verifier = uri
-					.getQueryParameter(oauth.signpost.OAuth.OAUTH_VERIFIER);
+		OAuthGetTemporaryToken temporaryToken = new OAuthGetTemporaryToken(
+				getString(R.string.twitter_request_url));
+		temporaryToken.transport = new ApacheHttpTransport();
+		temporaryToken.signer = signer;
+		temporaryToken.consumerKey = getString(R.string.twitter_consumer_key);
+		temporaryToken.callback = getString(R.string.twitter_callback_url);
 
-			try {
-				httpOauthProvider.retrieveAccessToken(httpOauthConsumer,
-						verifier);
-				String userKey = httpOauthConsumer.getToken();
-				String userSecret = httpOauthConsumer.getTokenSecret();
+		OAuthCredentialsResponse tempCredentials;
+		try {
+			tempCredentials = temporaryToken.execute();
+			signer.tokenSharedSecret = tempCredentials.tokenSecret;
 
-				Log.d(TAG, "User key: " + userKey);
-				Log.d(TAG, "User secret: " + userSecret);
-				// Do CD login stuff here
-			} catch (Exception e) {
-				Toast.makeText(this, "There was an error, please try again",
-						Toast.LENGTH_LONG).show();
-				BugSenseHandler.log(TAG, e);
-			}
+			OAuthAuthorizeTemporaryTokenUrl authorizeUrl = new OAuthAuthorizeTemporaryTokenUrl(
+					getString(R.string.twitter_auth_url));
+			authorizeUrl.temporaryToken = tempCredentials.token;
+			String authorizationUrl = authorizeUrl.build();
+
+			webview.loadUrl(authorizationUrl);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -232,28 +229,6 @@ public class LoginActivity extends SherlockActivity {
 	}
 
 	public void startTwitterAuthFlow() {
-		try {
-			// Create OAuth objects
-			httpOauthConsumer = new CommonsHttpOAuthConsumer(
-					getString(R.string.twitter_consumer_key),
-					getString(R.string.twitter_consumer_secret));
-			httpOauthProvider = new DefaultOAuthProvider(
-					getString(R.string.twitter_request_url),
-					getString(R.string.twitter_access_token_url),
-					getString(R.string.twitter_auth_url));
-
-			// Get the request token and generate the login url
-			String authUrl = "";
-			AsyncTwitter twit = new AsyncTwitter();
-			authUrl = twit.doInBackground(new String[] { authUrl });
-
-			// Fire up the browser and get do oAuth
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(authUrl)));
-		} catch (Exception e) {
-			Toast.makeText(this, "There was an error, please try again",
-					Toast.LENGTH_LONG).show();
-			BugSenseHandler.log(TAG, e);
-		}
 	}
 
 	public void getFbUserId() {
@@ -334,29 +309,6 @@ public class LoginActivity extends SherlockActivity {
 						"There was an error, please try again",
 						Toast.LENGTH_LONG).show();
 			}
-		}
-	}
-
-	private class AsyncTwitter extends AsyncTask<String, Void, String> {
-
-		@Override
-		protected String doInBackground(String... params) {
-			try {
-				params[0] = httpOauthProvider.retrieveRequestToken(
-						httpOauthConsumer,
-						getString(R.string.twitter_callback_url));
-			} catch (OAuthMessageSignerException e) {
-				BugSenseHandler.log(TAG, e);
-			} catch (OAuthNotAuthorizedException e) {
-				BugSenseHandler.log(TAG, e);
-			} catch (OAuthExpectationFailedException e) {
-				BugSenseHandler.log(TAG, e);
-			} catch (OAuthCommunicationException e) {
-				BugSenseHandler.log(TAG, e);
-			}
-			Log.d(TAG, params[0]);
-
-			return params[0];
 		}
 	}
 
