@@ -39,6 +39,8 @@ public class StartActivity extends SherlockActivity {
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
 		}
+		
+		this.finish();
 	}
 
 }

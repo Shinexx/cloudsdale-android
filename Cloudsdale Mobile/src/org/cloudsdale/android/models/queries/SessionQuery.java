@@ -65,7 +65,9 @@ public class SessionQuery extends PostQuery {
 			httpResponse = httpClient.execute(httpPost);
 
 			// If we got anything other than 200 OK, break
-			if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
+			if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { throw new Exception(
+					"Server query failed with error code "
+							+ httpResponse.getStatusLine().getStatusCode()); }
 
 			// Build the json
 			BufferedReader reader = new BufferedReader(new InputStreamReader(

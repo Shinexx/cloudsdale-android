@@ -1,7 +1,6 @@
 package org.cloudsdale.android.models.queries;
 
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 public abstract class GetQuery extends Query {
 
@@ -9,7 +8,7 @@ public abstract class GetQuery extends Query {
 
 	@Override
 	protected final void setupHttpObjects(String url) {
+		super.setupHttpObjects(url);
 		httpGet = new HttpGet(url);
-		httpClient = new DefaultHttpClient();
 	}
 }
