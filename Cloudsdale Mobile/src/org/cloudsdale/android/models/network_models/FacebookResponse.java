@@ -1,10 +1,9 @@
 package org.cloudsdale.android.models.network_models;
 
-
 public class FacebookResponse extends Response {
-	private String id;
-	private String type;
-	
+	private String	id;
+	private String	type;
+
 	public FacebookResponse() {
 	}
 
@@ -12,29 +11,30 @@ public class FacebookResponse extends Response {
 	 * @return the id
 	 */
 	public String getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
+		return this.id;
 	}
 
 	/**
 	 * @return the type
 	 */
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
 	}
-	
-	
+
 }

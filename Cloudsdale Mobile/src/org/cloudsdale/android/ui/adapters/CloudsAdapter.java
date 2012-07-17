@@ -1,10 +1,5 @@
 package org.cloudsdale.android.ui.adapters;
 
-import java.util.ArrayList;
-
-import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.api_models.Cloud;
-
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,27 +11,36 @@ import android.widget.TextView;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
+import org.cloudsdale.android.R;
+import org.cloudsdale.android.models.api_models.Cloud;
+
+import java.util.ArrayList;
+
 public class CloudsAdapter extends BaseAdapter {
 
-	private Activity				root;
-	private ArrayList<Cloud>		clouds;
-	private LayoutInflater	inflate;
+	private Activity			root;
+	private ArrayList<Cloud>	clouds;
+	private LayoutInflater		inflate;
 
 	public CloudsAdapter(Activity activity, ArrayList<Cloud> clouds) {
 		this.root = activity;
 		this.clouds = clouds;
-		this.inflate = (LayoutInflater) root
+		this.inflate = (LayoutInflater) this.root
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	}
+
+	public void addCloud(Cloud cloud) {
+		this.clouds.add(cloud);
 	}
 
 	@Override
 	public int getCount() {
-		return clouds.size();
+		return this.clouds.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return clouds.get(position);
+		return this.clouds.get(position);
 	}
 
 	@Override
@@ -53,7 +57,7 @@ public class CloudsAdapter extends BaseAdapter {
 		View cloudView = convertView;
 
 		if (convertView == null) {
-			cloudView = inflate.inflate(R.layout.cloud_list_item, null);
+			cloudView = this.inflate.inflate(R.layout.cloud_list_item, null);
 		}
 
 		// Get the view objects
@@ -65,10 +69,6 @@ public class CloudsAdapter extends BaseAdapter {
 				R.drawable.unknown_cloud, 60000 * 60);
 		tv.setText(cloud.getName());
 		return cloudView;
-	}
-
-	public void addCloud(Cloud cloud) {
-		clouds.add(cloud);
 	}
 
 }

@@ -5,7 +5,7 @@ public class ApiResponse extends Response {
 	private ApiResult	result;
 
 	public ApiResult getResult() {
-		return result;
+		return this.result;
 	}
 
 	public void setResult(ApiResult result) {

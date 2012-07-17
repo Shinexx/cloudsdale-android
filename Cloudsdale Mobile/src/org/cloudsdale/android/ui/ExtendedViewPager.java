@@ -15,15 +15,15 @@ public class ExtendedViewPager extends ViewPager {
 	}
 
 	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if (this.enabled) { return super.onTouchEvent(event); }
+	public boolean onInterceptTouchEvent(MotionEvent event) {
+		if (this.enabled) { return super.onInterceptTouchEvent(event); }
 
 		return false;
 	}
 
 	@Override
-	public boolean onInterceptTouchEvent(MotionEvent event) {
-		if (this.enabled) { return super.onInterceptTouchEvent(event); }
+	public boolean onTouchEvent(MotionEvent event) {
+		if (this.enabled) { return super.onTouchEvent(event); }
 
 		return false;
 	}

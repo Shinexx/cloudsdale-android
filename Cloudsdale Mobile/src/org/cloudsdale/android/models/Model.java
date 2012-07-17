@@ -1,9 +1,9 @@
 package org.cloudsdale.android.models;
 
+import org.cloudsdale.android.ISO8601;
+
 import java.text.ParseException;
 import java.util.Calendar;
-
-import org.cloudsdale.android.ISO8601;
 
 /**
  * Basic model class for shared properties and model logic

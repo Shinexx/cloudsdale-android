@@ -1,5 +1,7 @@
 package org.cloudsdale.android.models.queries;
 
+import android.content.Context;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -15,31 +17,31 @@ public abstract class Query implements ThreadCompleteListener {
 	protected NotifyingThread	thread;
 	protected boolean			isAlive;
 
-	abstract Model execute(QueryData data);
-
-	protected void setupHttpObjects(String url) {
-		httpClient = new DefaultHttpClient();
+	public final void addListener(ThreadCompleteListener listener) {
+		this.thread.addListener(listener);
 	}
 
 	public final Thread.State getThreadState() {
-		return thread.getState();
+		return this.thread.getState();
 	}
 
 	public final boolean isAlive() {
-		return isAlive;
+		return this.isAlive;
+	}
+
+	@Override
+	public final void notifyOfThreadComplete(Thread thread) {
+		this.isAlive = false;
+	}
+
+	protected void setupHttpObjects(String url) {
+		this.httpClient = new DefaultHttpClient();
 	}
 
 	public final String stripHtml(String htmlString) {
 		return android.text.Html.fromHtml(htmlString).toString();
 	}
 
-	public final void addListener(ThreadCompleteListener listener) {
-		thread.addListener(listener);
-	}
-	
-	@Override
-	public final void notifyOfThreadComplete(Thread thread) {
-		isAlive = false;
-	}
-	
+	public abstract Model execute(QueryData data, Context context);
+
 }

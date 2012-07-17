@@ -16,25 +16,24 @@ public class Response extends Model {
 	protected Flash		flash;
 
 	/**
-	 * @return the status
-	 */
-	public int getStatus() {
-		return status;
-	}
-
-	/**
-	 * @param status
-	 *            the status to set
-	 */
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	/**
 	 * @return the errors
 	 */
 	public Error[] getErrors() {
-		return errors;
+		return this.errors;
+	}
+
+	/**
+	 * @return the flash
+	 */
+	public Flash getFlash() {
+		return this.flash;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public int getStatus() {
+		return this.status;
 	}
 
 	/**
@@ -46,18 +45,19 @@ public class Response extends Model {
 	}
 
 	/**
-	 * @return the flash
-	 */
-	public Flash getFlash() {
-		return flash;
-	}
-
-	/**
 	 * @param the
 	 *            flash to set
 	 */
 	public void setFlash(Flash flash) {
 		this.flash = flash;
+	}
+
+	/**
+	 * @param status
+	 *            the status to set
+	 */
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
 }

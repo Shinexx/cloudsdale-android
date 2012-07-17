@@ -10,7 +10,7 @@ public class IdentityModel extends Model {
 	protected String	id;
 
 	public String getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(String id) {

@@ -17,33 +17,59 @@ public class CloudListActivity extends SherlockFragmentActivity implements
 	private boolean		mTwoPane;
 
 	@Override
+	public void onBackPressed() {
+		if (this.slideMenu.isShowing()) {
+			this.slideMenu.hide();
+		} else {
+			super.onBackPressed();
+		}
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity_cloud_list);
 
 		if (findViewById(R.id.cloud_detail_container) != null) {
-			mTwoPane = true;
+			this.mTwoPane = true;
 			((CloudListFragment) getSupportFragmentManager().findFragmentById(
 					R.id.cloud_list)).setActivateOnItemClick(true);
 		}
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		slideMenu = new SlideMenu(this);
-		slideMenu.checkEnabled();
+		this.slideMenu = new SlideMenu(this);
+		this.slideMenu.checkEnabled();
+	}
+
+	@Override
+	public void onItemSelected(String id) {
+		if (this.mTwoPane) {
+			Bundle arguments = new Bundle();
+			arguments.putString(CloudDetailFragment.ARG_ITEM_ID, id);
+			CloudDetailFragment fragment = new CloudDetailFragment();
+			fragment.setArguments(arguments);
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.cloud_detail_container, fragment).commit();
+
+		} else {
+			Intent detailIntent = new Intent(this, CloudDetailActivity.class);
+			detailIntent.putExtra(CloudDetailFragment.ARG_ITEM_ID, id);
+			startActivity(detailIntent);
+		}
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				slideMenu.show();
+				this.slideMenu.show();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
 
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -106,31 +132,5 @@ public class CloudListActivity extends SherlockFragmentActivity implements
 		// }
 		// });
 		// t.start();
-	}
-
-	@Override
-	public void onItemSelected(String id) {
-		if (mTwoPane) {
-			Bundle arguments = new Bundle();
-			arguments.putString(CloudDetailFragment.ARG_ITEM_ID, id);
-			CloudDetailFragment fragment = new CloudDetailFragment();
-			fragment.setArguments(arguments);
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.cloud_detail_container, fragment).commit();
-
-		} else {
-			Intent detailIntent = new Intent(this, CloudDetailActivity.class);
-			detailIntent.putExtra(CloudDetailFragment.ARG_ITEM_ID, id);
-			startActivity(detailIntent);
-		}
-	}
-
-	@Override
-	public void onBackPressed() {
-		if(slideMenu.isShowing()) {
-			slideMenu.hide();
-		} else {
-			super.onBackPressed();
-		}
 	}
 }

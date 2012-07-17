@@ -9,6 +9,6 @@ public abstract class GetQuery extends Query {
 	@Override
 	protected final void setupHttpObjects(String url) {
 		super.setupHttpObjects(url);
-		httpGet = new HttpGet(url);
+		this.httpGet = new HttpGet(url);
 	}
 }

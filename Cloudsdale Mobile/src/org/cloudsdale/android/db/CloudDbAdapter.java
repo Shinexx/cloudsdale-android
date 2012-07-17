@@ -12,9 +12,35 @@ import android.util.Log;
  * Database adapter for long-term cloud storage
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
- * 
  */
 public class CloudDbAdapter {
+	/**
+	 * Helper class for database basic executions
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com)
+	 */
+	private static class DatabaseHelper extends SQLiteOpenHelper {
+
+		DatabaseHelper(Context context) {
+			super(context, CloudDbAdapter.DATABASE_NAME, null,
+					CloudDbAdapter.DATABASE_VERSION);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			db.execSQL(CloudDbAdapter.DATABASE_CREATE);
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			Log.w(CloudDbAdapter.TAG, "Upgrading cloud db from version "
+					+ oldVersion + " to " + newVersion
+					+ ", which will destroy all old data");
+			db.execSQL("DROP TABLE IF EXISTS clouds");
+			onCreate(db);
+		}
+	}
+
 	// Column names
 	public static final String	KEY_ID				= "cloud_id";
 	public static final String	KEY_NAME			= "name";
@@ -24,11 +50,12 @@ public class CloudDbAdapter {
 	public static final String	KEY_AVATARN			= "avatar_normal";
 	public static final String	KEY_AVATARM			= "avatar_mini";
 	public static final String	KEY_AVATART			= "avatar_thumb";
-	public static final String	KEY_AVATARP			= "avatar_preview";
 
+	public static final String	KEY_AVATARP			= "avatar_preview";
 	// Helper objects
 	private static final String	TAG					= "CloudDbAdapter";
 	private DatabaseHelper		mDbHelper;
+
 	private SQLiteDatabase		mDb;
 
 	// Query to create the table as necessary
@@ -36,39 +63,13 @@ public class CloudDbAdapter {
 															+ "(cloud_id text primary key, name text not null, description text not null, "
 															+ "created_at text not null, chat_id text, avatar_normal text, avatar_mini text, "
 															+ "avatar_thumb text, avatar_preview text";
-
 	// Database identifiers
 	private static final String	DATABASE_NAME		= "cloudsdale_data";
 	private static final String	TABLE_NAME			= "clouds";
+
 	private static final int	DATABASE_VERSION	= 0;
 
 	private final Context		mCtx;
-
-	/**
-	 * Helper class for database basic executions
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com)
-	 * 
-	 */
-	private static class DatabaseHelper extends SQLiteOpenHelper {
-
-		DatabaseHelper(Context context) {
-			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		}
-
-		@Override
-		public void onCreate(SQLiteDatabase db) {
-			db.execSQL(DATABASE_CREATE);
-		}
-
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.w(TAG, "Upgrading cloud db from version " + oldVersion + " to "
-					+ newVersion + ", which will destroy all old data");
-			db.execSQL("DROP TABLE IF EXISTS clouds");
-			onCreate(db);
-		}
-	}
 
 	/**
 	 * Constructor
@@ -81,23 +82,10 @@ public class CloudDbAdapter {
 	}
 
 	/**
-	 * Open the connection to the Database
-	 * 
-	 * @return The Adapter with the open connection
-	 * @throws SQLException
-	 *             Failure to open the connection
-	 */
-	public CloudDbAdapter open() throws SQLException {
-		mDbHelper = new DatabaseHelper(mCtx);
-		mDb = mDbHelper.getWritableDatabase();
-		return this;
-	}
-
-	/**
 	 * Close the connection
 	 */
 	public void close() {
-		mDbHelper.close();
+		this.mDbHelper.close();
 	}
 
 	/**
@@ -117,16 +105,16 @@ public class CloudDbAdapter {
 			String created_at, String avatar_n, String avatar_m,
 			String avatar_t, String avatar_p) {
 		ContentValues initialValues = new ContentValues();
-		initialValues.put(KEY_ID, id);
-		initialValues.put(KEY_NAME, name);
-		initialValues.put(KEY_DESCRIPTION, description);
-		initialValues.put(KEY_CREATEDAT, created_at);
-		initialValues.put(KEY_AVATARN, avatar_n);
-		initialValues.put(KEY_AVATARM, avatar_m);
-		initialValues.put(KEY_AVATART, avatar_t);
-		initialValues.put(KEY_AVATARP, avatar_p);
+		initialValues.put(CloudDbAdapter.KEY_ID, id);
+		initialValues.put(CloudDbAdapter.KEY_NAME, name);
+		initialValues.put(CloudDbAdapter.KEY_DESCRIPTION, description);
+		initialValues.put(CloudDbAdapter.KEY_CREATEDAT, created_at);
+		initialValues.put(CloudDbAdapter.KEY_AVATARN, avatar_n);
+		initialValues.put(CloudDbAdapter.KEY_AVATARM, avatar_m);
+		initialValues.put(CloudDbAdapter.KEY_AVATART, avatar_t);
+		initialValues.put(CloudDbAdapter.KEY_AVATARP, avatar_p);
 
-		return mDb.insert(TABLE_NAME, null, initialValues);
+		return this.mDb.insert(CloudDbAdapter.TABLE_NAME, null, initialValues);
 	}
 
 	/**
@@ -137,7 +125,8 @@ public class CloudDbAdapter {
 	 * @return Whether the user was deleted or not
 	 */
 	public boolean deleteUser(String id) {
-		return mDb.delete(TABLE_NAME, KEY_ID + "=" + id, null) > 0;
+		return this.mDb.delete(CloudDbAdapter.TABLE_NAME, CloudDbAdapter.KEY_ID
+				+ "=" + id, null) > 0;
 	}
 
 	/**
@@ -146,8 +135,9 @@ public class CloudDbAdapter {
 	 * @return A cursor with access to all the users
 	 */
 	public Cursor fetchAllUsers() {
-		return mDb.query(TABLE_NAME, new String[] { KEY_ID, KEY_NAME,
-				KEY_DESCRIPTION }, null, null, null, null, null);
+		return this.mDb.query(CloudDbAdapter.TABLE_NAME, new String[] {
+				CloudDbAdapter.KEY_ID, CloudDbAdapter.KEY_NAME,
+				CloudDbAdapter.KEY_DESCRIPTION }, null, null, null, null, null);
 	}
 
 	/**
@@ -158,14 +148,29 @@ public class CloudDbAdapter {
 	 * @return A Cursor pointing to the database results
 	 */
 	public Cursor fetchUser(String id) {
-		Cursor mCursor = mDb.query(true, TABLE_NAME, new String[] { KEY_ID,
-				KEY_NAME, KEY_DESCRIPTION }, KEY_ID + "=" + id, null, null,
-				null, null, null);
+		Cursor mCursor = this.mDb.query(true, CloudDbAdapter.TABLE_NAME,
+				new String[] { CloudDbAdapter.KEY_ID, CloudDbAdapter.KEY_NAME,
+						CloudDbAdapter.KEY_DESCRIPTION }, CloudDbAdapter.KEY_ID
+						+ "=" + id, null, null, null, null, null);
 
-		if (mCursor != null)
+		if (mCursor != null) {
 			mCursor.moveToFirst();
+		}
 
 		return mCursor;
+	}
+
+	/**
+	 * Open the connection to the Database
+	 * 
+	 * @return The Adapter with the open connection
+	 * @throws SQLException
+	 *             Failure to open the connection
+	 */
+	public CloudDbAdapter open() throws SQLException {
+		this.mDbHelper = new DatabaseHelper(this.mCtx);
+		this.mDb = this.mDbHelper.getWritableDatabase();
+		return this;
 	}
 
 	/**
@@ -186,15 +191,16 @@ public class CloudDbAdapter {
 			String time_zone, String member_since, String avatar_n,
 			String avatar_m, String avatar_t, String avatar_c) {
 		ContentValues args = new ContentValues();
-		args.put(KEY_ID, id);
-		args.put(KEY_NAME, email);
-		args.put(KEY_DESCRIPTION, time_zone);
-		args.put(KEY_CREATEDAT, member_since);
-		args.put(KEY_AVATARN, avatar_n);
-		args.put(KEY_AVATARM, avatar_m);
-		args.put(KEY_AVATART, avatar_t);
-		args.put(KEY_AVATARP, avatar_c);
+		args.put(CloudDbAdapter.KEY_ID, id);
+		args.put(CloudDbAdapter.KEY_NAME, email);
+		args.put(CloudDbAdapter.KEY_DESCRIPTION, time_zone);
+		args.put(CloudDbAdapter.KEY_CREATEDAT, member_since);
+		args.put(CloudDbAdapter.KEY_AVATARN, avatar_n);
+		args.put(CloudDbAdapter.KEY_AVATARM, avatar_m);
+		args.put(CloudDbAdapter.KEY_AVATART, avatar_t);
+		args.put(CloudDbAdapter.KEY_AVATARP, avatar_c);
 
-		return mDb.update(TABLE_NAME, args, KEY_ID + "=" + id, null) > 0;
+		return this.mDb.update(CloudDbAdapter.TABLE_NAME, args,
+				CloudDbAdapter.KEY_ID + "=" + id, null) > 0;
 	}
 }

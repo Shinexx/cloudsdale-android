@@ -1,11 +1,11 @@
 package org.cloudsdale.android.models.authentication;
 
+import android.content.Context;
 
 /**
  * Bundle to store all the objects required for login
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
- * 
  */
 public class LoginBundle {
 	private String		usernameInput;
@@ -13,6 +13,7 @@ public class LoginBundle {
 	private String		loginUrl;
 	private String		authToken;
 	private OAuthBundle	oAuthBundle;
+	private Context		context;
 
 	/**
 	 * Constructor
@@ -34,21 +35,12 @@ public class LoginBundle {
 	}
 
 	/**
-	 * Get the user's username
+	 * Get the internal authorization token
 	 * 
-	 * @return The user's username
+	 * @return The internal authorization token string
 	 */
-	public String getUsernameInput() {
-		return usernameInput;
-	}
-
-	/**
-	 * Get the user's password
-	 * 
-	 * @return The user's password
-	 */
-	public String getPasswordInput() {
-		return passwordInput;
+	public String getAuthToken() {
+		return this.authToken;
 	}
 
 	/**
@@ -57,23 +49,32 @@ public class LoginBundle {
 	 * @return The url to log in to
 	 */
 	public String getLoginUrl() {
-		return loginUrl;
-	}
-
-	/**
-	 * Get the internal authorization token
-	 * 
-	 * @return The internal authorization token string
-	 */
-	public String getAuthToken() {
-		return authToken;
+		return this.loginUrl;
 	}
 
 	/**
 	 * @return the oAuthBundle
 	 */
 	public OAuthBundle getoAuthBundle() {
-		return oAuthBundle;
+		return this.oAuthBundle;
+	}
+
+	/**
+	 * Get the user's password
+	 * 
+	 * @return The user's password
+	 */
+	public String getPasswordInput() {
+		return this.passwordInput;
+	}
+
+	/**
+	 * Get the user's username
+	 * 
+	 * @return The user's username
+	 */
+	public String getUsernameInput() {
+		return this.usernameInput;
 	}
 
 	/**
@@ -82,5 +83,13 @@ public class LoginBundle {
 	 */
 	public void setoAuthBundle(OAuthBundle oAuthBundle) {
 		this.oAuthBundle = oAuthBundle;
+	}
+
+	public Context getContext() {
+		return context;
+	}
+
+	public void setContext(Context context) {
+		this.context = context;
 	}
 }

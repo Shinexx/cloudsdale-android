@@ -12,54 +12,55 @@ import android.util.Log;
  * Database adapter for long-term join table
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
- * 
  */
 public class CloudMessagesDbAdapter {
+	/**
+	 * Helper class for database basic executions
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com)
+	 */
+	private static class DatabaseHelper extends SQLiteOpenHelper {
+		DatabaseHelper(Context context) {
+			super(context, CloudMessagesDbAdapter.DATABASE_NAME, null,
+					CloudMessagesDbAdapter.DATABASE_VERSION);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			db.execSQL(CloudMessagesDbAdapter.DATABASE_CREATE);
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			Log.w(CloudMessagesDbAdapter.TAG,
+					"Upgrading message db from version " + oldVersion + " to "
+							+ newVersion + ", which will destroy the old data");
+			db.execSQL("DROP TABLE IF EXISTS messages");
+			onCreate(db);
+		}
+	}
+
 	// Column names
 	public static final String	KEY_CLOUDID			= "cloud_id";
-	public static final String	KEY_MESSAGEID		= "message_id";
 
+	public static final String	KEY_MESSAGEID		= "message_id";
 	// Helper objects
 	private static final String	TAG					= "CloudMessageDbAdapter";
 	private DatabaseHelper		mDbHelper;
+
 	private SQLiteDatabase		mDb;
 
 	// Query to create the database
 	private static final String	DATABASE_CREATE		= "create table cloud_messages "
 															+ "(cloud_id text references cloud(cloud_id, "
 															+ "message_id text references message(message_id), primary key(cloud_id, message_id))";
-
 	// Database Identifiers
 	private static final String	DATABASE_NAME		= "cloudsdale_data";
 	private static final String	TABLE_NAME			= "cloud_messages";
+
 	private static final int	DATABASE_VERSION	= 0;
 
 	private final Context		mCtx;
-
-	/**
-	 * Helper class for database basic executions
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com)
-	 * 
-	 */
-	private static class DatabaseHelper extends SQLiteOpenHelper {
-		DatabaseHelper(Context context) {
-			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		}
-
-		@Override
-		public void onCreate(SQLiteDatabase db) {
-			db.execSQL(DATABASE_CREATE);
-		}
-
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.w(TAG, "Upgrading message db from version " + oldVersion
-					+ " to " + newVersion + ", which will destroy the old data");
-			db.execSQL("DROP TABLE IF EXISTS messages");
-			onCreate(db);
-		}
-	}
 
 	/**
 	 * Constructor
@@ -71,23 +72,10 @@ public class CloudMessagesDbAdapter {
 	}
 
 	/**
-	 * Open the connection to the database
-	 * 
-	 * @return The adapter with the open connection
-	 * @throws SQLException
-	 *             Failure to open the connection
-	 */
-	public CloudMessagesDbAdapter open() throws SQLException {
-		mDbHelper = new DatabaseHelper(mCtx);
-		mDb = mDbHelper.getWritableDatabase();
-		return this;
-	}
-
-	/**
 	 * Close the connection
 	 */
 	public void close() {
-		mDbHelper.close();
+		this.mDbHelper.close();
 	}
 
 	/**
@@ -101,10 +89,11 @@ public class CloudMessagesDbAdapter {
 	 */
 	public long createCloudMessage(String cloud_id, String message_id) {
 		ContentValues initialValues = new ContentValues();
-		initialValues.put(KEY_CLOUDID, cloud_id);
-		initialValues.put(KEY_MESSAGEID, message_id);
+		initialValues.put(CloudMessagesDbAdapter.KEY_CLOUDID, cloud_id);
+		initialValues.put(CloudMessagesDbAdapter.KEY_MESSAGEID, message_id);
 
-		return mDb.insert(TABLE_NAME, null, initialValues);
+		return this.mDb.insert(CloudMessagesDbAdapter.TABLE_NAME, null,
+				initialValues);
 	}
 
 	/**
@@ -117,8 +106,10 @@ public class CloudMessagesDbAdapter {
 	 * @return Whether the delete was successful
 	 */
 	public boolean deleteCloudMessage(String cloud_id, String message_id) {
-		return mDb.delete(TABLE_NAME, KEY_CLOUDID + "=" + cloud_id + " and "
-				+ KEY_MESSAGEID + "=" + message_id, null) > 0;
+		return this.mDb.delete(CloudMessagesDbAdapter.TABLE_NAME,
+				CloudMessagesDbAdapter.KEY_CLOUDID + "=" + cloud_id + " and "
+						+ CloudMessagesDbAdapter.KEY_MESSAGEID + "="
+						+ message_id, null) > 0;
 	}
 
 	/**
@@ -127,9 +118,10 @@ public class CloudMessagesDbAdapter {
 	 * @return A cursor with the results
 	 */
 	public Cursor fetchAllCloudMessages() {
-		return mDb.query(TABLE_NAME,
-				new String[] { KEY_CLOUDID, KEY_MESSAGEID }, null, null, null,
-				null, null);
+		return this.mDb.query(CloudMessagesDbAdapter.TABLE_NAME, new String[] {
+				CloudMessagesDbAdapter.KEY_CLOUDID,
+				CloudMessagesDbAdapter.KEY_MESSAGEID }, null, null, null, null,
+				null);
 	}
 
 	/**
@@ -140,15 +132,31 @@ public class CloudMessagesDbAdapter {
 	 * @return
 	 */
 	public Cursor fetchCloudMessages(String cloud_id, String message_id) {
-		Cursor mCursor = mDb.query(true, TABLE_NAME, new String[] {
-				KEY_CLOUDID, KEY_MESSAGEID }, KEY_CLOUDID + "=" + cloud_id,
-				null, null, null, null, null);
+		Cursor mCursor = this.mDb.query(true,
+				CloudMessagesDbAdapter.TABLE_NAME, new String[] {
+						CloudMessagesDbAdapter.KEY_CLOUDID,
+						CloudMessagesDbAdapter.KEY_MESSAGEID },
+				CloudMessagesDbAdapter.KEY_CLOUDID + "=" + cloud_id, null,
+				null, null, null, null);
 
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}
 
 		return mCursor;
+	}
+
+	/**
+	 * Open the connection to the database
+	 * 
+	 * @return The adapter with the open connection
+	 * @throws SQLException
+	 *             Failure to open the connection
+	 */
+	public CloudMessagesDbAdapter open() throws SQLException {
+		this.mDbHelper = new DatabaseHelper(this.mCtx);
+		this.mDb = this.mDbHelper.getWritableDatabase();
+		return this;
 	}
 
 	/**
@@ -160,10 +168,12 @@ public class CloudMessagesDbAdapter {
 	 */
 	public boolean updateCloudMessage(String cloud_id, String message_id) {
 		ContentValues args = new ContentValues();
-		args.put(KEY_CLOUDID, cloud_id);
-		args.put(KEY_MESSAGEID, message_id);
+		args.put(CloudMessagesDbAdapter.KEY_CLOUDID, cloud_id);
+		args.put(CloudMessagesDbAdapter.KEY_MESSAGEID, message_id);
 
-		return mDb.update(TABLE_NAME, args, KEY_CLOUDID + "=" + cloud_id + "&"
-				+ KEY_MESSAGEID + "=" + message_id, null) > 0;
+		return this.mDb.update(CloudMessagesDbAdapter.TABLE_NAME, args,
+				CloudMessagesDbAdapter.KEY_CLOUDID + "=" + cloud_id + "&"
+						+ CloudMessagesDbAdapter.KEY_MESSAGEID + "="
+						+ message_id, null) > 0;
 	}
 }

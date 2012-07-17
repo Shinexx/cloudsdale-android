@@ -4,11 +4,11 @@ import org.apache.http.client.methods.HttpPost;
 
 public abstract class PostQuery extends Query {
 
-	protected HttpPost httpPost;
-	
+	protected HttpPost	httpPost;
+
 	@Override
 	protected void setupHttpObjects(String url) {
 		super.setupHttpObjects(url);
-		httpPost = new HttpPost(url);
+		this.httpPost = new HttpPost(url);
 	}
 }

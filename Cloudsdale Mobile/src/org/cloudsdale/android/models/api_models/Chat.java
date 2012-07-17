@@ -11,7 +11,7 @@ public class Chat extends Model {
 	 * Default constructor
 	 */
 	public Chat() {
-		cloud = null;
+		this.cloud = null;
 	}
 
 	/**
@@ -25,7 +25,7 @@ public class Chat extends Model {
 	}
 
 	public Cloud getCloud() {
-		return cloud;
+		return this.cloud;
 	}
 
 	/**

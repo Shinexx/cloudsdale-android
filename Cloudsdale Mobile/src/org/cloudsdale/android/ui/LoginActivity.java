@@ -1,6 +1,9 @@
 package org.cloudsdale.android.ui;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -21,6 +24,7 @@ import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.google.gson.Gson;
+import com.zubhium.ZubhiumSDK;
 
 import oauth.signpost.OAuth;
 import oauth.signpost.OAuthProviderListener;
@@ -58,38 +62,246 @@ import java.net.MalformedURLException;
  *         Cloudsdale.org
  */
 public class LoginActivity extends SherlockActivity {
+	/**
+	 * Extension of CloudsdaleAsyncAuth to allow UI functions on execution
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com) code Copyright (c) 2012
+	 *         Cloudsdale.org
+	 */
+	private class CdAuth extends CloudsdaleAsyncAuth {
+
+		@Override
+		protected void onCancelled(LoggedUser result) {
+			// Close the dialog and inform the user of the error
+			super.onCancelled(result);
+			cancelDialog();
+			Toast.makeText(LoginActivity.this,
+					"There was an error logging in, please try again",
+					Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		protected void onPostExecute(LoggedUser result) {
+			// Close the dialog
+			cancelDialog();
+
+			// If a user was returned, store it and move on to the next activity
+			// Else, inform the user that there was an error
+			if (result != null) {
+				// Store the user
+				PersistentData.StoreMe(LoginActivity.this, result);
+
+				Intent intent = new Intent();
+				intent.setClass(LoginActivity.this, CloudListActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
+				finish();
+			} else {
+				if (++failureCount < 5) {
+					Toast.makeText(LoginActivity.this,
+							"There was an error, please try again",
+							Toast.LENGTH_LONG).show();
+				} else {
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							LoginActivity.this);
+					builder.setMessage("You seem to be having issues logging in. Would you like to try loading Cloudsdale in your web browser instead?")
+					.setCancelable(true)
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							startActivity(new Intent(Intent.ACTION_VIEW, Uri
+									.parse("http://www.cloudsdale.org")));
+							LoginActivity.this.finish();
+						}
+					})
+					.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// Do nothing, dialog dismisses
+						}
+					}).show();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Listener for Async queries
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com) code Copyright (c) 2012
+	 *         Cloudsdale.org
+	 */
+	private class FbAsyncListener implements
+			AsyncFacebookRunner.RequestListener {
+
+		@Override
+		public void onComplete(String response, Object state) {
+			Looper.prepare();
+
+			// Deserialize the response
+			Gson gson = new Gson();
+			FacebookResponse fbr = gson.fromJson(response,
+					FacebookResponse.class);
+
+			// Set the fields
+			LoginActivity.this.fbId = fbr.getId();
+			LoginActivity.this.fbRunnerWorking = false;
+		}
+
+		@Override
+		public void onFacebookError(FacebookError e, Object state) {
+
+		}
+
+		@Override
+		public void onFileNotFoundException(FileNotFoundException e,
+				Object state) {
+
+		}
+
+		@Override
+		public void onIOException(IOException e, Object state) {
+
+		}
+
+		@Override
+		public void onMalformedURLException(MalformedURLException e,
+				Object state) {
+
+		}
+
+	}
+
+	/**
+	 * Asychronus Facebook query runner
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com) code Copyright (c) 2012
+	 *         Cloudsdale.org
+	 */
+	private class FbAsyncRunner extends AsyncFacebookRunner {
+
+		public FbAsyncRunner(Facebook fb) {
+			super(fb);
+		}
+
+	}
+
+	/**
+	 * DialogListener listener for Facebook authentication
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com) code Copyright (c) 2012
+	 *         Cloudsdale.org
+	 */
+	private class FbListener implements Facebook.DialogListener {
+
+		@Override
+		public void onCancel() {
+			cancelDialog();
+		}
+
+		@Override
+		public void onComplete(Bundle values) {
+			SharedPreferences.Editor editor = LoginActivity.this.mPrefs.edit();
+			editor.putString("access_token",
+					LoginActivity.this.facebook.getAccessToken());
+			editor.putLong("access_expires",
+					LoginActivity.this.facebook.getAccessExpires());
+			editor.commit();
+			LoginActivity.this.fbRunnerWorking = false;
+		}
+
+		@Override
+		public void onError(DialogError e) {
+			cancelDialog();
+			Toast.makeText(LoginActivity.this,
+					"Facebook encountered an error,  please try again",
+					Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void onFacebookError(FacebookError e) {
+			BugSenseHandler.log(LoginActivity.TAG, e);
+			cancelDialog();
+			Toast.makeText(
+					LoginActivity.this,
+					"There was an error communicating with Facebook, please try again",
+					Toast.LENGTH_LONG).show();
+		}
+
+	}
+
 	public static final String				TAG						= "Cloudsdale LoginViewActivity";
 	public static final int					FACEBOOK_ACTIVITY_CODE	= 10298;
-
 	@SuppressWarnings("unused")
 	private static final String				FILENAME				= "AndroidSSO_data";
-
+	private static int						failureCount			= 0;
 	// Internal fields
 	private EditText						emailField;
 	private EditText						passwordField;
+
 	private Button							cdButton;
 	private Button							fbButton;
+
 	private Button							twitterButton;
 	private ProgressDialog					progress;
 
 	// Fields required by the Facebook SDK
 	private Facebook						facebook;
 	private SharedPreferences				mPrefs;
-
 	// Fields for Facebook login
 	private boolean							fbRunnerWorking;
 	private String							fbId;
-
 	// Fields for Twitter login
 	private static String					twitterConsumerKey;
+
 	private static String					twitterConsumerSecret;
+
 	private static CommonsHttpOAuthProvider	twitterProvider;
+
 	private static CommonsHttpOAuthConsumer	twitterConsumer;
+
 	private static Twitter					twitter;
+
+	/**
+	 * Hides the login dialog if it's displayed
+	 */
+	public void cancelDialog() {
+		if (this.progress != null && this.progress.isShowing()) {
+			this.progress.dismiss();
+		}
+	}
+
+	/**
+	 * Gets the user's id from Facebook
+	 */
+	private void getFbUserId() {
+		// Get the user's uid from FB
+		this.fbRunnerWorking = true;
+		FbAsyncRunner runner = new FbAsyncRunner(this.facebook);
+		runner.request("me", new Bundle(), new FbAsyncListener());
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		// Callback to Facebook
+		this.facebook.authorizeCallback(requestCode, resultCode, data);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// SET THEMES HERE
+
+		// Setup BugSense
+		BugSenseHandler.setup(this, "2bccbeb2");
+		// Setup Zubhium
+		ZubhiumSDK sdk = ZubhiumSDK.getZubhiumSDKInstance(
+				getApplicationContext(), "65de0ea209fa414beee8518bd08b05");
+		sdk.enableCrashReporting(true);
 
 		// Hide the Cloudsdale text and icon in the ActionBar
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -101,21 +313,21 @@ public class LoginActivity extends SherlockActivity {
 		setContentView(R.layout.login_view);
 
 		// Instantiate the Facebook client
-		facebook = new Facebook(getString(R.string.facebook_api_token));
+		this.facebook = new Facebook(getString(R.string.facebook_api_token));
 
 		// Grab the Twitter fields
-		twitterConsumerKey = getString(R.string.twitter_consumer_key);
-		twitterConsumerSecret = getString(R.string.twitter_consumer_secret);
+		LoginActivity.twitterConsumerKey = getString(R.string.twitter_consumer_key);
+		LoginActivity.twitterConsumerSecret = getString(R.string.twitter_consumer_secret);
 
 		// Bind the data entities
-		emailField = (EditText) findViewById(R.id.login_email_field);
-		passwordField = (EditText) findViewById(R.id.login_password_field);
-		cdButton = (Button) findViewById(R.id.login_view_cd_button);
-		fbButton = (Button) findViewById(R.id.login_view_fb_button);
-		twitterButton = (Button) findViewById(R.id.login_view_twitter_button);
+		this.emailField = (EditText) findViewById(R.id.login_email_field);
+		this.passwordField = (EditText) findViewById(R.id.login_password_field);
+		this.cdButton = (Button) findViewById(R.id.login_view_cd_button);
+		this.fbButton = (Button) findViewById(R.id.login_view_fb_button);
+		this.twitterButton = (Button) findViewById(R.id.login_view_twitter_button);
 
 		// Set the CD button listener
-		cdButton.setOnClickListener(new View.OnClickListener() {
+		this.cdButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -124,7 +336,7 @@ public class LoginActivity extends SherlockActivity {
 		});
 
 		// Set the FB button listener
-		fbButton.setOnClickListener(new View.OnClickListener() {
+		this.fbButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -133,7 +345,7 @@ public class LoginActivity extends SherlockActivity {
 		});
 
 		// Set the Twitter button listener
-		twitterButton.setOnClickListener(new View.OnClickListener() {
+		this.twitterButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -155,11 +367,9 @@ public class LoginActivity extends SherlockActivity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		// Callback to Facebook
-		facebook.authorizeCallback(requestCode, resultCode, data);
+	protected void onPause() {
+		super.onPause();
+		cancelDialog();
 	}
 
 	@Override
@@ -178,24 +388,27 @@ public class LoginActivity extends SherlockActivity {
 			final String verifier = uri.getQueryParameter(OAuth.OAUTH_VERIFIER);
 			new Thread(new Runnable() {
 
+				@Override
 				public void run() {
 					try {
 						Looper.prepare();
 
 						// Setup Twitter
-						twitterProvider.retrieveAccessToken(twitterConsumer,
-								verifier);
+						LoginActivity.twitterProvider.retrieveAccessToken(
+								LoginActivity.twitterConsumer, verifier);
 						AccessToken accessToken = new AccessToken(
-								twitterConsumer.getToken(),
-								twitterConsumer.getTokenSecret());
-						twitter = new TwitterFactory().getInstance();
-						twitter.setOAuthConsumer(
-								twitterConsumer.getConsumerKey(),
-								twitterConsumer.getConsumerSecret());
-						twitter.setOAuthAccessToken(accessToken);
-						String twId = String.valueOf(twitter
+								LoginActivity.twitterConsumer.getToken(),
+								LoginActivity.twitterConsumer.getTokenSecret());
+						LoginActivity.twitter = new TwitterFactory()
+								.getInstance();
+						LoginActivity.twitter.setOAuthConsumer(
+								LoginActivity.twitterConsumer.getConsumerKey(),
+								LoginActivity.twitterConsumer
+										.getConsumerSecret());
+						LoginActivity.twitter.setOAuthAccessToken(accessToken);
+						String twId = String.valueOf(LoginActivity.twitter
 								.verifyCredentials().getId());
-						Log.d(TAG, twId);
+						Log.d(LoginActivity.TAG, twId);
 
 						// Get the Twitter ID and send off to Cloudsdale
 						sendTwitterCredentials(twId);
@@ -219,164 +432,13 @@ public class LoginActivity extends SherlockActivity {
 		}
 	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-		cancelDialog();
-	}
-
-	/**
-	 * Shows the login dialog
-	 */
-	public void showDialog() {
-		progress = ProgressDialog.show(this, "",
-				getString(R.string.login_dialog_wait_string));
-	}
-
-	/**
-	 * Hides the login dialog if it's displayed
-	 */
-	public void cancelDialog() {
-		if (progress != null && progress.isShowing()) {
-			progress.dismiss();
-		}
-	}
-
-	/**
-	 * Starts the authentication flow using Facebook credentials
-	 */
-	private void startFbAuthFlow() {
-		// Show the dialog
-		showDialog();
-
-		// Get existing token if it exists
-		mPrefs = getPreferences(MODE_PRIVATE);
-		String access_token = mPrefs.getString("access_token", null);
-		long expires = mPrefs.getLong("access_expires", 0);
-
-		// Set items
-		if (access_token != null) {
-			facebook.setAccessToken(access_token);
-		}
-		if (expires != 0) {
-			facebook.setAccessExpires(expires);
-		}
-
-		// Only call auth if access has expired
-		if (!facebook.isSessionValid()) {
-			facebook.authorize(LoginActivity.this, new String[] {},
-					new FbListener());
-		}
-
-		// Get the credentials, then send to Cloudsdale
-		getFacebookCredentials();
-
-	}
-
-	/**
-	 * Starts the authentication flow using Twitter credentials
-	 */
-	private void startTwitterAuthFlow() {
-		// Show the dialog
-		showDialog();
-
-		SetupTwitterObjects();
-
-		// Get the auth url
-		new Thread(new Runnable() {
-
-			public void run() {
-				try {
-					String authUrl = twitterProvider.retrieveRequestToken(
-							twitterConsumer,
-							getString(R.string.twitter_callback_url));
-
-					// Call out to the browser for authorization
-					startActivity(new Intent(Intent.ACTION_VIEW,
-							Uri.parse(authUrl)));
-				} catch (OAuthMessageSignerException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (OAuthNotAuthorizedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (OAuthExpectationFailedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (OAuthCommunicationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			};
-
-		}).start();
-
-	}
-
-	/**
-	 * Sets up the Twitter authentication objects if necessary
-	 */
-	private void SetupTwitterObjects() {
-		// OAuth objects
-		twitterConsumer = new CommonsHttpOAuthConsumer(twitterConsumerKey,
-				twitterConsumerSecret);
-		twitterProvider = new CommonsHttpOAuthProvider(
-				getString(R.string.twitter_request_url),
-				getString(R.string.twitter_access_token_url),
-				getString(R.string.twitter_auth_url));
-		twitterProvider.setListener(new OAuthProviderListener() {
-
-			@Override
-			public void prepareSubmission(HttpRequest arg0) throws Exception {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void prepareRequest(HttpRequest arg0) throws Exception {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public boolean onResponseReceived(HttpRequest arg0,
-					HttpResponse arg1) throws Exception {
-				// TODO Auto-generated method stub
-				return false;
-			}
-		});
-	}
-
-	private void getFacebookCredentials() {
-		// Start CD Auth flow
-		getFbUserId();
-
-		// Chill while FB does its thing
-		while (fbRunnerWorking) {
-			continue;
-		}
-
-		// Send the credentials to Cloudsdale
-		sendFbCredentials();
-	}
-
-	/**
-	 * Gets the user's id from Facebook
-	 */
-	private void getFbUserId() {
-		// Get the user's uid from FB
-		fbRunnerWorking = true;
-		FbAsyncRunner runner = new FbAsyncRunner(facebook);
-		runner.request("me?fields=id", new Bundle(), new FbAsyncListener());
-	}
-
 	/**
 	 * Sends Cloudsdale credentials to Cloudsdale
 	 */
 	private void sendCdCredentials() {
 		// Get inputted email and password
-		String email = emailField.getText().toString();
-		String pass = passwordField.getText().toString();
+		String email = this.emailField.getText().toString();
+		String pass = this.passwordField.getText().toString();
 
 		// Check that neither is null
 		if (email != null && !email.equals("") && pass != null
@@ -404,7 +466,7 @@ public class LoginActivity extends SherlockActivity {
 	 */
 	private void sendFbCredentials() {
 		// Create the oAuth bundle
-		OAuthBundle oAuth = new OAuthBundle(Provider.FACEBOOK, fbId,
+		OAuthBundle oAuth = new OAuthBundle(Provider.FACEBOOK, this.fbId,
 				getString(R.string.cloudsdale_auth_token));
 
 		// Build the login bundle with the oAuth bundle
@@ -441,147 +503,133 @@ public class LoginActivity extends SherlockActivity {
 	}
 
 	/**
-	 * Extension of CloudsdaleAsyncAuth to allow UI functions on execution
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com) code Copyright (c) 2012
-	 *         Cloudsdale.org
+	 * Sets up the Twitter authentication objects if necessary
 	 */
-	private class CdAuth extends CloudsdaleAsyncAuth {
+	private void SetupTwitterObjects() {
+		// OAuth objects
+		LoginActivity.twitterConsumer = new CommonsHttpOAuthConsumer(
+				LoginActivity.twitterConsumerKey,
+				LoginActivity.twitterConsumerSecret);
+		LoginActivity.twitterProvider = new CommonsHttpOAuthProvider(
+				getString(R.string.twitter_request_url),
+				getString(R.string.twitter_access_token_url),
+				getString(R.string.twitter_auth_url));
+		LoginActivity.twitterProvider.setListener(new OAuthProviderListener() {
 
-		@Override
-		protected void onCancelled(LoggedUser result) {
-			// Close the dialog and inform the user of the error
-			super.onCancelled(result);
-			LoginActivity.this.cancelDialog();
-			Toast.makeText(LoginActivity.this,
-					"There was an error logging in, please try again",
-					Toast.LENGTH_LONG).show();
-		}
-
-		@Override
-		protected void onPostExecute(LoggedUser result) {
-			// Close the dialog
-			LoginActivity.this.cancelDialog();
-
-			// If a user was returned, store it and move on to the next activity
-			// Else, inform the user that there was an error
-			if (result != null) {
-				// Store the user
-				PersistentData.StoreMe(LoginActivity.this, result);
-
-				Intent intent = new Intent();
-				intent.setClass(LoginActivity.this, CloudListActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
-				LoginActivity.this.finish();
-			} else {
-				Toast.makeText(LoginActivity.this,
-						"There was an error, please try again",
-						Toast.LENGTH_LONG).show();
+			@Override
+			public boolean onResponseReceived(HttpRequest arg0,
+					HttpResponse arg1) throws Exception {
+				// TODO Auto-generated method stub
+				return false;
 			}
-		}
+
+			@Override
+			public void prepareRequest(HttpRequest arg0) throws Exception {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void prepareSubmission(HttpRequest arg0) throws Exception {
+				// TODO Auto-generated method stub
+
+			}
+		});
 	}
 
 	/**
-	 * DialogListener listener for Facebook authentication
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com) code Copyright (c) 2012
-	 *         Cloudsdale.org
+	 * Shows the login dialog
 	 */
-	private class FbListener implements Facebook.DialogListener {
+	public void showDialog() {
+		this.progress = ProgressDialog.show(this, "",
+				getString(R.string.login_dialog_wait_string));
+	}
 
-		@Override
-		public void onComplete(Bundle values) {
-			SharedPreferences.Editor editor = mPrefs.edit();
-			editor.putString("access_token", facebook.getAccessToken());
-			editor.putLong("access_expires", facebook.getAccessExpires());
-			editor.commit();
+	/**
+	 * Starts the authentication flow using Facebook credentials
+	 */
+	private void startFbAuthFlow() {
+		// Show the dialog
+		showDialog();
+
+		// Get existing token if it exists
+		this.mPrefs = getPreferences(Context.MODE_PRIVATE);
+		String access_token = this.mPrefs.getString("access_token", null);
+		long expires = this.mPrefs.getLong("access_expires", 0);
+
+		// Set items
+		if (access_token != null) {
+			this.facebook.setAccessToken(access_token);
+		}
+		if (expires != 0) {
+			this.facebook.setAccessExpires(expires);
 		}
 
-		@Override
-		public void onFacebookError(FacebookError e) {
-			BugSenseHandler.log(TAG, e);
-			cancelDialog();
-			Toast.makeText(
-					LoginActivity.this,
-					"There was an error communicating with Facebook, please try again",
-					Toast.LENGTH_LONG).show();
+		// Only call auth if access has expired
+		if (!this.facebook.isSessionValid()) {
+			this.facebook.authorize(LoginActivity.this, new String[] {},
+					new FbListener());
+			this.fbRunnerWorking = true;
 		}
 
-		@Override
-		public void onError(DialogError e) {
-			cancelDialog();
-			Toast.makeText(LoginActivity.this,
-					"Facebook encountered an error,  please try again",
-					Toast.LENGTH_LONG).show();
+		Log.d(TAG, "Facebook is " + (facebook == null ? "null" : "not null"));
+
+		while (this.fbRunnerWorking) {
+			continue;
 		}
 
-		@Override
-		public void onCancel() {
-			cancelDialog();
+		// Start CD Auth flow
+		getFbUserId();
+
+		// Chill while FB does its thing
+		while (this.fbRunnerWorking) {
+			continue;
 		}
+
+		// Send the credentials to Cloudsdale
+		sendFbCredentials();
 
 	}
 
 	/**
-	 * Asychronus Facebook query runner
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com) code Copyright (c) 2012
-	 *         Cloudsdale.org
+	 * Starts the authentication flow using Twitter credentials
 	 */
-	private class FbAsyncRunner extends AsyncFacebookRunner {
+	private void startTwitterAuthFlow() {
+		// Show the dialog
+		showDialog();
 
-		public FbAsyncRunner(Facebook fb) {
-			super(fb);
-		}
+		SetupTwitterObjects();
 
-	}
+		// Get the auth url
+		new Thread(new Runnable() {
 
-	/**
-	 * Listener for Async queries
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com) code Copyright (c) 2012
-	 *         Cloudsdale.org
-	 */
-	private class FbAsyncListener implements
-			AsyncFacebookRunner.RequestListener {
+			@Override
+			public void run() {
+				try {
+					String authUrl = LoginActivity.twitterProvider
+							.retrieveRequestToken(
+									LoginActivity.twitterConsumer,
+									getString(R.string.twitter_callback_url));
 
-		@Override
-		public void onComplete(String response, Object state) {
-			Looper.prepare();
+					// Call out to the browser for authorization
+					startActivity(new Intent(Intent.ACTION_VIEW, Uri
+							.parse(authUrl)));
+				} catch (OAuthMessageSignerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OAuthNotAuthorizedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OAuthExpectationFailedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OAuthCommunicationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			};
 
-			// Deserialize the response
-			Gson gson = new Gson();
-			FacebookResponse fbr = gson.fromJson(response,
-					FacebookResponse.class);
-
-			// Set the fields
-			LoginActivity.this.fbId = fbr.getId();
-			LoginActivity.this.fbRunnerWorking = false;
-		}
-
-		@Override
-		public void onIOException(IOException e, Object state) {
-
-		}
-
-		@Override
-		public void onFileNotFoundException(FileNotFoundException e,
-				Object state) {
-
-		}
-
-		@Override
-		public void onMalformedURLException(MalformedURLException e,
-				Object state) {
-
-		}
-
-		@Override
-		public void onFacebookError(FacebookError e, Object state) {
-
-		}
+		}).start();
 
 	}
 }

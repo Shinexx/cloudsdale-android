@@ -11,7 +11,21 @@ public class Flash extends Model {
 	 * @return the message
 	 */
 	public String getMessage() {
-		return message;
+		return this.message;
+	}
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return this.title;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return this.type;
 	}
 
 	/**
@@ -23,10 +37,11 @@ public class Flash extends Model {
 	}
 
 	/**
-	 * @return the type
+	 * @param title
+	 *            the title to set
 	 */
-	public String getType() {
-		return type;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	/**
@@ -35,20 +50,5 @@ public class Flash extends Model {
 	 */
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	/**
-	 * @return the title
-	 */
-	public String getTitle() {
-		return title;
-	}
-
-	/**
-	 * @param title
-	 *            the title to set
-	 */
-	public void setTitle(String title) {
-		this.title = title;
 	}
 }

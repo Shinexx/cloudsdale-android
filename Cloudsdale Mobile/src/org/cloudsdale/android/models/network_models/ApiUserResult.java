@@ -1,8 +1,8 @@
 package org.cloudsdale.android.models.network_models;
 
-import org.cloudsdale.android.models.api_models.User;
-
 import com.google.gson.annotations.SerializedName;
+
+import org.cloudsdale.android.models.api_models.User;
 
 public class ApiUserResult extends ApiResult {
 
@@ -11,7 +11,7 @@ public class ApiUserResult extends ApiResult {
 
 	@Override
 	public User getModel() {
-		return model;
+		return this.model;
 	}
 
 	public void setModel(User model) {

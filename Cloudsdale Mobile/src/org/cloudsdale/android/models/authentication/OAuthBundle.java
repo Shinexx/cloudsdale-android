@@ -1,8 +1,8 @@
 package org.cloudsdale.android.models.authentication;
 
-import org.cloudsdale.android.BCrypt;
-
 import com.google.gson.annotations.SerializedName;
+
+import org.cloudsdale.android.BCrypt;
 
 public class OAuthBundle {
 	private static final String	CLIENT_TYPE	= "android";
@@ -27,14 +27,43 @@ public class OAuthBundle {
 		this.provider = provider.toString();
 		this.uid = uid;
 		this.token = BCrypt.hashpw(uid + provider.toString(), token);
-		clientType = CLIENT_TYPE;
+		this.clientType = OAuthBundle.CLIENT_TYPE;
+	}
+
+	/**
+	 * @return the clientType
+	 */
+	public String getClientType() {
+		return this.clientType;
 	}
 
 	/**
 	 * @return the provider
 	 */
 	public String getProvider() {
-		return provider;
+		return this.provider;
+	}
+
+	/**
+	 * @return the token
+	 */
+	public String getToken() {
+		return this.token;
+	}
+
+	/**
+	 * @return the uid
+	 */
+	public String getUid() {
+		return this.uid;
+	}
+
+	/**
+	 * @param clientType
+	 *            the clientType to set
+	 */
+	public void setClientType(String clientType) {
+		this.clientType = clientType;
 	}
 
 	/**
@@ -46,28 +75,6 @@ public class OAuthBundle {
 	}
 
 	/**
-	 * @return the uid
-	 */
-	public String getUid() {
-		return uid;
-	}
-
-	/**
-	 * @param uid
-	 *            the uid to set
-	 */
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
-
-	/**
-	 * @return the token
-	 */
-	public String getToken() {
-		return token;
-	}
-
-	/**
 	 * @param token
 	 *            the token to set
 	 */
@@ -76,17 +83,10 @@ public class OAuthBundle {
 	}
 
 	/**
-	 * @return the clientType
+	 * @param uid
+	 *            the uid to set
 	 */
-	public String getClientType() {
-		return clientType;
-	}
-
-	/**
-	 * @param clientType
-	 *            the clientType to set
-	 */
-	public void setClientType(String clientType) {
-		this.clientType = clientType;
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 }

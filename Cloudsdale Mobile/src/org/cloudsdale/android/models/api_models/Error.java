@@ -1,8 +1,8 @@
 package org.cloudsdale.android.models.api_models;
 
-import org.cloudsdale.android.models.Model;
-
 import com.google.gson.annotations.SerializedName;
+
+import org.cloudsdale.android.models.Model;
 
 public class Error extends Model {
 	private String	type;
@@ -15,40 +15,46 @@ public class Error extends Model {
 	private String	message;
 
 	/**
-	 * @return the type
+	 * @return the message
 	 */
-	public String getType() {
-		return type;
-	}
-
-	/**
-	 * @param type
-	 *            the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	/**
-	 * @return the refType
-	 */
-	public String getRefType() {
-		return refType;
-	}
-
-	/**
-	 * @param refType
-	 *            the refType to set
-	 */
-	public void setRefType(String refType) {
-		this.refType = refType;
+	public String getMessage() {
+		return this.message;
 	}
 
 	/**
 	 * @return the refId
 	 */
 	public String getRefId() {
-		return refId;
+		return this.refId;
+	}
+
+	/**
+	 * @return the refNode
+	 */
+	public String getRefNode() {
+		return this.refNode;
+	}
+
+	/**
+	 * @return the refType
+	 */
+	public String getRefType() {
+		return this.refType;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return this.type;
+	}
+
+	/**
+	 * @param message
+	 *            the message to set
+	 */
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 	/**
@@ -60,13 +66,6 @@ public class Error extends Model {
 	}
 
 	/**
-	 * @return the refNode
-	 */
-	public String getRefNode() {
-		return refNode;
-	}
-
-	/**
 	 * @param refNode
 	 *            the refNode to set
 	 */
@@ -75,17 +74,18 @@ public class Error extends Model {
 	}
 
 	/**
-	 * @return the message
+	 * @param refType
+	 *            the refType to set
 	 */
-	public String getMessage() {
-		return message;
+	public void setRefType(String refType) {
+		this.refType = refType;
 	}
 
 	/**
-	 * @param message
-	 *            the message to set
+	 * @param type
+	 *            the type to set
 	 */
-	public void setMessage(String message) {
-		this.message = message;
+	public void setType(String type) {
+		this.type = type;
 	}
 }

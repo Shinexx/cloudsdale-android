@@ -1,5 +1,7 @@
 package org.cloudsdale.android.models.queries;
 
+import android.content.Context;
+
 import com.bugsense.trace.BugSenseHandler;
 
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
@@ -28,31 +30,32 @@ public class TwitterUserGetQuery extends GetQuery {
 	}
 
 	@Override
-	public TwitterResponse execute(QueryData data) {
+	public TwitterResponse execute(QueryData data, Context context) {
 		TwitterResponse twitterResponse = null;
 
 		try {
 			// Sign the request and execute it
-			oAuthConsumer.sign(httpGet);
-			httpResponse = httpClient.execute(httpGet);
+			this.oAuthConsumer.sign(this.httpGet);
+			this.httpResponse = this.httpClient.execute(this.httpGet);
 
 			// Deserialize the response
-			JSONObject array = new JSONObject(httpResponse.getEntity().toString());
+			JSONObject array = new JSONObject(this.httpResponse.getEntity()
+					.toString());
 			String id = array.getString("id");
 			twitterResponse = new TwitterResponse();
 			twitterResponse.setId(Integer.valueOf(id));
 		} catch (ClientProtocolException e) {
-			BugSenseHandler.log(TAG, e);
+			BugSenseHandler.log(TwitterUserGetQuery.TAG, e);
 		} catch (IOException e) {
-			BugSenseHandler.log(TAG, e);
+			BugSenseHandler.log(TwitterUserGetQuery.TAG, e);
 		} catch (OAuthMessageSignerException e) {
-			BugSenseHandler.log(TAG, e);
+			BugSenseHandler.log(TwitterUserGetQuery.TAG, e);
 		} catch (OAuthExpectationFailedException e) {
-			BugSenseHandler.log(TAG, e);
+			BugSenseHandler.log(TwitterUserGetQuery.TAG, e);
 		} catch (OAuthCommunicationException e) {
-			BugSenseHandler.log(TAG, e);
+			BugSenseHandler.log(TwitterUserGetQuery.TAG, e);
 		} catch (JSONException e) {
-			BugSenseHandler.log(TAG, e);
+			BugSenseHandler.log(TwitterUserGetQuery.TAG, e);
 		}
 
 		return twitterResponse;

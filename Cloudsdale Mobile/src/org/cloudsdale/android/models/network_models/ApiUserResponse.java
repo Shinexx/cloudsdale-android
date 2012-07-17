@@ -1,11 +1,12 @@
 package org.cloudsdale.android.models.network_models;
 
 public class ApiUserResponse extends ApiResponse {
-	
-	private ApiUserResult result;
 
+	private ApiUserResult	result;
+
+	@Override
 	public ApiUserResult getResult() {
-		return result;
+		return this.result;
 	}
 
 	public void setResult(ApiUserResult result) {

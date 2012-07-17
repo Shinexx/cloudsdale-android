@@ -1,8 +1,8 @@
 package org.cloudsdale.android.models.api_models;
 
-import java.util.Date;
-
 import org.cloudsdale.android.models.Model;
+
+import java.util.Date;
 
 public class Message extends Model {
 
@@ -15,34 +15,62 @@ public class Message extends Model {
 	private String	authorId;
 
 	public Message() {
-		timestamp = new Date();
-		content = "";
-		username = "";
-		userPath = "";
-		userAvatar = "";
-		authorId = "";
+		this.timestamp = new Date();
+		this.content = "";
+		this.username = "";
+		this.userPath = "";
+		this.userAvatar = "";
+		this.authorId = "";
 	}
 
 	/**
-	 * @return the timestamp
+	 * @return the authorId
 	 */
-	public Date getTimestamp() {
-		return timestamp;
-	}
-
-	/**
-	 * @param timestamp
-	 *            the timestamp to set
-	 */
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
+	public String getAuthorId() {
+		return this.authorId;
 	}
 
 	/**
 	 * @return the content
 	 */
 	public String getContent() {
-		return content;
+		return this.content;
+	}
+
+	/**
+	 * @return the timestamp
+	 */
+	public Date getTimestamp() {
+		return this.timestamp;
+	}
+
+	/**
+	 * @return the userAvatar
+	 */
+	public String getUserAvatar() {
+		return this.userAvatar;
+	}
+
+	/**
+	 * @return the username
+	 */
+	public String getUsername() {
+		return this.username;
+	}
+
+	/**
+	 * @return the userPath
+	 */
+	public String getUserPath() {
+		return this.userPath;
+	}
+
+	/**
+	 * @param authorId
+	 *            the authorId to set
+	 */
+	public void setAuthorId(String authorId) {
+		this.authorId = authorId;
 	}
 
 	/**
@@ -54,40 +82,11 @@ public class Message extends Model {
 	}
 
 	/**
-	 * @return the username
+	 * @param timestamp
+	 *            the timestamp to set
 	 */
-	public String getUsername() {
-		return username;
-	}
-
-	/**
-	 * @param username
-	 *            the username to set
-	 */
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	/**
-	 * @return the userPath
-	 */
-	public String getUserPath() {
-		return userPath;
-	}
-
-	/**
-	 * @param userPath
-	 *            the userPath to set
-	 */
-	public void setUserPath(String userPath) {
-		this.userPath = userPath;
-	}
-
-	/**
-	 * @return the userAvatar
-	 */
-	public String getUserAvatar() {
-		return userAvatar;
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	/**
@@ -99,18 +98,19 @@ public class Message extends Model {
 	}
 
 	/**
-	 * @return the authorId
+	 * @param username
+	 *            the username to set
 	 */
-	public String getAuthorId() {
-		return authorId;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	/**
-	 * @param authorId
-	 *            the authorId to set
+	 * @param userPath
+	 *            the userPath to set
 	 */
-	public void setAuthorId(String authorId) {
-		this.authorId = authorId;
+	public void setUserPath(String userPath) {
+		this.userPath = userPath;
 	}
 
 }

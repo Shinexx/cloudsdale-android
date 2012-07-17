@@ -10,25 +10,46 @@ public class AvatarContainer extends Model {
 	private String	chat;
 
 	/**
-	 * @return the normal
+	 * @return the chat
 	 */
-	public String getNormal() {
-		return normal;
-	}
-
-	/**
-	 * @param normal
-	 *            the normal to set
-	 */
-	public void setNormal(String normal) {
-		this.normal = normal;
+	public String getChat() {
+		return this.chat;
 	}
 
 	/**
 	 * @return the mini
 	 */
 	public String getMini() {
-		return mini;
+		return this.mini;
+	}
+
+	/**
+	 * @return the normal
+	 */
+	public String getNormal() {
+		return this.normal;
+	}
+
+	/**
+	 * @return the preview
+	 */
+	public String getPreview() {
+		return this.preview;
+	}
+
+	/**
+	 * @return the thumb
+	 */
+	public String getThumb() {
+		return this.thumb;
+	}
+
+	/**
+	 * @param chat
+	 *            the chat to set
+	 */
+	public void setChat(String chat) {
+		this.chat = chat;
 	}
 
 	/**
@@ -40,25 +61,11 @@ public class AvatarContainer extends Model {
 	}
 
 	/**
-	 * @return the thumb
+	 * @param normal
+	 *            the normal to set
 	 */
-	public String getThumb() {
-		return thumb;
-	}
-
-	/**
-	 * @param thumb
-	 *            the thumb to set
-	 */
-	public void setThumb(String thumb) {
-		this.thumb = thumb;
-	}
-
-	/**
-	 * @return the preview
-	 */
-	public String getPreview() {
-		return preview;
+	public void setNormal(String normal) {
+		this.normal = normal;
 	}
 
 	/**
@@ -70,18 +77,11 @@ public class AvatarContainer extends Model {
 	}
 
 	/**
-	 * @return the chat
+	 * @param thumb
+	 *            the thumb to set
 	 */
-	public String getChat() {
-		return chat;
-	}
-
-	/**
-	 * @param chat
-	 *            the chat to set
-	 */
-	public void setChat(String chat) {
-		this.chat = chat;
+	public void setThumb(String thumb) {
+		this.thumb = thumb;
 	}
 
 }
