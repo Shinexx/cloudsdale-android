@@ -15,7 +15,7 @@ public class CloudDetailActivity extends SherlockFragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_activity_cloud_detail);
+		setContentView(R.layout.activity_main_cloud_detail);
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

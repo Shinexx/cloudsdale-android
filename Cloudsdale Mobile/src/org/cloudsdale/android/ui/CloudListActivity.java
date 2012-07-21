@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
 
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.ui.fragments.CloudDetailFragment;
@@ -13,17 +12,7 @@ import org.cloudsdale.android.ui.fragments.CloudListFragment;
 public class CloudListActivity extends SherlockFragmentActivity implements
 		CloudListFragment.Callbacks {
 
-	private SlideMenu	slideMenu;
 	private boolean		mTwoPane;
-
-	@Override
-	public void onBackPressed() {
-		if (this.slideMenu.isShowing()) {
-			this.slideMenu.hide();
-		} else {
-			super.onBackPressed();
-		}
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,10 +24,6 @@ public class CloudListActivity extends SherlockFragmentActivity implements
 			((CloudListFragment) getSupportFragmentManager().findFragmentById(
 					R.id.cloud_list)).setActivateOnItemClick(true);
 		}
-
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		this.slideMenu = new SlideMenu(this);
-		this.slideMenu.checkEnabled();
 	}
 
 	@Override
@@ -56,18 +41,6 @@ public class CloudListActivity extends SherlockFragmentActivity implements
 			detailIntent.putExtra(CloudDetailFragment.ARG_ITEM_ID, id);
 			startActivity(detailIntent);
 		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				this.slideMenu.show();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-
 	}
 
 	@Override

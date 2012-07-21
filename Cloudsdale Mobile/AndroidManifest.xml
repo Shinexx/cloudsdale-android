@@ -74,6 +74,16 @@
         <!-- Services -->
         <service android:name="com.b3rwynmobile.fayeclient.FayeService" >
         </service>
+
+        <activity
+            android:name=".ui.HomeActivity"
+            android:label="@string/title_activity_home" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

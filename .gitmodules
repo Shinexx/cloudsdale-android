@@ -1,15 +1,6 @@
 [submodule "submodules/HoloEverywhere"]
 	path = submodules/HoloEverywhere
 	url = git://github.com/ChristopheVersieux/HoloEverywhere.git
-[submodule "submodules/ActionBarSherlock"]
-	path = submodules/ActionBarSherlock
-	url = git://github.com/JakeWharton/ActionBarSherlock.git
-[submodule "submodules/Android-PullToRefresh"]
-	path = submodules/Android-PullToRefresh
-	url = git://github.com/chrisbanes/Android-PullToRefresh.git
-[submodule "submodules/Android-ViewPagerIndicator"]
-	path = submodules/Android-ViewPagerIndicator
-	url = git://github.com/JakeWharton/Android-ViewPagerIndicator.git
 [submodule "submodules/facebook-android-sdk"]
 	path = submodules/facebook-android-sdk
 	url = git://github.com/facebook/facebook-android-sdk.git

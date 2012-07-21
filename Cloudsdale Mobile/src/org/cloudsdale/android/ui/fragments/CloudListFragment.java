@@ -1,6 +1,7 @@
 package org.cloudsdale.android.ui.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AbsListView;
@@ -11,6 +12,7 @@ import com.actionbarsherlock.app.SherlockListFragment;
 
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.models.api_models.Cloud;
+import org.cloudsdale.android.ui.CloudDetailActivity;
 import org.cloudsdale.android.ui.adapters.CloudsAdapter;
 
 import java.util.ArrayList;
@@ -40,10 +42,10 @@ public class CloudListFragment extends SherlockListFragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		if (!(activity instanceof Callbacks)) { throw new IllegalStateException(
-				"Activity must implement fragment's callbacks."); }
-
-		this.mCallbacks = (Callbacks) activity;
+//		if (!(activity instanceof Callbacks)) { throw new IllegalStateException(
+//				"Activity must implement fragment's callbacks."); }
+//
+//		this.mCallbacks = (Callbacks) activity;
 	}
 
 	@Override
@@ -72,7 +74,10 @@ public class CloudListFragment extends SherlockListFragment {
 		Cloud selectedCloud = (Cloud) listView.getAdapter().getItem(position);
 
 		// Send the cloud id
-		this.mCallbacks.onItemSelected(selectedCloud.getId());
+//		this.mCallbacks.onItemSelected(selectedCloud.getId());
+		Intent detailIntent = new Intent(getSherlockActivity(), CloudDetailActivity.class);
+		detailIntent.putExtra(CloudDetailFragment.ARG_ITEM_ID, id);
+		startActivity(detailIntent);
 	}
 
 	@Override

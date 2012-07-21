@@ -92,9 +92,7 @@ public class LoginActivity extends SherlockActivity {
 				PersistentData.StoreMe(LoginActivity.this, result);
 
 				Intent intent = new Intent();
-				intent.setClass(LoginActivity.this, CloudListActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.setClass(LoginActivity.this, HomeActivity.class);
 				startActivity(intent);
 				finish();
 			} else {
@@ -310,7 +308,7 @@ public class LoginActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 
 		// Set the layout
-		setContentView(R.layout.login_view);
+		setContentView(R.layout.activity_login);
 
 		// Instantiate the Facebook client
 		this.facebook = new Facebook(getString(R.string.facebook_api_token));

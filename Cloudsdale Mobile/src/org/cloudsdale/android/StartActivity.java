@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
-import org.cloudsdale.android.ui.CloudListActivity;
+import org.cloudsdale.android.ui.HomeActivity;
 import org.cloudsdale.android.ui.LoginActivity;
 
 public class StartActivity extends SherlockActivity {
@@ -19,7 +19,7 @@ public class StartActivity extends SherlockActivity {
 
 		if (PersistentData.getMe(this) != null) {
 			Intent intent = new Intent();
-			intent.setClass(this, CloudListActivity.class);
+			intent.setClass(this, HomeActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
