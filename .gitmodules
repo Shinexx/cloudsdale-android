@@ -10,3 +10,6 @@
 [submodule "submodules/UrlImageViewHelper"]
 	path = submodules/UrlImageViewHelper
 	url = git://github.com/koush/UrlImageViewHelper.git
+[submodule "submodules/ActionBarSherlock"]
+	path = submodules/ActionBarSherlock
+	url = git://github.com/JakeWharton/ActionBarSherlock.git
