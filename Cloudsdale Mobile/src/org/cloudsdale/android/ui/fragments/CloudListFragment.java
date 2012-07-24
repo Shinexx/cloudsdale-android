@@ -3,6 +3,7 @@ package org.cloudsdale.android.ui.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -17,7 +18,7 @@ import org.cloudsdale.android.ui.adapters.CloudsAdapter;
 
 import java.util.ArrayList;
 
-public class CloudListFragment extends SherlockListFragment {
+public class CloudListFragment extends ListFragment {
 
 	public interface Callbacks {
 
@@ -57,7 +58,7 @@ public class CloudListFragment extends SherlockListFragment {
 				.getClouds();
 
 		// Build the adapter
-		setListAdapter(new CloudsAdapter(getSherlockActivity(), myClouds));
+		setListAdapter(new CloudsAdapter(getActivity(), myClouds));
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class CloudListFragment extends SherlockListFragment {
 
 		// Send the cloud id
 //		this.mCallbacks.onItemSelected(selectedCloud.getId());
-		Intent detailIntent = new Intent(getSherlockActivity(), CloudDetailActivity.class);
+		Intent detailIntent = new Intent(getActivity(), CloudDetailActivity.class);
 		detailIntent.putExtra(CloudDetailFragment.ARG_ITEM_ID, id);
 		startActivity(detailIntent);
 	}

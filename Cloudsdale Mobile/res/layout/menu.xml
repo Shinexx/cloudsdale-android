@@ -5,46 +5,11 @@
     android:background="#000000"
     android:orientation="vertical" >
 
-    <RelativeLayout
-        android:layout_width="250dip"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp" >
-
-        <ImageView
-            android:id="@+id/slide_menu_user_icon"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_margin="8dp"
-            android:src="@drawable/unknown_user" />
-
-        <TextView
-            android:id="@+id/slide_menu_username_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_margin="8dp"
-            android:layout_toRightOf="@+id/slide_menu_user_icon"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#FFFFFF" />
-    </RelativeLayout>
-
     <ListView
         android:id="@+id/slide_menu_list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:divider="#666666"
         android:dividerHeight="2dp" />
-
-    <fragment
-        android:id="@+id/slide_menu_cloud_list"
-        android:name="org.cloudsdale.android.ui.fragments.CloudListFragment"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <FrameLayout
-        android:id="@+id/overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </LinearLayout>

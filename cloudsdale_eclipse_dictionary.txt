@@ -12,3 +12,5 @@ writeable
 app
 faye
 deserialize
+actionbar
+avatar

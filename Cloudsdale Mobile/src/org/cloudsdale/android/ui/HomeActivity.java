@@ -4,40 +4,53 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+import com.slidingmenu.lib.SlidingMenu;
+import com.slidingmenu.lib.app.SlidingActivity;
 
+import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api_models.User;
 import org.cloudsdale.android.models.enums.Role;
 
-public class HomeActivity extends SherlockFragmentActivity implements SlideMenuInterface.OnSlideMenuItemClickListener {
+public class HomeActivity extends SlidingActivity {
 
-	private ImageView	avatarView;
-	private TextView	usernameView;
-	private TextView	accountLevelView;
-	private TextView	dateRegisteredView;
-	private TextView	cloudCountView;
-	private TextView	warningCountView;
-	private SlideMenu	slideMenu;
+	private static final String	TAG	= "Home Activity";
 
+	private ImageView			avatarView;
+	private TextView			usernameView;
+	private TextView			accountLevelView;
+	private TextView			dateRegisteredView;
+	private TextView			cloudCountView;
+	private TextView			warningCountView;
+	private SlidingMenu			slidingMenu;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// Set the layouts
 		setContentView(R.layout.activity_home);
+		setBehindContentView(R.layout.menu);
 
+		// Get the view objects
 		getViews();
+		slidingMenu = getSlidingMenu();
+		Cloudsdale.prepareSlideMenu(slidingMenu, this);
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		slideMenu = new SlideMenu(this, R.layout.menu, this, 333);
+		// Customize actionbar
+		ActionBar actionbar = getSupportActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
+
 	}
-	
+
 	@Override
 	protected void onStart() {
 		super.onStart();
-		
+
 		setViewContent();
 	}
 
@@ -48,26 +61,19 @@ public class HomeActivity extends SherlockFragmentActivity implements SlideMenuI
 		getViews();
 		setViewContent();
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				this.slideMenu.show();
+				if(slidingMenu.isBehindShowing()) {
+					slidingMenu.showAbove();
+				} else {
+					slidingMenu.showBehind();
+				}
 				return true;
-			default:
-				return super.onOptionsItemSelected(item);
 		}
-
-	}
-	
-	@Override
-	public void onBackPressed() {
-		if (this.slideMenu.isShowing()) {
-			this.slideMenu.hide();
-		} else {
-			super.onBackPressed();
-		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void getViews() {
@@ -99,18 +105,24 @@ public class HomeActivity extends SherlockFragmentActivity implements SlideMenuI
 	private void setViewContent() {
 		User me = PersistentData.getMe(HomeActivity.this);
 
+		// Set the user's avatar in the view as well as the behind view
 		UrlImageViewHelper.setUrlDrawable(avatarView, me.getAvatar()
 				.getNormal(), R.drawable.unknown_user);
 
+		// Set the user's username in the view and behind view
 		usernameView.setText(me.getName());
 
+		// Set the user's other properties in the main view
 		accountLevelView.setText(createAccountLevelText(me.getRole()));
 
 		dateRegisteredView.setText("Placeholder");
 
-		cloudCountView.setText("You are a member of " + String.valueOf(me.getClouds().size()) + " clouds");
+		cloudCountView.setText("You are a member of "
+				+ String.valueOf(me.getClouds().size()) + " clouds");
 
-		warningCountView.setText("You have " + String.valueOf(me.getProsecutions().length) + " warnings");
+		warningCountView.setText("You have "
+				+ String.valueOf(me.getProsecutions().length) + " warnings");
+
 	}
 
 	private String createAccountLevelText(Role role) {
@@ -140,8 +152,4 @@ public class HomeActivity extends SherlockFragmentActivity implements SlideMenuI
 		return text;
 	}
 
-	@Override
-	public void onSlideMenuItemClick(int itemId) {
-		// TODO Auto-generated method stub
-	}
 }

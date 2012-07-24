@@ -14,7 +14,7 @@ public class OAuthBundle {
 	private String				clientType;
 
 	/**
-	 * Constuctor for the oAuth bundle class
+	 * Constructor for the oAuth bundle class
 	 * 
 	 * @param provider
 	 *            Provider for the oAuth
