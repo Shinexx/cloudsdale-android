@@ -12,6 +12,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.entity.StringEntity;
 import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.models.Model;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.annotations.GsonIgnoreExclusionStrategy;
 import org.cloudsdale.android.models.exceptions.ExternalServiceException;
@@ -75,9 +76,7 @@ public class SessionQuery extends PostQuery {
 				return null;
 			} else if (String.valueOf(
 					this.httpResponse.getStatusLine().getStatusCode())
-					.startsWith("5")) {
-				return null;
-			}
+					.startsWith("5")) { return null; }
 
 			// Build the json
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -117,5 +116,16 @@ public class SessionQuery extends PostQuery {
 				+ (this.user == null ? "Null" : "Not Null"));
 
 		return this.user;
+	}
+
+	/**
+	 * Not implemented for sessions, will always return null. Use
+	 * {@link #execute(QueryData, Context)} instead
+	 */
+	@Deprecated
+	@Override
+	public Model[] executeForCollection(QueryData data, Context context) {
+		// Stub, will never be used in this class
+		return null;
 	}
 }

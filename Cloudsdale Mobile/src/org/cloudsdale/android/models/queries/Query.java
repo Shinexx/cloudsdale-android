@@ -43,5 +43,7 @@ public abstract class Query implements ThreadCompleteListener {
 	}
 
 	public abstract Model execute(QueryData data, Context context);
+	
+	public abstract Model[] executeForCollection(QueryData data, Context context);
 
 }

@@ -1,23 +1,40 @@
 package org.cloudsdale.android.ui;
 
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
+import com.b3rwynmobile.fayeclient.FayeBinder;
+import com.b3rwynmobile.fayeclient.FayeService;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingActivity;
 
+import org.apache.http.message.BasicNameValuePair;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.models.QueryData;
+import org.cloudsdale.android.models.api_models.Cloud;
 import org.cloudsdale.android.models.api_models.User;
 import org.cloudsdale.android.models.enums.Role;
+import org.cloudsdale.android.models.queries.CloudGetQuery;
 
-public class HomeActivity extends SlidingActivity {
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 
+public class HomeActivity extends SlidingActivity implements ServiceConnection {
+
+	@SuppressWarnings("unused")
 	private static final String	TAG	= "Home Activity";
 
 	private ImageView			avatarView;
@@ -27,7 +44,8 @@ public class HomeActivity extends SlidingActivity {
 	private TextView			cloudCountView;
 	private TextView			warningCountView;
 	private SlidingMenu			slidingMenu;
-	
+	private FayeBinder			fayeBinder;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,13 +62,17 @@ public class HomeActivity extends SlidingActivity {
 		// Customize actionbar
 		ActionBar actionbar = getSupportActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
-
+		
+		Intent intent = new Intent();
+		intent.setClass(getApplication(), FayeService.class);
+//		fayeBinder = bindService(intent, this, BIND_AUTO_CREATE);
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
 
+		// updateClouds();
 		setViewContent();
 	}
 
@@ -58,6 +80,7 @@ public class HomeActivity extends SlidingActivity {
 	protected void onResume() {
 		super.onResume();
 
+		// updateClouds();
 		getViews();
 		setViewContent();
 	}
@@ -66,7 +89,7 @@ public class HomeActivity extends SlidingActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				if(slidingMenu.isBehindShowing()) {
+				if (slidingMenu.isBehindShowing()) {
 					slidingMenu.showAbove();
 				} else {
 					slidingMenu.showBehind();
@@ -74,6 +97,26 @@ public class HomeActivity extends SlidingActivity {
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void updateClouds() {
+		final LoggedUser me = PersistentData.getMe(this);
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				QueryData data = new QueryData();
+				String unformattedUrl = getString(R.string.cloudsdale_api_base)
+						+ getString(R.string.cloudsdale_user_clouds_endpoint);
+				data.setUrl(MessageFormat.format(unformattedUrl, me.getId()));
+				ArrayList<BasicNameValuePair> headers = new ArrayList<BasicNameValuePair>();
+				headers.add(new BasicNameValuePair("X-AUTH-TOKEN", me
+						.getAuthToken()));
+				data.setHeaders(headers);
+				Cloud[] clouds = new CloudGetQuery().executeForCollection(data,
+						HomeActivity.this);
+				me.setClouds((ArrayList<Cloud>) Arrays.asList(clouds));
+			}
+		}).start();
 	}
 
 	private void getViews() {
@@ -136,7 +179,7 @@ public class HomeActivity extends SlidingActivity {
 				text = "Thanks for donating!";
 				break;
 			case PLACEHOLDER:
-				text = "Now, either someone was expirementing on you, or your broke something";
+				text = "Now, either someone was expirementing on you, or you broke something";
 				break;
 			case MODERATOR:
 				text = "Get to work moderation monkey!";
@@ -150,6 +193,18 @@ public class HomeActivity extends SlidingActivity {
 		}
 
 		return text;
+	}
+
+	@Override
+	public void onServiceConnected(ComponentName arg0, IBinder arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onServiceDisconnected(ComponentName arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -8,8 +8,8 @@ import com.google.gson.Gson;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.cloudsdale.android.models.Model;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api_models.User;
 import org.cloudsdale.android.models.network_models.ApiUserResponse;
@@ -37,49 +37,45 @@ public class UserGetQuery extends GetQuery {
 	@Override
 	public User execute(final QueryData data, final Context context) {
 		// Mark the query as alive
-		this.isAlive = true;
+		isAlive = true;
 
-		// Setup HTTP components
 		setupHttpObjects(data.getUrl());
-
-		// Set the headers
-		if (data.getHeaders() != null) {
-			for (BasicNameValuePair nvp : data.getHeaders()) {
-				if (nvp.getName().toLowerCase().equals("x-auth-token")) {
-					UserGetQuery.this.httpGet.setHeader(nvp.getName(),
-							nvp.getValue());
-				}
-			}
-		}
+		setHeaders(data.getHeaders());
 
 		// Query the API
 		try {
 			// Get the response
-			this.httpResponse = this.httpClient.execute(this.httpGet);
+			httpResponse = httpClient.execute(httpGet);
 
 			// If we got anything other than a user, break out, there's
 			// no point to continuing
-			if (this.httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
+			if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
 
 			// Build the json
-			this.json = EntityUtils.toString(UserGetQuery.this.httpResponse
+			json = EntityUtils.toString(httpResponse
 					.getEntity());
-			this.json = stripHtml(UserGetQuery.this.json);
+			json = stripHtml(json);
 
 			// Deserialize
 			Gson gson = new Gson();
-			if (this.json != null) {
-				Log.d(TAG, this.json);
-				this.response = gson.fromJson(this.json,
+			if (json != null) {
+				Log.d(TAG, json);
+				response = gson.fromJson(json,
 						ApiUserResponse.class);
-				this.u = this.response.getResult();
+				u = response.getResult();
 			}
 		} catch (ClientProtocolException e) {
-			BugSenseHandler.log(UserGetQuery.TAG, e);
+			BugSenseHandler.log(TAG, e);
 		} catch (IOException e) {
-			BugSenseHandler.log(UserGetQuery.TAG, e);
+			BugSenseHandler.log(TAG, e);
 		}
 
-		return this.u;
+		return u;
+	}
+
+	@Override
+	public Model[] executeForCollection(QueryData data, Context context) {
+		//  TODO NYI
+		return null;
 	}
 }

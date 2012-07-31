@@ -10,6 +10,7 @@ import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 
 import org.apache.http.client.ClientProtocolException;
+import org.cloudsdale.android.models.Model;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.network_models.TwitterResponse;
 import org.json.JSONException;
@@ -59,5 +60,16 @@ public class TwitterUserGetQuery extends GetQuery {
 		}
 
 		return twitterResponse;
+	}
+
+	/**
+	 * Not implemented for twitter get requests, will always return null. Use
+	 * {@link #execute(QueryData, Context)} instead
+	 */
+	@Deprecated
+	@Override
+	public Model[] executeForCollection(QueryData data, Context context) {
+		// Stub, will never be used in this class
+		return null;
 	}
 }
