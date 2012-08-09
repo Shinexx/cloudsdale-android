@@ -1,18 +1,22 @@
 package org.cloudsdale.android.ui;
 
-import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.b3rwynmobile.fayeclient.FayeBinder;
+import com.b3rwynmobile.fayeclient.FayeClient;
+import com.b3rwynmobile.fayeclient.FayeListener;
 import com.b3rwynmobile.fayeclient.FayeService;
+import com.b3rwynmobile.fayeclient.models.FayeMessage;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingActivity;
@@ -29,10 +33,13 @@ import org.cloudsdale.android.models.enums.Role;
 import org.cloudsdale.android.models.queries.CloudGetQuery;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
-public class HomeActivity extends SlidingActivity implements ServiceConnection {
+public class HomeActivity extends SlidingActivity implements ServiceConnection,
+		FayeListener {
 
 	@SuppressWarnings("unused")
 	private static final String	TAG	= "Home Activity";
@@ -62,10 +69,10 @@ public class HomeActivity extends SlidingActivity implements ServiceConnection {
 		// Customize actionbar
 		ActionBar actionbar = getSupportActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
-		
+
 		Intent intent = new Intent();
 		intent.setClass(getApplication(), FayeService.class);
-//		fayeBinder = bindService(intent, this, BIND_AUTO_CREATE);
+		bindService(intent, this, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
@@ -148,24 +155,39 @@ public class HomeActivity extends SlidingActivity implements ServiceConnection {
 	private void setViewContent() {
 		User me = PersistentData.getMe(HomeActivity.this);
 
-		// Set the user's avatar in the view as well as the behind view
+		// Set the user's avatar in the view
 		UrlImageViewHelper.setUrlDrawable(avatarView, me.getAvatar()
 				.getNormal(), R.drawable.unknown_user);
 
-		// Set the user's username in the view and behind view
+		// Set the user's username in the view
 		usernameView.setText(me.getName());
 
 		// Set the user's other properties in the main view
 		accountLevelView.setText(createAccountLevelText(me.getRole()));
 
-		dateRegisteredView.setText("Placeholder");
+		// Format and set the user's join date
+		Date date = me.getMemberSince().getTime();
+		SimpleDateFormat df = new SimpleDateFormat("dd MM, yyyy");
+		dateRegisteredView.setText(MessageFormat.format(
+				"You registered on {0}", df.format(date)));
 
+		// Set the user's cloud count
 		cloudCountView.setText("You are a member of "
 				+ String.valueOf(me.getClouds().size()) + " clouds");
 
+		// Set the user's warning count
 		warningCountView.setText("You have "
 				+ String.valueOf(me.getProsecutions().length) + " warnings");
 
+	}
+
+	private void subscribeToClouds() {
+		final User me = PersistentData.getMe(this);
+		Log.d(TAG, "Starting cloud subscriptions");
+		for (Cloud c : me.getClouds()) {
+			HomeActivity.this.fayeBinder.getFayeClient().subscribe(
+					"/cloud/" + c.getId());
+		}
 	}
 
 	private String createAccountLevelText(Role role) {
@@ -196,15 +218,30 @@ public class HomeActivity extends SlidingActivity implements ServiceConnection {
 	}
 
 	@Override
-	public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-		// TODO Auto-generated method stub
-		
+	public void onServiceConnected(ComponentName className, IBinder binder) {
+		fayeBinder = (FayeBinder) binder;
+		fayeBinder.getFayeClient().setFayeListener(this);
+		fayeBinder.getFayeService().startFaye();
 	}
 
 	@Override
-	public void onServiceDisconnected(ComponentName arg0) {
-		// TODO Auto-generated method stub
-		
+	public void onServiceDisconnected(ComponentName className) {
+		fayeBinder = null;
+	}
+
+	@Override
+	public void connectedToServer(FayeClient faye) {
+		subscribeToClouds();
+	}
+
+	@Override
+	public void disconnectedFromServer(FayeClient faye) {
+
+	}
+
+	@Override
+	public void messageReceived(FayeClient faye, FayeMessage msg) {
+		// TODO parse messages
 	}
 
 }

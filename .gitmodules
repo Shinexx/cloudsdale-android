@@ -13,3 +13,12 @@
 [submodule "submodules/ActionBarSherlock"]
 	path = submodules/ActionBarSherlock
 	url = git://github.com/JakeWharton/ActionBarSherlock.git
+[submodule "SlidingMenu"]
+	path = SlidingMenu
+	url = git://github.com/jfeinstein10/SlidingMenu.git
+[submodule "submodules/SlidingMenu"]
+	path = submodules/SlidingMenu
+	url = git://github.com/jfeinstein10/SlidingMenu.git
+[submodule "submodules/Autobahn"]
+	path = submodules/Autobahn
+	url = git://github.com/tavendo/AutobahnAndroid.git
