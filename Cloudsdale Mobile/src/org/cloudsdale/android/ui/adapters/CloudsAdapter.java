@@ -53,7 +53,7 @@ public class CloudsAdapter extends BaseAdapter {
 		// Get the cloud
 		Cloud cloud = (Cloud) getItem(position);
 
-		// Inflate the view if neccessary
+		// Inflate the view if necessary
 		View cloudView = convertView;
 
 		if (convertView == null) {
@@ -68,6 +68,9 @@ public class CloudsAdapter extends BaseAdapter {
 		UrlImageViewHelper.setUrlDrawable(icon, cloud.getAvatar().getPreview(),
 				R.drawable.unknown_cloud, 60000 * 60);
 		tv.setText(cloud.getName());
+		
+		// Set the view's id to the cloud's id
+		cloudView.setId(cloud.getId().hashCode());
 		return cloudView;
 	}
 
