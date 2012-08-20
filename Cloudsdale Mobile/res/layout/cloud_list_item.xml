@@ -35,6 +35,12 @@
         android:background="#FF0000"
         android:maxWidth="48dp"
         android:textColor="#FFFFFF"
-        android:visibility="invisible" />
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/cloud_hidden_id"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 
 </RelativeLayout>

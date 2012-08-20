@@ -1,8 +1,10 @@
 package org.cloudsdale.android.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,18 +35,15 @@ import java.util.Date;
 
 public class HomeActivity extends SlidingActivity implements FayeMessageHandler {
 
-    @SuppressWarnings("unused")
-    private static final String  TAG   = "Home Activity";
-    @SuppressWarnings("unused")
-    private static final boolean DEBUG = true;
+    private static final String TAG = "Home Activity";
 
-    private ImageView            mAvatarView;
-    private TextView             mUsernameView;
-    private TextView             mAccountLevelView;
-    private TextView             mDateRegisteredView;
-    private TextView             mCloudCountView;
-    private TextView             mWarningCountView;
-    private SlidingMenu          mSlidingMenu;
+    private ImageView           mAvatarView;
+    private TextView            mUsernameView;
+    private TextView            mAccountLevelView;
+    private TextView            mDateRegisteredView;
+    private TextView            mCloudCountView;
+    private TextView            mWarningCountView;
+    private SlidingMenu         mSlidingMenu;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +65,20 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
         // Bind the Faye service
         Cloudsdale.bindFaye();
         Cloudsdale.subscribeToMessages(this);
+
+        // Set the item listener for the menu
+        ((AdapterView) mSlidingMenu.findViewById(android.R.id.list))
+                .setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view,
+                            int position, long id) {
+                        showAbove();
+                        Cloudsdale.navigate(((TextView) view
+                                .findViewById(R.id.cloud_hidden_id)).getText()
+                                .toString(), HomeActivity.this);
+                    }
+                });
     }
 
     @Override
@@ -100,7 +113,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
     }
 
     private void updateClouds() {
-        final LoggedUser me = PersistentData.getMe(this);
+        final LoggedUser me = PersistentData.getMe();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -146,7 +159,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
     }
 
     private void setViewContent() {
-        User me = PersistentData.getMe(HomeActivity.this);
+        User me = PersistentData.getMe();
 
         // Set the user's avatar in the view
         UrlImageViewHelper.setUrlDrawable(mAvatarView, me.getAvatar()
@@ -205,16 +218,11 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
     public void handleMessage(FayeMessage message) {
         String channel = message.getChannel().substring(1);
         String cloudId = channel.split("/")[1];
-        if (DEBUG) {
+        if (Cloudsdale.DEBUG) {
             Log.d(TAG, "Handling message for channel " + channel
                     + " which generated a cloud id of " + cloudId);
         }
-//        TextView unreadCountView = (TextView) mSlidingMenu
-//                .findViewById(R.id.slide_menu_list)
-//                .findViewById(cloudId.hashCode())
-//                .findViewById(R.id.cloud_unread);
-//        unreadCountView.setVisibility(View.VISIBLE);
-//        int unreadCount = Integer.valueOf(unreadCountView.getText().toString());
-//        unreadCountView.setText(unreadCount++);
+        // TODO Handle the unread message counts
     }
+
 }

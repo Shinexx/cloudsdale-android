@@ -13,6 +13,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,6 +29,8 @@ import com.slidingmenu.lib.SlidingMenu;
 import org.cloudsdale.android.faye.FayeMessageHandler;
 import org.cloudsdale.android.models.api_models.Cloud;
 import org.cloudsdale.android.models.api_models.User;
+import org.cloudsdale.android.ui.CloudActivity;
+import org.cloudsdale.android.ui.HomeActivity;
 import org.cloudsdale.android.ui.adapters.CloudsAdapter;
 
 import java.util.ArrayList;
@@ -41,7 +44,7 @@ public class Cloudsdale extends Application implements ServiceConnection,
         FayeListener {
 
     // Debug fields
-    private static final boolean                 DEBUG            = true;
+    public static final boolean                  DEBUG            = true;
     private static final String                  TAG              = "Cloudsdale Mobile";
 
     // Static objects
@@ -49,6 +52,16 @@ public class Cloudsdale extends Application implements ServiceConnection,
     private static FayeBinder                    sFayeBinder;
     private static ArrayList<FayeMessageHandler> sMessageHandlerList;
     private static boolean                       mFirstConnection = true;
+
+    /**
+     * Dummy constructor to handle creating static classes and fetch the global
+     * app context
+     */
+    public Cloudsdale() {
+        super();
+        sMessageHandlerList = new ArrayList<FayeMessageHandler>();
+        sAppObject = this;
+    }
 
     public static int dpToPx(int dp, Context ctx) {
         Resources r = ctx.getResources();
@@ -84,17 +97,6 @@ public class Cloudsdale extends Application implements ServiceConnection,
         }
     }
 
-    /**
-     * Dummy constructor to handle creating static classes and fetch the global
-     * app context
-     */
-    public Cloudsdale() {
-        super();
-        new PersistentData();
-        sMessageHandlerList = new ArrayList<FayeMessageHandler>();
-        sAppObject = this;
-    }
-
     public static void prepareSlideMenu(SlidingMenu slidingMenu,
             Activity context) {
         // View settings
@@ -106,9 +108,9 @@ public class Cloudsdale extends Application implements ServiceConnection,
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         View head = inflater.inflate(R.layout.menu_header, null);
         ListView itemOptions = (ListView) slidingMenu
-                .findViewById(R.id.slide_menu_list);
+                .findViewById(android.R.id.list);
 
-        User me = PersistentData.getMe(context);
+        User me = PersistentData.getMe();
         setSlideMenuHeader(head, itemOptions, me);
         addStaticSlideMenuViews(itemOptions, inflater);
         itemOptions.setAdapter(new CloudsAdapter(context, me.getClouds()));
@@ -140,6 +142,9 @@ public class Cloudsdale extends Application implements ServiceConnection,
         homeIcon.setImageResource(R.drawable.color_icon);
         TextView homeText = (TextView) homeView.findViewById(R.id.cloud_name);
         homeText.setText("Home");
+        TextView homeId = (TextView) homeView
+                .findViewById(R.id.cloud_hidden_id);
+        homeId.setText("Home");
         list.addHeaderView(homeView);
 
         ImageView settingsIcon = (ImageView) settingsView
@@ -148,6 +153,9 @@ public class Cloudsdale extends Application implements ServiceConnection,
         TextView settingsText = (TextView) settingsView
                 .findViewById(R.id.cloud_name);
         settingsText.setText("Settings");
+        TextView settingsId = (TextView) settingsView
+                .findViewById(R.id.cloud_hidden_id);
+        settingsId.setText("Settings");
         list.addHeaderView(settingsView);
 
         ImageView logoutIcon = (ImageView) logoutView
@@ -156,6 +164,9 @@ public class Cloudsdale extends Application implements ServiceConnection,
         TextView logoutText = (TextView) logoutView
                 .findViewById(R.id.cloud_name);
         logoutText.setText("Log out");
+        TextView logoutId = (TextView) logoutView
+                .findViewById(R.id.cloud_hidden_id);
+        logoutId.setText("Logout");
         list.addHeaderView(logoutView);
     }
 
@@ -200,8 +211,8 @@ public class Cloudsdale extends Application implements ServiceConnection,
     }
 
     private static void subscribeToClouds() {
-        final User me = PersistentData.getMe(sAppObject);
-        if (DEBUG) {
+        final User me = PersistentData.getMe();
+        if (Cloudsdale.DEBUG) {
             Log.d(TAG, "Starting cloud subscriptions");
         }
         for (Cloud c : me.getClouds()) {
@@ -212,5 +223,23 @@ public class Cloudsdale extends Application implements ServiceConnection,
 
     public static void subscribeToMessages(FayeMessageHandler handler) {
         sMessageHandlerList.add(handler);
+    }
+
+    public static void navigate(String viewId, Activity context) {
+        Intent intent = new Intent();
+        if (viewId.equals("Home")) {
+            intent.setClass(context, HomeActivity.class);
+        } else if (viewId.equals("Settings")) {
+            // TODO Start the settings view
+            intent.setClass(context, HomeActivity.class);
+        } else if (viewId.equals("Logout")) {
+            // TODO Logout the user
+            // TODO Start the login view
+            intent.setClass(context, HomeActivity.class);
+        } else {
+            intent.setClass(context, CloudActivity.class);
+            intent.putExtra("cloudId", viewId);
+        }
+        context.startActivity(intent);
     }
 }

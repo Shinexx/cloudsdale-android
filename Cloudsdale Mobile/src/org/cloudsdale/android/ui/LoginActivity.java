@@ -89,7 +89,7 @@ public class LoginActivity extends SherlockActivity {
 			// Else, inform the user that there was an error
 			if (result != null) {
 				// Store the user
-				PersistentData.StoreMe(LoginActivity.this, result);
+				PersistentData.storeLoggedUser(result);
 
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, HomeActivity.class);

@@ -16,8 +16,9 @@ public class StartActivity extends SherlockActivity {
 		getSupportActionBar().hide();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.startup_layout);
+		PersistentData.initialize(this);
 
-		if (PersistentData.getMe(this) != null) {
+		if (PersistentData.getMe() != null) {
 			Intent intent = new Intent();
 			intent.setClass(this, HomeActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
