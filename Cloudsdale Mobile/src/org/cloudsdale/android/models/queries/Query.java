@@ -6,44 +6,30 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.cloudsdale.android.models.Model;
-import org.cloudsdale.android.models.NotifyingThread;
 import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.ThreadCompleteListener;
 
-public abstract class Query implements ThreadCompleteListener {
+public abstract class Query {
 
-	protected HttpClient		httpClient;
-	protected HttpResponse		httpResponse;
-	protected NotifyingThread	thread;
-	protected boolean			isAlive;
+    protected HttpClient   mhttpClient;
+    protected HttpResponse mHttpResponse;
+    protected String       mUrl;
 
-	public final void addListener(ThreadCompleteListener listener) {
-		this.thread.addListener(listener);
-	}
+    public Query(String url) {
+        setupHttpObjects(url);
+    }
 
-	public final Thread.State getThreadState() {
-		return this.thread.getState();
-	}
+    protected void setupHttpObjects(String url) {
+        this.mhttpClient = new DefaultHttpClient();
+    }
 
-	public final boolean isAlive() {
-		return this.isAlive;
-	}
+    public final String stripHtml(String htmlString) {
+        return android.text.Html.fromHtml(htmlString).toString();
+    }
 
-	@Override
-	public final void notifyOfThreadComplete(Thread thread) {
-		this.isAlive = false;
-	}
+    public abstract void addHeader(String key, String value);
 
-	protected void setupHttpObjects(String url) {
-		this.httpClient = new DefaultHttpClient();
-	}
+    public abstract Model execute(QueryData data, Context context);
 
-	public final String stripHtml(String htmlString) {
-		return android.text.Html.fromHtml(htmlString).toString();
-	}
-
-	public abstract Model execute(QueryData data, Context context);
-	
-	public abstract Model[] executeForCollection(QueryData data, Context context);
+    public abstract Model[] executeForCollection(QueryData data, Context context);
 
 }

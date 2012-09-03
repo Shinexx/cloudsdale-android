@@ -1,116 +1,87 @@
 package org.cloudsdale.android.models.api_models;
 
+import com.google.gson.annotations.SerializedName;
+
 import org.cloudsdale.android.models.Model;
 
 import java.util.Date;
 
 public class Message extends Model {
 
-	// Object attributes
-	private Date	timestamp;
-	private String	content;
-	private String	username;
-	private String	userPath;
-	private String	userAvatar;
-	private String	authorId;
+    // Object attributes
+    private Date     timestamp;
+    private String   content;
+    @SerializedName("author")
+    private User     user;
+    private String[] urls;
+    private String   device;
+    @SerializedName("author_id")
+    private String   authorId;
 
-	public Message() {
-		this.timestamp = new Date();
-		this.content = "";
-		this.username = "";
-		this.userPath = "";
-		this.userAvatar = "";
-		this.authorId = "";
-	}
+    public User getAuthor() {
+        return user;
+    }
 
-	/**
-	 * @return the authorId
-	 */
-	public String getAuthorId() {
-		return this.authorId;
-	}
+    public void setAuthor(User author) {
+        this.user = author;
+    }
 
-	/**
-	 * @return the content
-	 */
-	public String getContent() {
-		return this.content;
-	}
+    public String[] getUrls() {
+        return urls;
+    }
 
-	/**
-	 * @return the timestamp
-	 */
-	public Date getTimestamp() {
-		return this.timestamp;
-	}
+    public void setUrls(String[] urls) {
+        this.urls = urls;
+    }
 
-	/**
-	 * @return the userAvatar
-	 */
-	public String getUserAvatar() {
-		return this.userAvatar;
-	}
+    public Message() {
+        this.timestamp = new Date();
+        this.content = "";
+    }
 
-	/**
-	 * @return the username
-	 */
-	public String getUsername() {
-		return this.username;
-	}
+    /**
+     * @return the content
+     */
+    public String getContent() {
+        return this.content;
+    }
 
-	/**
-	 * @return the userPath
-	 */
-	public String getUserPath() {
-		return this.userPath;
-	}
+    /**
+     * @return the timestamp
+     */
+    public Date getTimestamp() {
+        return this.timestamp;
+    }
 
-	/**
-	 * @param authorId
-	 *            the authorId to set
-	 */
-	public void setAuthorId(String authorId) {
-		this.authorId = authorId;
-	}
+    /**
+     * @param content
+     *            the content to set
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-	/**
-	 * @param content
-	 *            the content to set
-	 */
-	public void setContent(String content) {
-		this.content = content;
-	}
+    /**
+     * @param timestamp
+     *            the timestamp to set
+     */
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
 
-	/**
-	 * @param timestamp
-	 *            the timestamp to set
-	 */
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
-	}
+    public String getDevice() {
+        return device;
+    }
 
-	/**
-	 * @param userAvatar
-	 *            the userAvatar to set
-	 */
-	public void setUserAvatar(String userAvatar) {
-		this.userAvatar = userAvatar;
-	}
+    public void setDevice(String device) {
+        this.device = device;
+    }
+    
+    public String getAuthorId() {
+        return authorId;
+    }
 
-	/**
-	 * @param username
-	 *            the username to set
-	 */
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	/**
-	 * @param userPath
-	 *            the userPath to set
-	 */
-	public void setUserPath(String userPath) {
-		this.userPath = userPath;
-	}
-
+    public void setAuthorId(String id) {
+        this.authorId = id;
+    }
 }

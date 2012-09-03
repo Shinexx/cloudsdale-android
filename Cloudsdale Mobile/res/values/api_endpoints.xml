@@ -7,5 +7,6 @@
     <string name="cloudsdale_sessions_endpoint">sessions.json</string>
     <string name="facebook_graph_api_base_path">http://graph.facebook.com/</string>
     <string name="twitter_user_info_api_path">http://api.twitter.com/version/users/show.json</string>
+    <string name="cloudsdale_cloud_chat_messages_endpoint">clouds/%1$s/chat/messages.json</string>
 
 </resources>

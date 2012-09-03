@@ -18,64 +18,62 @@ import java.io.IOException;
 
 public class UserGetQuery extends GetQuery {
 
-	private static final String	TAG	= "UserGet Query";
+    public UserGetQuery(String url) {
+        super(url);
+    }
 
-	private String				json;
-	private User				u;
-	private ApiUserResponse		response;
+    private static final String TAG = "UserGet Query";
 
-	/**
-	 * Executes the query using data provided to return a User from the
-	 * Cloudsdale API
-	 * 
-	 * @param data
-	 *            The object containing all the header data required by the
-	 *            query
-	 * @param context
-	 *            Not used in this query implementation
-	 */
-	@Override
-	public User execute(final QueryData data, final Context context) {
-		// Mark the query as alive
-		isAlive = true;
+    private String              json;
+    private User                u;
+    private ApiUserResponse     response;
 
-		setupHttpObjects(data.getUrl());
-		setHeaders(data.getHeaders());
+    /**
+     * Executes the query using data provided to return a User from the
+     * Cloudsdale API
+     * 
+     * @param data
+     *            The object containing all the header data required by the
+     *            query
+     * @param context
+     *            Not used in this query implementation
+     */
+    @Override
+    public User execute(final QueryData data, final Context context) {
+        setHeaders(data.getHeaders());
 
-		// Query the API
-		try {
-			// Get the response
-			httpResponse = httpClient.execute(httpGet);
+        // Query the API
+        try {
+            // Get the response
+            mHttpResponse = mhttpClient.execute(httpGet);
 
-			// If we got anything other than a user, break out, there's
-			// no point to continuing
-			if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
+            // If we got anything other than a user, break out, there's
+            // no point to continuing
+            if (mHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
 
-			// Build the json
-			json = EntityUtils.toString(httpResponse
-					.getEntity());
-			json = stripHtml(json);
+            // Build the json
+            json = EntityUtils.toString(mHttpResponse.getEntity());
+            json = stripHtml(json);
 
-			// Deserialize
-			Gson gson = new Gson();
-			if (json != null) {
-				Log.d(TAG, json);
-				response = gson.fromJson(json,
-						ApiUserResponse.class);
-				u = response.getResult();
-			}
-		} catch (ClientProtocolException e) {
-			BugSenseHandler.log(TAG, e);
-		} catch (IOException e) {
-			BugSenseHandler.log(TAG, e);
-		}
+            // Deserialize
+            Gson gson = new Gson();
+            if (json != null) {
+                Log.d(TAG, json);
+                response = gson.fromJson(json, ApiUserResponse.class);
+                u = response.getResult();
+            }
+        } catch (ClientProtocolException e) {
+            BugSenseHandler.log(TAG, e);
+        } catch (IOException e) {
+            BugSenseHandler.log(TAG, e);
+        }
 
-		return u;
-	}
+        return u;
+    }
 
-	@Override
-	public Model[] executeForCollection(QueryData data, Context context) {
-		//  TODO NYI
-		return null;
-	}
+    @Override
+    public Model[] executeForCollection(QueryData data, Context context) {
+        // TODO NYI
+        return null;
+    }
 }

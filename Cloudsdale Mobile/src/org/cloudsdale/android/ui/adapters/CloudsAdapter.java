@@ -18,64 +18,64 @@ import java.util.ArrayList;
 
 public class CloudsAdapter extends BaseAdapter {
 
-	private Activity			root;
-	private ArrayList<Cloud>	clouds;
-	private LayoutInflater		inflate;
+    private Activity         mViewRoot;
+    private ArrayList<Cloud> mCloudArray;
+    private LayoutInflater   mInflater;
 
-	public CloudsAdapter(Activity activity, ArrayList<Cloud> clouds) {
-		this.root = activity;
-		this.clouds = clouds;
-		this.inflate = (LayoutInflater) this.root
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	}
+    public CloudsAdapter(Activity activity, ArrayList<Cloud> clouds) {
+        this.mViewRoot = activity;
+        this.mCloudArray = clouds;
+        this.mInflater = (LayoutInflater) this.mViewRoot
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
 
-	public void addCloud(Cloud cloud) {
-		this.clouds.add(cloud);
-	}
+    public void addCloud(Cloud cloud) {
+        this.mCloudArray.add(cloud);
+    }
 
-	@Override
-	public int getCount() {
-		return this.clouds.size();
-	}
+    @Override
+    public int getCount() {
+        return this.mCloudArray.size();
+    }
 
-	@Override
-	public Object getItem(int position) {
-		return this.clouds.get(position);
-	}
+    @Override
+    public Cloud getItem(int position) {
+        return this.mCloudArray.get(position);
+    }
 
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		// Get the cloud
-		Cloud cloud = (Cloud) getItem(position);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        // Get the cloud
+        Cloud cloud = (Cloud) getItem(position);
 
-		// Inflate the view if necessary
-		View cloudView = convertView;
+        // Inflate the view if necessary
+        View cloudView = convertView;
 
-		if (convertView == null) {
-			cloudView = this.inflate.inflate(R.layout.cloud_list_item, null);
-		}
+        if (convertView == null) {
+            cloudView = this.mInflater.inflate(R.layout.cloud_list_item, null);
+        }
 
-		// Get the view objects
-		ImageView icon = (ImageView) cloudView.findViewById(R.id.cloud_icon);
-		TextView tv = (TextView) cloudView.findViewById(R.id.cloud_name);
-		TextView uc = (TextView) cloudView.findViewById(R.id.cloud_unread);
-		TextView id = (TextView) cloudView.findViewById(R.id.cloud_hidden_id);
+        // Get the view objects
+        ImageView icon = (ImageView) cloudView.findViewById(R.id.cloud_icon);
+        TextView tv = (TextView) cloudView.findViewById(R.id.cloud_name);
+        TextView uc = (TextView) cloudView.findViewById(R.id.cloud_unread);
+        TextView id = (TextView) cloudView.findViewById(R.id.cloud_hidden_id);
 
-		// Set view properties
-		UrlImageViewHelper.setUrlDrawable(icon, cloud.getAvatar().getPreview(),
-				R.drawable.unknown_cloud, 60000 * 60);
-		tv.setText(cloud.getName());
-		uc.setText("0");
-		id.setText(cloud.getId());
-		
-		// Set the view's id to the cloud's id
-		cloudView.setId(cloud.getId().hashCode());
-		return cloudView;
-	}
+        // Set view properties
+        UrlImageViewHelper.setUrlDrawable(icon, cloud.getAvatar().getPreview(),
+                R.drawable.unknown_cloud, 60000 * 60);
+        tv.setText(cloud.getName());
+        uc.setText("0");
+        id.setText(cloud.getId());
+
+        // Set the view's id to the cloud's id
+        cloudView.setId(cloud.getId().hashCode());
+        return cloudView;
+    }
 
 }

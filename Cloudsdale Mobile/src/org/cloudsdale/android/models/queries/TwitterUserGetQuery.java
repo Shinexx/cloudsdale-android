@@ -23,9 +23,15 @@ public class TwitterUserGetQuery extends GetQuery {
 	private static final String			TAG	= "TwitterUserGetQuery";
 
 	private CommonsHttpOAuthConsumer	oAuthConsumer;
+	
+	@Deprecated
+	public TwitterUserGetQuery(String url) {
+	    super(url);
+	}
 
 	public TwitterUserGetQuery(String url,
 			CommonsHttpOAuthConsumer oAuthConsumer) {
+	    super(url);
 		setupHttpObjects(url);
 		this.oAuthConsumer = oAuthConsumer;
 	}
@@ -37,10 +43,10 @@ public class TwitterUserGetQuery extends GetQuery {
 		try {
 			// Sign the request and execute it
 			this.oAuthConsumer.sign(this.httpGet);
-			this.httpResponse = this.httpClient.execute(this.httpGet);
+			this.mHttpResponse = this.mhttpClient.execute(this.httpGet);
 
 			// Deserialize the response
-			JSONObject array = new JSONObject(this.httpResponse.getEntity()
+			JSONObject array = new JSONObject(this.mHttpResponse.getEntity()
 					.toString());
 			String id = array.getString("id");
 			twitterResponse = new TwitterResponse();

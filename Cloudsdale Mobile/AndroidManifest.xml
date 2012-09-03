@@ -56,7 +56,7 @@
         </activity>
 
         <!-- Services -->
-        <service android:name="com.b3rwynmobile.fayeclient.FayeService" >
+        <service android:name="org.cloudsdale.android.faye.CloudsdaleFayeService" >
         </service>
     </application>
 

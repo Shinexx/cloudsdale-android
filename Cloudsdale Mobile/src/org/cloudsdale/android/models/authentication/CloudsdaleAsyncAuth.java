@@ -60,7 +60,7 @@ public class CloudsdaleAsyncAuth extends
 		}
 
 		// Query the server and return the User to the caller
-		SessionQuery query = new SessionQuery();
+		SessionQuery query = new SessionQuery(data.getUrl());
 		LoggedUser u = query.execute(data, params[0].getContext());
 
 		return u;

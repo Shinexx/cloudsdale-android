@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
-import com.b3rwynmobile.fayeclient.models.FayeMessage;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -24,6 +23,7 @@ import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.faye.FayeMessageHandler;
+import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api_models.Cloud;
 import org.cloudsdale.android.ui.fragments.ChatFragment;
 import org.cloudsdale.android.ui.fragments.DropFragment;
@@ -34,13 +34,14 @@ import java.util.ArrayList;
 public class CloudActivity extends SlidingFragmentActivity implements
         FayeMessageHandler {
 
-    private String      mCloudShowingId;
-    private Cloud       mCloudShowing;
-    private TabHost     mTabHost;
-    private ViewPager   mViewPager;
-    private TabsAdapter mTabsAdapter;
-    private SlidingMenu mSlidingMenu;
-    private boolean     mDualView;
+    private String       mCloudShowingId;
+    private Cloud        mCloudShowing;
+    private TabHost      mTabHost;
+    private ViewPager    mViewPager;
+    private TabsAdapter  mTabsAdapter;
+    private SlidingMenu  mSlidingMenu;
+    private boolean      mDualView;
+    private ChatFragment mChatFrag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,19 +67,19 @@ public class CloudActivity extends SlidingFragmentActivity implements
         // TODO Check for the frame, see if we're in tablet mode
         mDualView = false;
 
-        mTabsAdapter.addTab(mTabHost.newTabSpec("drops").setIndicator("Drops"),
-                DropFragment.class, null);
-        mTabsAdapter.addTab(mTabHost.newTabSpec("online")
-                .setIndicator("Online"), OnlineListFragment.class, null);
-
         // If we're on a phone, add chat to the pager
         // Else, put it in the dualView frame
         if (!mDualView) {
             mTabsAdapter.addTab(mTabHost.newTabSpec("chat")
                     .setIndicator("Chat"), ChatFragment.class, null);
+            mChatFrag = (ChatFragment) mTabsAdapter.getItem(0);
         } else {
             // TODO Tablet chat goes in the frame, silly filly!
         }
+        mTabsAdapter.addTab(mTabHost.newTabSpec("drops").setIndicator("Drops"),
+                DropFragment.class, null);
+        mTabsAdapter.addTab(mTabHost.newTabSpec("online")
+                .setIndicator("Online"), OnlineListFragment.class, null);
 
         if (savedInstanceState != null) {
             mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
@@ -106,7 +107,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
         super.onStart();
         GetShowingCloud();
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -117,7 +118,8 @@ public class CloudActivity extends SlidingFragmentActivity implements
         Intent intent = getIntent();
         mCloudShowingId = intent.getExtras().getString("cloudId");
         mCloudShowing = PersistentData.getCloud(mCloudShowingId);
-        this.setTitle(mCloudShowing.getName());
+        Cloudsdale.setShowingCloud(mCloudShowingId);
+        getSherlock().setTitle(mCloudShowing.getName());
     }
 
     @Override
@@ -141,10 +143,10 @@ public class CloudActivity extends SlidingFragmentActivity implements
     }
 
     @Override
-    public void handleMessage(FayeMessage message) {
+    public void handleMessage(CloudsdaleFayeMessage message) {
         String channel = message.getChannel().substring(1).split("/")[1];
         if (channel.equals(mCloudShowingId)) {
-            // TODO handle the barking thing
+            mChatFrag.addMessage(message.getData());
         }
     }
 

@@ -16,6 +16,7 @@
         android:src="@drawable/unknown_user" />
 
     <LinearLayout
+        android:id="@+id/message_root"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/message_user_avatar"
@@ -35,6 +36,7 @@
                 android:id="@+id/message_name_tag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />

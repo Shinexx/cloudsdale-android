@@ -1,9 +1,10 @@
 package org.cloudsdale.android.faye;
 
-import com.b3rwynmobile.fayeclient.models.FayeMessage;
+import org.cloudsdale.android.models.CloudsdaleFayeMessage;
+
 
 public interface FayeMessageHandler {
     
-    public void handleMessage(FayeMessage message);
+    public void handleMessage(CloudsdaleFayeMessage msg);
 
 }

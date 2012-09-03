@@ -7,8 +7,12 @@ import java.util.List;
 
 public abstract class GetQuery extends Query {
 
-	protected HttpGet	httpGet;
+	public GetQuery(String url) {
+        super(url);
+    }
 
+    protected HttpGet	httpGet;
+	
 	@Override
 	protected final void setupHttpObjects(String url) {
 		super.setupHttpObjects(url);
@@ -24,5 +28,10 @@ public abstract class GetQuery extends Query {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void addHeader(String key, String value) {
+	    httpGet.addHeader(key,value);
 	}
 }

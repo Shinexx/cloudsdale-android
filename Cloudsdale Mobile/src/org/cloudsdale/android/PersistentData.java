@@ -13,6 +13,7 @@ import org.cloudsdale.android.models.api_models.User;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,17 +35,21 @@ public class PersistentData {
     private static HashMap<String, Cloud> sCachedClouds;
     private static File                   sUserFile;
     private static File                   sCloudFile;
+    private static boolean                mCloudsLoading;
 
     public static void initialize(final Context context) {
-        if (sCachedClouds == null) {
-            sCachedClouds = new HashMap<String, Cloud>();
-        }
         if (sUserFile == null) {
             sUserFile = new File(getExternalStorage(context) + "/me");
         }
+
         if (sCloudFile == null) {
             sCloudFile = new File(PersistentData.getExternalStorage(context)
                     + "/clouds");
+        }
+
+        if (sCachedClouds == null) {
+            sCachedClouds = new HashMap<String, Cloud>();
+            loadClouds();
         }
     }
 
@@ -100,7 +105,7 @@ public class PersistentData {
             cloudCached = sCachedClouds.containsKey(cloudId);
         }
 
-        if (cloudCached) {
+        if (!cloudCached) {
             loadClouds();
         }
 
@@ -202,7 +207,14 @@ public class PersistentData {
      * @return The logged in user
      */
     public static LoggedUser getMe() {
-        return PersistentData.sLoggedUser;
+        if (sLoggedUser == null) {
+            loadLoggedUser();
+            return sLoggedUser;
+        } else {
+            synchronized (sLoggedUser) {
+                return sLoggedUser;
+            }
+        }
     }
 
     /**
@@ -311,6 +323,10 @@ public class PersistentData {
             public void run() {
                 super.run();
                 try {
+                    synchronized (sLoggedUser) {
+                        sLoggedUser = me;
+                    }
+
                     synchronized (sUserFile) {
                         if (!sUserFile.exists()) {
                             sUserFile.createNewFile();
@@ -325,13 +341,45 @@ public class PersistentData {
                         bw.close();
                     }
 
-                    PersistentData.sLoggedUser = me;
-                    storeClouds(me.getClouds());
                 } catch (IOException e) {
                     BugSenseHandler.log(PersistentData.TAG, e);
                 }
             }
         }.start();
+        storeClouds(me.getClouds());
     }
 
+    public static void loadLoggedUser() {
+        try {
+            String json;
+            synchronized (sUserFile) {
+                if (!sUserFile.exists()) { return; }
+
+                // Build the JSON
+                BufferedReader br = new BufferedReader(
+                        new FileReader(sUserFile));
+                json = br.readLine();
+                br.close();
+            }
+
+            // Deserialize the array
+            Gson gson = new Gson();
+            LoggedUser temp = gson.fromJson(json, LoggedUser.class);
+
+            // Convert the array to a list
+            if (temp != null) {
+                if (sLoggedUser == null) {
+                    sLoggedUser = temp;
+                } else {
+                    synchronized (sLoggedUser) {
+                        sLoggedUser = temp;
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

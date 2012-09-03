@@ -32,10 +32,14 @@ import java.io.UnsupportedEncodingException;
  */
 public class SessionQuery extends PostQuery {
 
-	private static final String	TAG	= "Session Query";
+	public SessionQuery(String url) {
+        super(url);
+    }
 
-	private String				json;
-	private LoggedUser			user;
+    private static final String	TAG	= "Session Query";
+
+	private String				mJsonString;
+	private LoggedUser			mUser;
 
 	/**
 	 * Execute the query, establishing a session with Cloudsdale
@@ -44,24 +48,18 @@ public class SessionQuery extends PostQuery {
 	 * @throws ExternalServiceException
 	 */
 	@Override
-	public LoggedUser execute(final QueryData data, final Context context) {
-		// Mark the query as alive
-		this.isAlive = true;
-
-		// Build the HTTP objects
-		setupHttpObjects(data.getUrl());
-
+	public LoggedUser execute(QueryData data, Context context) {
 		// Set the entity
 		if (data.getHeaders() != null) {
 			try {
-				this.httpPost.setEntity(new UrlEncodedFormEntity(data
+				this.mHttpPost.setEntity(new UrlEncodedFormEntity(data
 						.getHeaders()));
 			} catch (UnsupportedEncodingException e) {
 				BugSenseHandler.log(SessionQuery.TAG, e);
 			}
 		} else if (data.getJson() != null) {
 			try {
-				this.httpPost.setEntity(new StringEntity(data.getJson()));
+				this.mHttpPost.setEntity(new StringEntity(data.getJson()));
 			} catch (UnsupportedEncodingException e) {
 				BugSenseHandler.log(SessionQuery.TAG, e);
 			}
@@ -70,38 +68,38 @@ public class SessionQuery extends PostQuery {
 		// Query the API
 		try {
 			// Get the response
-			this.httpResponse = this.httpClient.execute(this.httpPost);
+			mHttpResponse = mhttpClient.execute(mHttpPost);
 
-			if (this.httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+			if (mHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
 				return null;
 			} else if (String.valueOf(
-					this.httpResponse.getStatusLine().getStatusCode())
+					this.mHttpResponse.getStatusLine().getStatusCode())
 					.startsWith("5")) { return null; }
 
 			// Build the json
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					this.httpResponse.getEntity().getContent(), "UTF-8"));
+					this.mHttpResponse.getEntity().getContent(), "UTF-8"));
 			StringBuilder sb = new StringBuilder();
 			for (String line = null; (line = reader.readLine()) != null;) {
 				sb.append(line);
 			}
-			this.json = sb.toString();
-			this.json = stripHtml(this.json);
+			mJsonString = sb.toString();
+			mJsonString = stripHtml(mJsonString);
 
 			// [DEBUG] Logcat the json response
-			Log.d(SessionQuery.TAG, "Session API response: " + this.json);
+			Log.d(SessionQuery.TAG, "Session API response: " + mJsonString);
 
 			// Deserialize
 			GsonBuilder gb = new GsonBuilder();
 			gb.setExclusionStrategies(new GsonIgnoreExclusionStrategy(
 					String[].class));
 			Gson gson = gb.create();
-			if (this.json != null) {
-				LoginResponse resp = gson.fromJson(this.json,
+			if (this.mJsonString != null) {
+				LoginResponse resp = gson.fromJson(mJsonString,
 						LoginResponse.class);
-				SessionQuery.this.user = (LoggedUser) resp.getResult()
+				mUser = (LoggedUser) resp.getResult()
 						.getUser();
-				SessionQuery.this.user.setClientId(resp.getResult()
+				mUser.setClientId(resp.getResult()
 						.getClientId());
 			}
 		} catch (ClientProtocolException e) {
@@ -113,9 +111,9 @@ public class SessionQuery extends PostQuery {
 		}
 
 		Log.d(SessionQuery.TAG, "User: "
-				+ (this.user == null ? "Null" : "Not Null"));
+				+ (this.mUser == null ? "Null" : "Not Null"));
 
-		return this.user;
+		return this.mUser;
 	}
 
 	/**

@@ -12,82 +12,86 @@ import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api_models.Cloud;
 import org.cloudsdale.android.models.network_models.ApiCloudArrayResponse;
+import org.cloudsdale.android.models.network_models.ApiCloudResponse;
 
 import java.io.IOException;
 
 public class CloudGetQuery extends GetQuery {
 
-	private static final String	TAG	= "Cloud Get Query";
+    public CloudGetQuery(String url) {
+        super(url);
+    }
 
-	private String				json;
-	private Cloud[]				results;
-	private Cloud				result;
+    private static final String TAG = "Cloud Get Query";
 
-	@Override
-	public Cloud[] executeForCollection(QueryData data, Context context) {
-		setupHttpObjects(data.getUrl());
-		setHeaders(data.getHeaders());
+    private String              mJsonString;
+    private Cloud[]             mResults;
+    private Cloud               mResult;
 
-		// Query the API
-		try {
-			// Get the response
-			httpResponse = httpClient.execute(httpGet);
+    @Override
+    public Cloud[] executeForCollection(QueryData data, Context context) {
+        setHeaders(data.getHeaders());
 
-			// If we got anything other than a user, break out, there's
-			// no point to continuing
-			if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
+        // Query the API
+        try {
+            // Get the response
+            mHttpResponse = mhttpClient.execute(httpGet);
 
-			// Build the json
-			json = EntityUtils.toString(httpResponse.getEntity());
-			json = stripHtml(json);
+            // If we got anything other than a user, break out, there's
+            // no point to continuing
+            if (mHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
 
-			// Deserialize
-			Gson gson = new Gson();
-			Log.d(TAG, json == null ? "Json is null" : json);
-			if (json != null) {
-				results = gson.fromJson(json, ApiCloudArrayResponse.class)
-						.getResult();
-			}
-		} catch (ClientProtocolException e) {
-			BugSenseHandler.log(TAG, e);
-		} catch (IOException e) {
-			BugSenseHandler.log(TAG, e);
-		}
+            // Build the json
+            mJsonString = EntityUtils.toString(mHttpResponse.getEntity());
+            mJsonString = stripHtml(mJsonString);
 
-		return results;
-	}
+            // Deserialize
+            Gson gson = new Gson();
+            if (mJsonString != null) {
+                mResults = gson.fromJson(mJsonString,
+                        ApiCloudArrayResponse.class).getResult();
+            }
+        } catch (ClientProtocolException e) {
+            BugSenseHandler.log(TAG, e);
+        } catch (IOException e) {
+            BugSenseHandler.log(TAG, e);
+        }
 
-	@Override
-	public Cloud execute(QueryData data, Context context) {
-		setupHttpObjects(data.getUrl());
-		setHeaders(data.getHeaders());
+        return mResults;
+    }
 
-		// Query the API
-		try {
-			// Get the response
-			httpResponse = httpClient.execute(httpGet);
+    @Override
+    public Cloud execute(QueryData data, Context context) {
+        setupHttpObjects(data.getUrl());
+        setHeaders(data.getHeaders());
 
-			// If we got anything other than a user, break out, there's
-			// no point to continuing
-			if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
+        // Query the API
+        try {
+            // Get the response
+            mHttpResponse = mhttpClient.execute(httpGet);
 
-			// Build the json
-			json = EntityUtils.toString(httpResponse.getEntity());
-			json = stripHtml(json);
+            // If we got anything other than a user, break out, there's
+            // no point to continuing
+            if (mHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
 
-			// Deserialize
-			Gson gson = new Gson();
-			if (json != null) {
-				Log.d(TAG, json);
-				result = gson.fromJson(json, Cloud.class);
-			}
-		} catch (ClientProtocolException e) {
-			BugSenseHandler.log(TAG, e);
-		} catch (IOException e) {
-			BugSenseHandler.log(TAG, e);
-		}
+            // Build the json
+            mJsonString = EntityUtils.toString(mHttpResponse.getEntity());
+            mJsonString = stripHtml(mJsonString);
 
-		return result;
-	}
+            // Deserialize
+            Gson gson = new Gson();
+            if (mJsonString != null) {
+                Log.d(TAG, mJsonString);
+                mResult = gson.fromJson(mJsonString, ApiCloudResponse.class)
+                        .getResult();
+            }
+        } catch (ClientProtocolException e) {
+            BugSenseHandler.log(TAG, e);
+        } catch (IOException e) {
+            BugSenseHandler.log(TAG, e);
+        }
+
+        return mResult;
+    }
 
 }

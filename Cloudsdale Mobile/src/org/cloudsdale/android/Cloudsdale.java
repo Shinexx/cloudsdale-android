@@ -13,20 +13,22 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.b3rwynmobile.fayeclient.FayeBinder;
 import com.b3rwynmobile.fayeclient.FayeClient;
-import com.b3rwynmobile.fayeclient.FayeListener;
-import com.b3rwynmobile.fayeclient.FayeService;
 import com.b3rwynmobile.fayeclient.models.FayeMessage;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.slidingmenu.lib.SlidingMenu;
 
+import org.cloudsdale.android.faye.CloudsdaleFayeBinder;
+import org.cloudsdale.android.faye.CloudsdaleFayeClient;
+import org.cloudsdale.android.faye.CloudsdaleFayeListener;
+import org.cloudsdale.android.faye.CloudsdaleFayeService;
 import org.cloudsdale.android.faye.FayeMessageHandler;
+import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api_models.Cloud;
 import org.cloudsdale.android.models.api_models.User;
 import org.cloudsdale.android.ui.CloudActivity;
@@ -41,7 +43,7 @@ import java.util.ArrayList;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 public class Cloudsdale extends Application implements ServiceConnection,
-        FayeListener {
+        CloudsdaleFayeListener {
 
     // Debug fields
     public static final boolean                  DEBUG            = true;
@@ -49,9 +51,12 @@ public class Cloudsdale extends Application implements ServiceConnection,
 
     // Static objects
     private static Cloudsdale                    sAppObject;
-    private static FayeBinder                    sFayeBinder;
+    private static CloudsdaleFayeBinder          sFayeBinder;
     private static ArrayList<FayeMessageHandler> sMessageHandlerList;
-    private static boolean                       mFirstConnection = true;
+    private static boolean                       sFirstConnection = true;
+
+    // Public data objects
+    private static String                        sCloudShowing;
 
     /**
      * Dummy constructor to handle creating static classes and fetch the global
@@ -61,6 +66,14 @@ public class Cloudsdale extends Application implements ServiceConnection,
         super();
         sMessageHandlerList = new ArrayList<FayeMessageHandler>();
         sAppObject = this;
+    }
+
+    public static void setShowingCloud(String cloudId) {
+        sCloudShowing = cloudId;
+    }
+
+    public static String getShowingCloud() {
+        return sCloudShowing;
     }
 
     public static int dpToPx(int dp, Context ctx) {
@@ -172,13 +185,17 @@ public class Cloudsdale extends Application implements ServiceConnection,
 
     public static void bindFaye() {
         Intent intent = new Intent();
-        intent.setClass(sAppObject, FayeService.class);
+        intent.setClass(sAppObject.getApplicationContext(), CloudsdaleFayeService.class);
         sAppObject.bindService(intent, sAppObject, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onServiceConnected(ComponentName className, IBinder binder) {
-        sFayeBinder = (FayeBinder) binder;
+        if(DEBUG) {
+            Toast.makeText(sAppObject, "Cloudsale Faye service bound", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Faye service bound");
+        }
+        sFayeBinder = (CloudsdaleFayeBinder) binder;
         sFayeBinder.getFayeClient().setFayeListener(this);
         sFayeBinder.getFayeService().startFaye();
     }
@@ -186,28 +203,6 @@ public class Cloudsdale extends Application implements ServiceConnection,
     @Override
     public void onServiceDisconnected(ComponentName className) {
         sFayeBinder = null;
-    }
-
-    @Override
-    public void connectedToServer(FayeClient faye) {
-        if (mFirstConnection) {
-            subscribeToClouds();
-            mFirstConnection = false;
-        }
-    }
-
-    @Override
-    public void disconnectedFromServer(FayeClient faye) {
-        // TODO handle behaviour when disconnected
-    }
-
-    @Override
-    public void messageReceived(FayeClient faye, FayeMessage msg) {
-        if (!sMessageHandlerList.isEmpty()) {
-            for (FayeMessageHandler handler : sMessageHandlerList) {
-                handler.handleMessage(msg);
-            }
-        }
     }
 
     private static void subscribeToClouds() {
@@ -241,5 +236,43 @@ public class Cloudsdale extends Application implements ServiceConnection,
             intent.putExtra("cloudId", viewId);
         }
         context.startActivity(intent);
+    }
+
+    @Override
+    public void connectedToServer(CloudsdaleFayeClient faye) {
+        if (sFirstConnection) {
+            subscribeToClouds();
+            sFirstConnection = false;
+        }
+    }
+
+    @Override
+    public void disconnectedFromServer(CloudsdaleFayeClient faye) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void messageReceived(CloudsdaleFayeClient faye,
+            CloudsdaleFayeMessage msg) {
+        if (!sMessageHandlerList.isEmpty()) {
+            for (FayeMessageHandler handler : sMessageHandlerList) {
+                handler.handleMessage(msg);
+            }
+        }
+    }
+
+    @Override
+    public void connectedToServer(FayeClient faye) {
+        // STUB because we're using the child class in this case
+    }
+
+    @Override
+    public void disconnectedFromServer(FayeClient faye) {
+        // STUB because we're using the child class in this case
+    }
+
+    @Override
+    public void messageReceived(FayeClient faye, FayeMessage message) {
+        // STUB because we're using the child class in this case
     }
 }
