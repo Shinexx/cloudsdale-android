@@ -15,7 +15,6 @@ public abstract class PostQuery extends Query {
 		super.setupHttpObjects(url);
 		this.mHttpPost = new HttpPost(url);
 		mHttpPost.setHeader("Accept", "application/json");
-
 	}
 	
 	@Override

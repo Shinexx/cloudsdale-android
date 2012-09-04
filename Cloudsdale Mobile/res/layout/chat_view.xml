@@ -31,7 +31,8 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight=".9"
-            android:inputType="textAutoComplete" />
+            android:imeOptions="actionSend"
+            android:inputType="text|textMultiLine|textCapSentences|textAutoCorrect" />
 
         <ImageButton
             android:id="@+id/chat_send_button"

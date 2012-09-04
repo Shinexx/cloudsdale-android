@@ -17,9 +17,9 @@ import com.google.gson.Gson;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api_models.Message;
+import org.cloudsdale.android.models.parsers.PostMessageBuilder;
 import org.cloudsdale.android.models.queries.ChatMessageGetQuery;
 import org.cloudsdale.android.models.queries.MessagePostQuery;
 import org.cloudsdale.android.ui.adapters.CloudMessageAdapter;
@@ -146,15 +146,15 @@ public class ChatFragment extends SherlockFragment {
 
         @Override
         protected Message doInBackground(String... params) {
+            String json = new PostMessageBuilder(sInputField.getText().toString()).toString();
             if (Cloudsdale.DEBUG) {
                 Log.d("Chat Send Message", "Attempting to send message");
+                Log.d("Chat Send Message", json);
             }
-            LoggedUser me = PersistentData.getMe();
-            String json = "{\"content\":\"" + params[0] + "\",\"client_id\":\""
-                    + me.getId() + "\"}";
             QueryData qd = new QueryData();
             qd.setJson(json);
             MessagePostQuery q = new MessagePostQuery(sCloudUrl);
+            q.addHeader("X-AUTH-TOKEN", PersistentData.getMe().getAuthToken());
             return q.execute(qd, getActivity());
         }
 

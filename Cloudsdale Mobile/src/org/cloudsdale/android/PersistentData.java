@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.api_models.Cloud;
-import org.cloudsdale.android.models.api_models.User;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,7 +17,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -35,7 +33,7 @@ public class PersistentData {
     private static HashMap<String, Cloud> sCachedClouds;
     private static File                   sUserFile;
     private static File                   sCloudFile;
-    private static boolean                mCloudsLoading;
+    private static boolean                sCloudsLoading;
 
     public static void initialize(final Context context) {
         if (sUserFile == null) {
@@ -323,8 +321,12 @@ public class PersistentData {
             public void run() {
                 super.run();
                 try {
-                    synchronized (sLoggedUser) {
+                    if (sLoggedUser == null) {
                         sLoggedUser = me;
+                    } else {
+                        synchronized (sLoggedUser) {
+                            sLoggedUser = me;
+                        }
                     }
 
                     synchronized (sUserFile) {

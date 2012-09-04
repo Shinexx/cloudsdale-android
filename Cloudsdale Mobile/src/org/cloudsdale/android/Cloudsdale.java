@@ -54,6 +54,7 @@ public class Cloudsdale extends Application implements ServiceConnection,
     private static CloudsdaleFayeBinder          sFayeBinder;
     private static ArrayList<FayeMessageHandler> sMessageHandlerList;
     private static boolean                       sFirstConnection = true;
+    private static boolean                       sFayeConnected;
 
     // Public data objects
     private static String                        sCloudShowing;
@@ -66,6 +67,11 @@ public class Cloudsdale extends Application implements ServiceConnection,
         super();
         sMessageHandlerList = new ArrayList<FayeMessageHandler>();
         sAppObject = this;
+        sFayeConnected = false;
+    }
+    
+    public static boolean isFayeConnected() {
+        return sFayeConnected;
     }
 
     public static void setShowingCloud(String cloudId) {
@@ -185,14 +191,16 @@ public class Cloudsdale extends Application implements ServiceConnection,
 
     public static void bindFaye() {
         Intent intent = new Intent();
-        intent.setClass(sAppObject.getApplicationContext(), CloudsdaleFayeService.class);
+        intent.setClass(sAppObject.getApplicationContext(),
+                CloudsdaleFayeService.class);
         sAppObject.bindService(intent, sAppObject, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onServiceConnected(ComponentName className, IBinder binder) {
-        if(DEBUG) {
-            Toast.makeText(sAppObject, "Cloudsale Faye service bound", Toast.LENGTH_LONG).show();
+        if (DEBUG) {
+            Toast.makeText(sAppObject, "Cloudsale Faye service bound",
+                    Toast.LENGTH_LONG).show();
             Log.d(TAG, "Faye service bound");
         }
         sFayeBinder = (CloudsdaleFayeBinder) binder;
@@ -244,11 +252,12 @@ public class Cloudsdale extends Application implements ServiceConnection,
             subscribeToClouds();
             sFirstConnection = false;
         }
+        sFayeConnected = true;
     }
 
     @Override
     public void disconnectedFromServer(CloudsdaleFayeClient faye) {
-        // TODO Auto-generated method stub
+        sFayeConnected = false;
     }
 
     @Override

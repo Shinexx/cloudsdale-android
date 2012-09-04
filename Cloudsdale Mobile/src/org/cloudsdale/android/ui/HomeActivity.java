@@ -1,5 +1,7 @@
 package org.cloudsdale.android.ui;
 
+import android.app.ProgressDialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,19 +29,23 @@ import java.util.Date;
 
 public class HomeActivity extends SlidingActivity implements FayeMessageHandler {
 
-    private static final String TAG = "Home Activity";
+    private static final String   TAG = "Home Activity";
 
-    private ImageView           mAvatarView;
-    private TextView            mUsernameView;
-    private TextView            mAccountLevelView;
-    private TextView            mDateRegisteredView;
-    private TextView            mCloudCountView;
-    private TextView            mWarningCountView;
-    private SlidingMenu         mSlidingMenu;
+    private ImageView             mAvatarView;
+    private TextView              mUsernameView;
+    private TextView              mAccountLevelView;
+    private TextView              mDateRegisteredView;
+    private TextView              mCloudCountView;
+    private TextView              mWarningCountView;
+    private SlidingMenu           mSlidingMenu;
+    private static ProgressDialog sProgressDialog;
+    private static boolean        sShowDialog;
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sShowDialog = true;
 
         // Set the layouts
         setContentView(R.layout.activity_home);
@@ -73,12 +79,45 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
                 });
     }
 
+    private void showProgressDialog() {
+        sProgressDialog = new ProgressDialog(this);
+        sProgressDialog.setIndeterminate(true);
+        sProgressDialog.setTitle("Cloudsdale is connecting");
+        sProgressDialog.setMessage("Please wait...");
+        sProgressDialog.setCancelable(false);
+        sProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (sProgressDialog != null && sProgressDialog.isShowing()) {
+            sProgressDialog.cancel();
+            sShowDialog = false;
+        }
+        sProgressDialog = null;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
 
         // updateClouds();
         setViewContent();
+        // Show the progress dialogue while Faye is connecting
+        if (sShowDialog) {
+            showProgressDialog();
+            new Thread() {
+                public void run() {
+                    while (!Cloudsdale.isFayeConnected()) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    hideProgressDialog();
+                };
+            }.start();
+        }
     }
 
     @Override
@@ -196,6 +235,12 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
                     + " which generated a cloud id of " + cloudId);
         }
         // TODO Handle the unread message counts
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        sProgressDialog.cancel();
+        super.onConfigurationChanged(newConfig);
     }
 
 }
