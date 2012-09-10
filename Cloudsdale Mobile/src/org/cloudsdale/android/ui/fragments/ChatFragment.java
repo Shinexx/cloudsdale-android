@@ -1,12 +1,14 @@
 package org.cloudsdale.android.ui.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -19,10 +21,11 @@ import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api_models.Message;
-import org.cloudsdale.android.models.parsers.PostMessageBuilder;
 import org.cloudsdale.android.models.queries.ChatMessageGetQuery;
 import org.cloudsdale.android.models.queries.MessagePostQuery;
 import org.cloudsdale.android.ui.adapters.CloudMessageAdapter;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -31,17 +34,32 @@ public class ChatFragment extends SherlockFragment {
     private static final String        TAG = "Chat Fragment";
 
     private static View                sChatView;
-    private static ListView            sMessageList;
+    private static ListView                   sMessageList;
     private static CloudMessageAdapter sMessageAdapter;
-    private static String              sCloudUrl;
-    private static EditText            sInputField;
-    private static ImageButton         sSendButton;
+    private static String                     sCloudUrl;
+    private static EditText                   sInputField;
+    private static ImageButton                sSendButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         sChatView = inflater.inflate(R.layout.chat_view, null);
+        return sChatView;
+    }
 
+    @Override
+    public void onStart() {
+        attachViews();
+        super.onStart();
+    }
+    
+    @Override
+    public void onResume() {
+        attachViews();
+        super.onResume();
+    }
+
+    private void attachViews() {
         sMessageList = (ListView) sChatView
                 .findViewById(R.id.chat_message_list);
         sMessageAdapter = new CloudMessageAdapter(getActivity(),
@@ -62,7 +80,27 @@ public class ChatFragment extends SherlockFragment {
         });
 
         populateChat();
-        return sChatView;
+    }
+    
+    @Override
+    public void onPause() {
+        detachViews();
+        super.onPause();
+    }
+    
+//    @Override
+//    public void onStop() {
+//        detachViews();
+//        super.onStop();
+//    }
+    
+    private void detachViews() {
+        sMessageList.setAdapter(null);
+//        sMessageList = null;
+//        sMessageAdapter.clearMessages();
+//        sMessageAdapter = null;
+//        sInputField = null;
+//        sSendButton = null;
     }
 
     @Override
@@ -79,7 +117,9 @@ public class ChatFragment extends SherlockFragment {
     }
 
     public void addMessage(Message message) {
-        sMessageAdapter.addMessage(message);
+        if (!message.getAuthorId().equals(PersistentData.getMe().getId())) {
+            sMessageAdapter.addMessage(message);
+        }
     }
 
     private void sendChatMessage() {
@@ -90,7 +130,7 @@ public class ChatFragment extends SherlockFragment {
             return;
         }
     }
-
+    
     class MessageAsyncQuery extends AsyncTask<Void, Void, Message[]> {
 
         @Override
@@ -146,13 +186,24 @@ public class ChatFragment extends SherlockFragment {
 
         @Override
         protected Message doInBackground(String... params) {
-            String json = new PostMessageBuilder(sInputField.getText().toString()).toString();
+            JSONObject body = new JSONObject();
+            JSONObject message = new JSONObject();
+            try {
+                body.put("device", "mobile");
+                body.put("content", sInputField.getText().toString());
+                body.put("client_id", PersistentData.getMe().getId());
+                message.put("message", body);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             if (Cloudsdale.DEBUG) {
                 Log.d("Chat Send Message", "Attempting to send message");
-                Log.d("Chat Send Message", json);
+                Log.d("Chat Send Message", message.toString());
             }
+
             QueryData qd = new QueryData();
-            qd.setJson(json);
+            qd.setJson(message.toString());
             MessagePostQuery q = new MessagePostQuery(sCloudUrl);
             q.addHeader("X-AUTH-TOKEN", PersistentData.getMe().getAuthToken());
             return q.execute(qd, getActivity());
@@ -163,6 +214,7 @@ public class ChatFragment extends SherlockFragment {
             if (Cloudsdale.DEBUG) {
                 Log.d("Chat Send Message", "Results received");
             }
+            sInputField.setText("");
             if (result != null) {
                 ((CloudMessageAdapter) sMessageList.getAdapter())
                         .addMessage(result);

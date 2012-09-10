@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.TabHost;
 import android.widget.TabWidget;
@@ -149,7 +150,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
             mChatFrag.addMessage(message.getData());
         }
     }
-
+    
     /**
      * This is a helper class that implements the management of tabs and all
      * details of connecting a ViewPager with associated TabHost. It relies on a

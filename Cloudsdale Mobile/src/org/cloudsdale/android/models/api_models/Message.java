@@ -17,6 +17,7 @@ public class Message extends Model {
     private String   device;
     @SerializedName("author_id")
     private String   authorId;
+    private Drop[]   drops;
 
     public User getAuthor() {
         return user;
@@ -76,12 +77,20 @@ public class Message extends Model {
     public void setDevice(String device) {
         this.device = device;
     }
-    
+
     public String getAuthorId() {
         return authorId;
     }
 
     public void setAuthorId(String id) {
         this.authorId = id;
+    }
+    
+    public Drop[] getDrops() {
+        return drops;
+    }
+    
+    public void setDrops(Drop[] drops) {
+        this.drops = drops;
     }
 }
