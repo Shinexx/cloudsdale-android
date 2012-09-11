@@ -62,16 +62,17 @@ public class CloudsAdapter extends BaseAdapter {
 
         // Get the view objects
         ImageView icon = (ImageView) cloudView.findViewById(R.id.cloud_icon);
-        TextView tv = (TextView) cloudView.findViewById(R.id.cloud_name);
-        TextView uc = (TextView) cloudView.findViewById(R.id.cloud_unread);
-        TextView id = (TextView) cloudView.findViewById(R.id.cloud_hidden_id);
+        TextView nameView = (TextView) cloudView.findViewById(R.id.cloud_name);
+        TextView unreadCount = (TextView) cloudView.findViewById(R.id.cloud_unread);
+        TextView hiddenId = (TextView) cloudView.findViewById(R.id.cloud_hidden_id);
 
         // Set view properties
         UrlImageViewHelper.setUrlDrawable(icon, cloud.getAvatar().getPreview(),
                 R.drawable.unknown_cloud, 60000 * 60);
-        tv.setText(cloud.getName());
-        uc.setText("0");
-        id.setText(cloud.getId());
+        nameView.setText(cloud.getName());
+        nameView.setSelected(true);
+        unreadCount.setText("0");
+        hiddenId.setText(cloud.getId());
 
         // Set the view's id to the cloud's id
         cloudView.setId(cloud.getId().hashCode());

@@ -35,14 +35,24 @@ import java.util.ArrayList;
 public class CloudActivity extends SlidingFragmentActivity implements
         FayeMessageHandler {
 
-    private String       mCloudShowingId;
-    private Cloud        mCloudShowing;
-    private TabHost      mTabHost;
-    private ViewPager    mViewPager;
-    private TabsAdapter  mTabsAdapter;
-    private SlidingMenu  mSlidingMenu;
-    private boolean      mDualView;
-    private ChatFragment mChatFrag;
+    private static final int   DUAL_VIEW_DROP_INDEX   = 0;
+    private static final int   DUAL_VIEW_ONLINE_INDEX = 1;
+    private static final int   CHAT_INDEX             = 0;
+    private static final int   DROP_INDEX             = 1;
+    private static final int   ONLINE_INDEX           = 2;
+
+    private String             mCloudShowingId;
+    private Cloud              mCloudShowing;
+    private TabHost            mTabHost;
+    private ViewPager          mViewPager;
+    private TabsAdapter        mTabsAdapter;
+    private SlidingMenu        mSlidingMenu;
+    private boolean            mDualView;
+    private ChatFragment       mChatFrag;
+    private DropFragment       mDropFrag;
+    private OnlineListFragment mOnlineFrag;
+    private int                mDropFragIndex;
+    private int                mOnlineFragIndex;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +62,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
         setContentView(R.layout.activity_cloud_view);
         setBehindContentView(R.layout.menu);
 
+        // Setup the sliding menu
         mSlidingMenu = getSlidingMenu();
         Cloudsdale.prepareSlideMenu(mSlidingMenu, this);
 
@@ -59,28 +70,16 @@ public class CloudActivity extends SlidingFragmentActivity implements
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
 
+        // Get the tab host
         mTabHost = (TabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup();
-
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
         // TODO Check for the frame, see if we're in tablet mode
         mDualView = false;
 
-        // If we're on a phone, add chat to the pager
-        // Else, put it in the dualView frame
-        if (!mDualView) {
-            mTabsAdapter.addTab(mTabHost.newTabSpec("chat")
-                    .setIndicator("Chat"), ChatFragment.class, null);
-            mChatFrag = (ChatFragment) mTabsAdapter.getItem(0);
-        } else {
-            // TODO Tablet chat goes in the frame, silly filly!
-        }
-        mTabsAdapter.addTab(mTabHost.newTabSpec("drops").setIndicator("Drops"),
-                DropFragment.class, null);
-        mTabsAdapter.addTab(mTabHost.newTabSpec("online")
-                .setIndicator("Online"), OnlineListFragment.class, null);
+        setupFragments();
 
         if (savedInstanceState != null) {
             mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
@@ -88,6 +87,10 @@ public class CloudActivity extends SlidingFragmentActivity implements
 
         Cloudsdale.subscribeToMessages(this);
 
+        setMenuListener();
+    }
+
+    private void setMenuListener() {
         // Set the item listener for the menu
         ((AdapterView) mSlidingMenu.findViewById(android.R.id.list))
                 .setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -101,6 +104,35 @@ public class CloudActivity extends SlidingFragmentActivity implements
                                 .toString(), CloudActivity.this);
                     }
                 });
+    }
+
+    private void setupFragments() {
+        // If we're on a phone, add chat to the pager
+        // Else, put it in the dualView frame
+        if (!mDualView) {
+            mTabsAdapter.addTab(mTabHost.newTabSpec("chat")
+                    .setIndicator("Chat"), ChatFragment.class, null);
+            mChatFrag = (ChatFragment) mTabsAdapter.getItem(CHAT_INDEX);
+        } else {
+            // TODO Tablet chat goes in the frame, silly filly!
+        }
+
+        // Add the remaining fragments
+        mTabsAdapter.addTab(mTabHost.newTabSpec("drops").setIndicator("Drops"),
+                DropFragment.class, null);
+        mTabsAdapter.addTab(mTabHost.newTabSpec("online")
+                .setIndicator("Online"), OnlineListFragment.class, null);
+
+        if (!mDualView) {
+            mDropFragIndex = DROP_INDEX;
+            mOnlineFragIndex = ONLINE_INDEX;
+        } else {
+            mDropFragIndex = DUAL_VIEW_DROP_INDEX;
+            mOnlineFragIndex = DUAL_VIEW_ONLINE_INDEX;
+        }
+        mDropFrag = (DropFragment) mTabsAdapter.getItem(mDropFragIndex);
+        mOnlineFrag = (OnlineListFragment) mTabsAdapter
+                .getItem(mOnlineFragIndex);
     }
 
     @Override
@@ -150,7 +182,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
             mChatFrag.addMessage(message.getData());
         }
     }
-    
+
     /**
      * This is a helper class that implements the management of tabs and all
      * details of connecting a ViewPager with associated TabHost. It relies on a

@@ -22,6 +22,8 @@ public class CloudMessageAdapter extends BaseAdapter {
     private ArrayList<Message> mMessageArray;
     private Activity           mViewRoot;
     private LayoutInflater     mInflater;
+    
+    private static final int AVATAR_REFRESH_INTERVAL = 1000 * 60 * 10;
 
     public CloudMessageAdapter(Activity activity, ArrayList<Message> messages) {
         this.mViewRoot = activity;
@@ -81,7 +83,7 @@ public class CloudMessageAdapter extends BaseAdapter {
         User user = message.getAuthor();
 
         UrlImageViewHelper.setUrlDrawable(avatar, user.getAvatar().getNormal(),
-                R.drawable.unknown_user, 60000 * 10);
+                R.drawable.unknown_user, AVATAR_REFRESH_INTERVAL);
          nameText.setText(message.getAuthor().getName());
          tagText.setText(message.getAuthor().getRole().toString());
          messageBody.setText(message.getContent());

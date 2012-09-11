@@ -46,14 +46,15 @@ public class Cloudsdale extends Application implements ServiceConnection,
         CloudsdaleFayeListener {
 
     // Debug fields
-    public static final boolean                  DEBUG            = true;
-    private static final String                  TAG              = "Cloudsdale Mobile";
+    public static final boolean                  DEBUG             = true;
+    private static final String                  TAG               = "Cloudsdale Mobile";
+    private static final int                     AVATAR_EXPIRATION = 30 * 60 * 1000;
 
     // Static objects
     private static Cloudsdale                    sAppObject;
     private static CloudsdaleFayeBinder          sFayeBinder;
     private static ArrayList<FayeMessageHandler> sMessageHandlerList;
-    private static boolean                       sFirstConnection = true;
+    private static boolean                       sFirstConnection  = true;
     private static boolean                       sFayeConnected;
 
     // Public data objects
@@ -69,7 +70,7 @@ public class Cloudsdale extends Application implements ServiceConnection,
         sAppObject = this;
         sFayeConnected = false;
     }
-    
+
     public static boolean isFayeConnected() {
         return sFayeConnected;
     }
@@ -146,47 +147,29 @@ public class Cloudsdale extends Application implements ServiceConnection,
                 .findViewById(R.id.slide_menu_username_label);
 
         UrlImageViewHelper.setUrlDrawable(userIcon, me.getAvatar().getNormal(),
-                R.drawable.unknown_user, 30 * 60 * 1000);
+                R.drawable.unknown_user, AVATAR_EXPIRATION);
         userName.setText(me.getName());
         head.setClickable(false);
     }
 
     private static void addStaticSlideMenuViews(ListView list,
             LayoutInflater inflater) {
-        View homeView = inflater.inflate(R.layout.cloud_list_item, null);
-        View settingsView = inflater.inflate(R.layout.cloud_list_item, null);
-        View logoutView = inflater.inflate(R.layout.cloud_list_item, null);
+        for (StaticNavigation nav : StaticNavigation.values()) {
+            View navigationView = inflater.inflate(R.layout.cloud_list_item,
+                    null);
+            ImageView navIcon = (ImageView) navigationView
+                    .findViewById(R.id.cloud_icon);
+            TextView navLabel = (TextView) navigationView
+                    .findViewById(R.id.cloud_name);
+            TextView navId = (TextView) navigationView
+                    .findViewById(R.id.cloud_hidden_id);
 
-        ImageView homeIcon = (ImageView) homeView.findViewById(R.id.cloud_icon);
-        homeIcon.setImageResource(R.drawable.color_icon);
-        TextView homeText = (TextView) homeView.findViewById(R.id.cloud_name);
-        homeText.setText("Home");
-        TextView homeId = (TextView) homeView
-                .findViewById(R.id.cloud_hidden_id);
-        homeId.setText("Home");
-        list.addHeaderView(homeView);
+            navIcon.setImageResource(nav.getResId());
+            navLabel.setText(nav.getDisplayName());
+            navId.setText(nav.getTextId());
 
-        ImageView settingsIcon = (ImageView) settingsView
-                .findViewById(R.id.cloud_icon);
-        settingsIcon.setImageResource(R.drawable.color_icon);
-        TextView settingsText = (TextView) settingsView
-                .findViewById(R.id.cloud_name);
-        settingsText.setText("Settings");
-        TextView settingsId = (TextView) settingsView
-                .findViewById(R.id.cloud_hidden_id);
-        settingsId.setText("Settings");
-        list.addHeaderView(settingsView);
-
-        ImageView logoutIcon = (ImageView) logoutView
-                .findViewById(R.id.cloud_icon);
-        logoutIcon.setImageResource(R.drawable.color_icon);
-        TextView logoutText = (TextView) logoutView
-                .findViewById(R.id.cloud_name);
-        logoutText.setText("Log out");
-        TextView logoutId = (TextView) logoutView
-                .findViewById(R.id.cloud_hidden_id);
-        logoutId.setText("Logout");
-        list.addHeaderView(logoutView);
+            list.addHeaderView(navigationView);
+        }
     }
 
     public static void bindFaye() {

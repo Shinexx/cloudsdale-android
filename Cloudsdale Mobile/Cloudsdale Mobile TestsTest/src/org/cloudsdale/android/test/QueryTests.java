@@ -44,7 +44,7 @@ public class QueryTests extends AndroidTestCase {
 
     public void testUserLookupQuery() {
         // Arrange
-        QueryData data = setupQueryData_UserGet();
+        QueryData data = setupQueryData(Constants.DUMMY_LOOKUP_ENDPOINT);
         LoggedUser session = establishSession();
 
         // Act
@@ -59,7 +59,7 @@ public class QueryTests extends AndroidTestCase {
 
     public void testCloudLookupQuery() {
         // Arrange
-        QueryData data = setupQueryData_CloudGet();
+        QueryData data = setupQueryData(Constants.HAMMOCK_LOOKUP_ENDPOINT);
         LoggedUser session = establishSession();
 
         // Act
@@ -75,7 +75,7 @@ public class QueryTests extends AndroidTestCase {
 
     public void testCloudChatQuery() {
         // Arrange
-        QueryData data = setupQueryData_CloudChat();
+        QueryData data = setupQueryData(Constants.META_CHAT_ENDPOINT);
         LoggedUser session = establishSession();
 
         // Act
@@ -89,7 +89,7 @@ public class QueryTests extends AndroidTestCase {
 
     public void testMessageSendQuery() {
         // Arrange
-        QueryData data = setupQueryData_MessageSend();
+        QueryData data = setupQueryData(Constants.TEST_CHAT_ENDPOINT);
         LoggedUser session = establishSession();
 
         // Act
@@ -120,7 +120,7 @@ public class QueryTests extends AndroidTestCase {
     
     public void testDropFetch() {
         // Arrange
-        QueryData data = setupQueryData_DropFetch();
+        QueryData data = setupQueryData(Constants.META_DROP_ENDPOINT);
         LoggedUser session = establishSession();
         
         // Act
@@ -142,9 +142,15 @@ public class QueryTests extends AndroidTestCase {
             Assert.assertEquals("OK", drop.getStatus()[1]);
         }
     }
-
-    private QueryData setupQueryData_Username() {
+    
+    private QueryData setupQueryData(String url) {
         QueryData data = new QueryData();
+        data.setUrl(url);
+        return data;
+    }
+
+    private QueryData setupQueryData_Username(String url) {
+        QueryData data = setupQueryData(url);
         data.setUrl(Constants.SESSION_ENDPOINT);
         ArrayList<BasicNameValuePair> headers = new ArrayList<BasicNameValuePair>();
         headers.add(new BasicNameValuePair("email", Constants.DUMMY_EMAIL));
@@ -153,38 +159,8 @@ public class QueryTests extends AndroidTestCase {
         return data;
     }
 
-    private QueryData setupQueryData_UserGet() {
-        QueryData data = new QueryData();
-        data.setUrl(Constants.DUMMY_LOOKUP_ENDPOINT);
-        return data;
-    }
-
-    private QueryData setupQueryData_CloudGet() {
-        QueryData data = new QueryData();
-        data.setUrl(Constants.HAMMOCK_LOOKUP_ENDPOINT);
-        return data;
-    }
-
-    private QueryData setupQueryData_CloudChat() {
-        QueryData data = new QueryData();
-        data.setUrl(Constants.HAMMOCK_CHAT_ENDPOINT);
-        return data;
-    }
-
-    private QueryData setupQueryData_MessageSend() {
-        QueryData data = new QueryData();
-        data.setUrl(Constants.TEST_CHAT_ENDPOINT);
-        return data;
-    }
-    
-    private QueryData setupQueryData_DropFetch() {
-        QueryData data = new QueryData();
-        data.setUrl(Constants.META_DROP_ENDPOINT);
-        return data;
-    }
-
     private LoggedUser establishSession() {
-        QueryData data = setupQueryData_Username();
+        QueryData data = setupQueryData_Username(Constants.SESSION_ENDPOINT);
         SessionQuery sq = new SessionQuery(data.getUrl());
         LoggedUser session = sq.execute(data, null);
         return session;

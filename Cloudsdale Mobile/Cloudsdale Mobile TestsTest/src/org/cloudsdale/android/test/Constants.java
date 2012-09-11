@@ -33,6 +33,11 @@ public class Constants {
                                                                        Constants.CLOUDSDALE_BASE,
                                                                        Constants.CLOUDSDALE_API_VERSION,
                                                                        Constants.HAMMOCK_ID);
+    public static final String HAMMOCK_ONLINE_ENDPOINT   = MessageFormat
+                                                               .format("{0}/{1}/clouds/{2}/users.json",
+                                                                       Constants.CLOUDSDALE_BASE,
+                                                                       Constants.CLOUDSDALE_API_VERSION,
+                                                                       Constants.HAMMOCK_ID);
     public static final String META_CHAT_ENDPOINT      = MessageFormat
                                                                .format("{0}/{1}/clouds/{2}/chat/messages.json",
                                                                        Constants.CLOUDSDALE_BASE,

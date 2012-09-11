@@ -1,20 +1,16 @@
 package org.cloudsdale.android.ui.fragments;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.google.gson.Gson;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.PersistentData;
@@ -34,11 +30,11 @@ public class ChatFragment extends SherlockFragment {
     private static final String        TAG = "Chat Fragment";
 
     private static View                sChatView;
-    private static ListView                   sMessageList;
+    private static ListView            sMessageList;
     private static CloudMessageAdapter sMessageAdapter;
-    private static String                     sCloudUrl;
-    private static EditText                   sInputField;
-    private static ImageButton                sSendButton;
+    private static String              sCloudUrl;
+    private static EditText            sInputField;
+    private static ImageButton         sSendButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,7 +48,7 @@ public class ChatFragment extends SherlockFragment {
         attachViews();
         super.onStart();
     }
-    
+
     @Override
     public void onResume() {
         attachViews();
@@ -81,31 +77,26 @@ public class ChatFragment extends SherlockFragment {
 
         populateChat();
     }
-    
+
     @Override
     public void onPause() {
         detachViews();
         super.onPause();
     }
-    
-//    @Override
-//    public void onStop() {
-//        detachViews();
-//        super.onStop();
-//    }
-    
+
+    // @Override
+    // public void onStop() {
+    // detachViews();
+    // super.onStop();
+    // }
+
     private void detachViews() {
         sMessageList.setAdapter(null);
-//        sMessageList = null;
-//        sMessageAdapter.clearMessages();
-//        sMessageAdapter = null;
-//        sInputField = null;
-//        sSendButton = null;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+        // sMessageList = null;
+        // sMessageAdapter.clearMessages();
+        // sMessageAdapter = null;
+        // sInputField = null;
+        // sSendButton = null;
     }
 
     public void populateChat() {
@@ -130,7 +121,7 @@ public class ChatFragment extends SherlockFragment {
             return;
         }
     }
-    
+
     class MessageAsyncQuery extends AsyncTask<Void, Void, Message[]> {
 
         @Override
@@ -221,22 +212,5 @@ public class ChatFragment extends SherlockFragment {
             }
             super.onPostExecute(result);
         }
-    }
-
-    class MessageAsyncAdd extends AsyncTask<String, Void, Message> {
-
-        @Override
-        protected Message doInBackground(String... params) {
-            Gson gson = new Gson();
-            Message message = gson.fromJson(params[0], Message.class);
-            return message;
-        }
-
-        @Override
-        protected void onPostExecute(Message result) {
-            sMessageAdapter.addMessage(result);
-            super.onPostExecute(result);
-        }
-
     }
 }
