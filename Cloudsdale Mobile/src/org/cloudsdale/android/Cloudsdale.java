@@ -208,7 +208,15 @@ public class Cloudsdale extends Application implements ServiceConnection,
     }
 
     public static void subscribeToMessages(FayeMessageHandler handler) {
-        sMessageHandlerList.add(handler);
+        synchronized (sMessageHandlerList) {
+            sMessageHandlerList.add(handler);
+        }
+    }
+
+    public static void unsubscribeToMessages(FayeMessageHandler handler) {
+        synchronized (sMessageHandlerList) {
+            sMessageHandlerList.remove(handler);
+        }
     }
 
     public static void navigate(String viewId, Activity context) {

@@ -147,6 +147,12 @@ public class CloudActivity extends SlidingFragmentActivity implements
         GetShowingCloud();
     }
 
+    @Override
+    protected void onPause() {
+        Cloudsdale.unsubscribeToMessages(this);
+        super.onPause();
+    }
+    
     private void GetShowingCloud() {
         Intent intent = getIntent();
         mCloudShowingId = intent.getExtras().getString("cloudId");

@@ -108,7 +108,7 @@ public class ChatFragment extends SherlockFragment {
     }
 
     public void addMessage(Message message) {
-        if (!message.getAuthorId().equals(PersistentData.getMe().getId())) {
+        if (!message.getAuthorId().equals(PersistentData.getMe().getId()) || !message.getDevice().equals("mobile")) {
             sMessageAdapter.addMessage(message);
         }
     }
