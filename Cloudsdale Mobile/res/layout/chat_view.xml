@@ -15,7 +15,7 @@
         android:background="@drawable/bg_frame_sm01"
         android:padding="0dp"
         android:stackFromBottom="true"
-        android:transcriptMode="alwaysScroll"
+        android:transcriptMode="normal"
         tools:listitem="@layout/chat_message_view" />
 
     <LinearLayout

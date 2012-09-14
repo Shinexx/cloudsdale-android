@@ -36,7 +36,7 @@ public class CloudDropAdapter extends BaseAdapter {
     }
 
     public void addDrop(Drop drop) {
-        mDrops.add(drop);
+        mDrops.add(0, drop);
         notifyDataSetChanged();
     }
     

@@ -42,6 +42,10 @@ public class DropFragment extends SherlockFragment {
         super.onResume();
     }
 
+    public void addDrop(Drop drop) {
+        sDropAdapter.addDrop(drop);
+    }
+
     private void attachViews() {
         sDropList = (ListView) sDropView.findViewById(R.id.drop_list);
         sDropAdapter = new CloudDropAdapter(getActivity(), null);
@@ -50,9 +54,10 @@ public class DropFragment extends SherlockFragment {
         sDropList.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView parent, View view, int position,
-                    long id) {
-                String url = ((Drop) sDropList.getItemAtPosition(position)).getUrl();
+            public void onItemClick(AdapterView parent, View view,
+                    int position, long id) {
+                String url = ((Drop) sDropList.getItemAtPosition(position))
+                        .getUrl();
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
             }
@@ -83,9 +88,10 @@ public class DropFragment extends SherlockFragment {
             super.onPostExecute(result);
 
             if (result != null) {
-                for (Drop d : result) {
-                    sDropAdapter.addDrop(d);
+                for(int i = result.length - 1; i >= 0; i--) {
+                    sDropAdapter.addDrop(result[i]);
                 }
+                sDropList.smoothScrollToPosition(0);
             }
         }
 

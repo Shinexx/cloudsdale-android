@@ -4,6 +4,7 @@
     android:id="@+id/drop_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:stackFromBottom="true"
     tools:listitem="@layout/drop_layout" >
 
 </ListView>

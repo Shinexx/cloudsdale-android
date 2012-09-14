@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.TabHost;
 import android.widget.TabWidget;
@@ -26,6 +25,7 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.faye.FayeMessageHandler;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api_models.Cloud;
+import org.cloudsdale.android.models.api_models.Drop;
 import org.cloudsdale.android.ui.fragments.ChatFragment;
 import org.cloudsdale.android.ui.fragments.DropFragment;
 import org.cloudsdale.android.ui.fragments.OnlineListFragment;
@@ -191,6 +191,12 @@ public class CloudActivity extends SlidingFragmentActivity implements
         String channel = message.getChannel().substring(1).split("/")[1];
         if (channel.equals(mCloudShowingId)) {
             mChatFrag.addMessage(message.getData());
+            if (message.getData().getDrops() != null
+                    && message.getData().getDrops().length > 0) {
+                for(Drop drop : message.getData().getDrops()) {
+                    mDropFrag.addDrop(drop);
+                }
+            }
         }
     }
 

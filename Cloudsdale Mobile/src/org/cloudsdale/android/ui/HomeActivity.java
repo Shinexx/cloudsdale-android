@@ -2,6 +2,7 @@ package org.cloudsdale.android.ui;
 
 import android.app.ProgressDialog;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,8 +21,11 @@ import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.faye.FayeMessageHandler;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
+import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.Role;
 import org.cloudsdale.android.models.api_models.User;
+import org.cloudsdale.android.models.queries.UserGetQuery;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -99,8 +103,17 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
     protected void onStart() {
         super.onStart();
 
-        // updateClouds();
         setViewContent();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        updateMe();
+        getViews();
+        setViewContent();
+
         // Show the progress dialogue while Faye is connecting
         if (sShowDialog) {
             showProgressDialog();
@@ -117,15 +130,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
                 };
             }.start();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // updateClouds();
-        getViews();
-        setViewContent();
     }
 
     @Override
@@ -234,4 +238,32 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
         super.onConfigurationChanged(newConfig);
     }
 
+    private void updateMe() {
+        new UserUpdateTask().execute();
+    }
+
+    private class UserUpdateTask extends AsyncTask<Void, Void, User> {
+
+        @Override
+        protected User doInBackground(Void... params) {
+            QueryData data = new QueryData();
+            UserGetQuery query = new UserGetQuery(
+                    getString(R.string.cloudsdale_api_base)
+                            + getString(R.string.cloudsdale_user_endpoint,
+                                    PersistentData.getMe().getId()));
+            query.addHeader("X-AUTH-TOKEN", PersistentData.getMe()
+                    .getAuthToken());
+            return query.execute(data, HomeActivity.this);
+        }
+        
+        @Override
+        protected void onPostExecute(User result) {
+            LoggedUser user = (LoggedUser) result;
+            user.setAuthToken(PersistentData.getMe().getAuthToken());
+            PersistentData.storeLoggedUser(user);
+            setViewContent();
+            super.onPostExecute(result);
+        }
+
+    }
 }
