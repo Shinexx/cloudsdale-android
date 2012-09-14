@@ -35,11 +35,9 @@ import java.util.ArrayList;
 public class CloudActivity extends SlidingFragmentActivity implements
         FayeMessageHandler {
 
-    private static final int   DUAL_VIEW_DROP_INDEX   = 0;
-    private static final int   DUAL_VIEW_ONLINE_INDEX = 1;
-    private static final int   CHAT_INDEX             = 0;
-    private static final int   DROP_INDEX             = 1;
-    private static final int   ONLINE_INDEX           = 2;
+    private static final int   ONLINE_INDEX = 0;
+    private static final int   DROP_INDEX   = 1;
+    private static final int   CHAT_INDEX   = 2;
 
     private String             mCloudShowingId;
     private Cloud              mCloudShowing;
@@ -83,6 +81,12 @@ public class CloudActivity extends SlidingFragmentActivity implements
 
         if (savedInstanceState != null) {
             mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
+        } else {
+            if (!mDualView) {
+                mTabHost.setCurrentTabByTag("chat");
+            } else {
+                mTabHost.setCurrentTabByTag("online");
+            }
         }
 
         Cloudsdale.subscribeToMessages(this);
@@ -107,6 +111,24 @@ public class CloudActivity extends SlidingFragmentActivity implements
     }
 
     private void setupFragments() {
+
+        // Add the remaining fragments
+        mTabsAdapter.addTab(mTabHost.newTabSpec("online")
+                .setIndicator("Online"), OnlineListFragment.class, null);
+        mTabsAdapter.addTab(mTabHost.newTabSpec("drops").setIndicator("Drops"),
+                DropFragment.class, null);
+
+        if (!mDualView) {
+            mDropFragIndex = DROP_INDEX;
+            mOnlineFragIndex = ONLINE_INDEX;
+        } else {
+            mDropFragIndex = DROP_INDEX;
+            mOnlineFragIndex = ONLINE_INDEX;
+        }
+        mDropFrag = (DropFragment) mTabsAdapter.getItem(mDropFragIndex);
+        mOnlineFrag = (OnlineListFragment) mTabsAdapter
+                .getItem(mOnlineFragIndex);
+
         // If we're on a phone, add chat to the pager
         // Else, put it in the dualView frame
         if (!mDualView) {
@@ -116,23 +138,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
         } else {
             // TODO Tablet chat goes in the frame, silly filly!
         }
-
-        // Add the remaining fragments
-        mTabsAdapter.addTab(mTabHost.newTabSpec("drops").setIndicator("Drops"),
-                DropFragment.class, null);
-        mTabsAdapter.addTab(mTabHost.newTabSpec("online")
-                .setIndicator("Online"), OnlineListFragment.class, null);
-
-        if (!mDualView) {
-            mDropFragIndex = DROP_INDEX;
-            mOnlineFragIndex = ONLINE_INDEX;
-        } else {
-            mDropFragIndex = DUAL_VIEW_DROP_INDEX;
-            mOnlineFragIndex = DUAL_VIEW_ONLINE_INDEX;
-        }
-        mDropFrag = (DropFragment) mTabsAdapter.getItem(mDropFragIndex);
-        mOnlineFrag = (OnlineListFragment) mTabsAdapter
-                .getItem(mOnlineFragIndex);
     }
 
     @Override
@@ -152,7 +157,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
         Cloudsdale.unsubscribeToMessages(this);
         super.onPause();
     }
-    
+
     private void GetShowingCloud() {
         Intent intent = getIntent();
         mCloudShowingId = intent.getExtras().getString("cloudId");

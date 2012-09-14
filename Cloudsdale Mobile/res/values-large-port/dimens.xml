@@ -1,5 +1,5 @@
 <resources>
 
-    <dimen name="actionbar_home_width">500dp</dimen>
+    <dimen name="actionbar_home_width">500px</dimen>
 
 </resources>

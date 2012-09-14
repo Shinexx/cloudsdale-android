@@ -1,10 +1,14 @@
 package org.cloudsdale.android.ui.fragments;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -33,12 +37,6 @@ public class DropFragment extends SherlockFragment {
     }
 
     @Override
-    public void onStart() {
-        attachViews();
-        super.onStart();
-    }
-
-    @Override
     public void onResume() {
         attachViews();
         super.onResume();
@@ -49,6 +47,16 @@ public class DropFragment extends SherlockFragment {
         sDropAdapter = new CloudDropAdapter(getActivity(), null);
         sDropList.setAdapter(sDropAdapter);
         populateDrops();
+        sDropList.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position,
+                    long id) {
+                String url = ((Drop) sDropList.getItemAtPosition(position)).getUrl();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+            }
+        });
     }
 
     private void populateDrops() {

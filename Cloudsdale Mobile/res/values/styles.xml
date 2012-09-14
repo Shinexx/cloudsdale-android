@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Theme.CloudsdaleLight" parent="Theme.HoloEverywhereLight.Sherlock">
-        <item name="actionBarStyle">@style/Widget.Cloudsdale.Light.Actionbar.Solid</item>
-        <item name="android:actionBarStyle">@style/Widget.Cloudsdale.Light.Actionbar.Solid</item>
-    </style>
+    <style name="Theme.CloudsdaleLight" parent="Holo.Theme.Sherlock.Light.DarkActionBar"></style>
 
-    <style name="Theme.CloudsdaleDark" parent="Theme.HoloEverywhereDark.Sherlock"></style>
+    <style name="Theme.CloudsdaleDark" parent="Holo.Theme.Sherlock"></style>
 
     <style name="Widget.Cloudsdale.Light.Actionbar.Solid" parent="Widget.Sherlock.Light.ActionBar.Solid">
         <item name="background">#FF1A91DB</item>

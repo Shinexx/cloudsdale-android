@@ -6,7 +6,7 @@
     <ImageView
         android:id="@+id/drop_preview"
         android:layout_width="fill_parent"
-        android:layout_height="144dp"
+        android:layout_height="@dimen/drop_height"
         android:background="#A8A8A8"
         android:focusable="false"
         android:scaleType="centerCrop"

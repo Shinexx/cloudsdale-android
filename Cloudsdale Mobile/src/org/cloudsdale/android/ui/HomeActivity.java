@@ -36,7 +36,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
     private TextView              mAccountLevelView;
     private TextView              mDateRegisteredView;
     private TextView              mCloudCountView;
-    private TextView              mWarningCountView;
     private SlidingMenu           mSlidingMenu;
     private static ProgressDialog sProgressDialog;
     private static boolean        sShowDialog;
@@ -163,10 +162,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
         if (mCloudCountView == null) {
             mCloudCountView = (TextView) findViewById(R.id.home_cloud_count_label);
         }
-
-        if (mWarningCountView == null) {
-            mWarningCountView = (TextView) findViewById(R.id.home_warning_count_label);
-        }
     }
 
     private void setViewContent() {
@@ -191,10 +186,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
         // Set the user's cloud count
         mCloudCountView.setText("You are a member of "
                 + String.valueOf(me.getClouds().size()) + " clouds");
-
-        // Set the user's warning count
-        mWarningCountView.setText("You have "
-                + String.valueOf(me.getProsecutions().length) + " warnings");
 
     }
 

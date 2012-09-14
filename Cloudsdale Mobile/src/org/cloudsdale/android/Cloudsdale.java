@@ -230,6 +230,9 @@ public class Cloudsdale extends Application implements ServiceConnection,
             // TODO Logout the user
             // TODO Start the login view
             intent.setClass(context, HomeActivity.class);
+        } else if (viewId.equals("Explore")) {
+            // TODO Start the explore view
+            intent.setClass(context, HomeActivity.class);
         } else {
             intent.setClass(context, CloudActivity.class);
             intent.putExtra("cloudId", viewId);
