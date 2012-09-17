@@ -9,6 +9,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api_models.Message;
 import org.cloudsdale.android.models.network_models.ApiMessageArrayResponse;
@@ -24,31 +25,38 @@ public class ChatMessageGetQuery extends GetQuery {
     private String    mJsonString;
     private Message[] mResults;
 
+    @Deprecated
     @Override
-    public Message execute(QueryData data, Context context) {
+    public Message execute(QueryData data, Context context)
+            throws CloudsdaleQueryException {
         throw new UnsupportedOperationException(
                 "Messages can only be queried for a collection");
     }
 
     @Override
-    public Message[] executeForCollection(QueryData data, Context context) {
+    public Message[] executeForCollection(QueryData data, Context context)
+            throws CloudsdaleQueryException {
         setHeaders(data.getHeaders());
 
         try {
             mHttpResponse = mhttpClient.execute(httpGet);
 
-            if (mHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
-
             mJsonString = EntityUtils.toString(mHttpResponse.getEntity());
-//            mJsonString = stripHtml(mJsonString);
-            if(Cloudsdale.DEBUG) {
+            // mJsonString = stripHtml(mJsonString);
+            if (Cloudsdale.DEBUG) {
                 Log.d("ChatMessageGetQuery", mJsonString);
             }
 
+            Gson gson = new Gson();
             if (mJsonString != null) {
-                Gson gson = new Gson();
-                mResults = gson.fromJson(mJsonString,
-                        ApiMessageArrayResponse.class).getResult();
+                ApiMessageArrayResponse resp = gson.fromJson(mJsonString,
+                        ApiMessageArrayResponse.class);
+                if (resp.getStatus() == 200) {
+                    mResults = resp.getResult();
+                } else {
+                    throw new CloudsdaleQueryException(
+                            resp.getErrors()[0].getMessage(), resp.getStatus());
+                }
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();

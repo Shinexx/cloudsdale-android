@@ -20,13 +20,22 @@
 
 package org.cloudsdale.android.faye;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
 import com.b3rwynmobile.fayeclient.FayeService;
 
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.R;
+import org.cloudsdale.android.ui.HomeActivity;
 
 /**
  * Service class to run Faye. Provides a singleton method to get the running
@@ -34,19 +43,19 @@ import org.cloudsdale.android.Cloudsdale;
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
-public class CloudsdaleFayeService extends FayeService {
+public class CloudsdaleFayeService extends FayeService implements IFayeCallback {
 
     // Data objects
     protected CloudsdaleFayeClient mFayeClient;
     protected CloudsdaleFayeBinder mFayeBinder;
-    
+
     /**
      * Default constructor
      */
     public CloudsdaleFayeService() {
         super();
     }
-    
+
     /**
      * Returns the Binder to interact with Faye. This is the prefered method to
      * run the service, and starting from an Intent is not currently supported
@@ -56,13 +65,13 @@ public class CloudsdaleFayeService extends FayeService {
         setup();
         return this.mFayeBinder;
     }
-    
+
     @Override
     public void onCreate() {
         super.onCreate();
         setup();
     }
-    
+
     /**
      * Stops Faye when the Service is being destroyed by the OS
      */
@@ -84,6 +93,7 @@ public class CloudsdaleFayeService extends FayeService {
 
         // Create the client
         mFayeClient = new CloudsdaleFayeClient(fayeUrl);
+        mFayeClient.setCallbacks(this);
 
         // Create the binder
         mFayeBinder = new CloudsdaleFayeBinder(this, this.mFayeClient);
@@ -94,10 +104,6 @@ public class CloudsdaleFayeService extends FayeService {
      */
     @Override
     public void startFaye() {
-        if (Cloudsdale.DEBUG) {
-            Toast.makeText(getApplicationContext(), "Faye Started",
-                    Toast.LENGTH_SHORT).show();
-        }
         mFayeClient.connect();
     }
 
@@ -107,5 +113,41 @@ public class CloudsdaleFayeService extends FayeService {
     @Override
     public void stopFaye() {
         mFayeClient.disconnect();
+    }
+
+    @Override
+    public void connected() {
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification note = makeNotification("Cloudsdale is connected",
+                "Cloudsdale is now connected to the chat server");
+        manager.notify(1337, note);
+    }
+
+    @Override
+    public void disconnected() {
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification note = makeNotification("Cloudsdale has disconnected",
+                "Cloudsdale has disconnected from the chat server");
+        manager.notify(1337, note);
+    }
+
+    @Override
+    public void connecting() {
+        Notification note = makeNotification("Cloudsdale is connecting",
+                "Cloudsale is currently connecting to the chat server");
+        startForeground(1337, note);
+    }
+
+    private Notification makeNotification(String title, String content) {
+        Bitmap icon = BitmapFactory.decodeResource(getApplicationContext()
+                .getResources(), R.drawable.color_icon);
+        Notification note = new NotificationCompat.Builder(
+                getApplicationContext()).setContentTitle(title)
+                .setContentText(content).setSmallIcon(R.drawable.color_icon)
+                .setLargeIcon(icon).getNotification();
+        Intent i = new Intent(this, HomeActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
+        note.flags |= Notification.FLAG_NO_CLEAR;
+        return note;
     }
 }

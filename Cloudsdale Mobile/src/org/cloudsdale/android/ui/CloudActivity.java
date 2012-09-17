@@ -1,5 +1,6 @@
 package org.cloudsdale.android.ui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -51,6 +52,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
     private OnlineListFragment mOnlineFrag;
     private int                mDropFragIndex;
     private int                mOnlineFragIndex;
+    private ProgressDialog     sProgressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,8 +90,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
                 mTabHost.setCurrentTabByTag("online");
             }
         }
-
-        Cloudsdale.subscribeToMessages(this);
 
         setMenuListener();
     }
@@ -149,6 +149,23 @@ public class CloudActivity extends SlidingFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        if (!Cloudsdale.isFayeConnected()) {
+            showProgressDialog();
+            Cloudsdale.bindFaye();
+            new Thread() {
+                public void run() {
+                    while (!Cloudsdale.isFayeConnected()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    hideProgressDialog();
+                };
+            };
+        }
+        Cloudsdale.subscribeToMessages(this);
         GetShowingCloud();
     }
 
@@ -156,6 +173,22 @@ public class CloudActivity extends SlidingFragmentActivity implements
     protected void onPause() {
         Cloudsdale.unsubscribeToMessages(this);
         super.onPause();
+    }
+
+    private void showProgressDialog() {
+        sProgressDialog = new ProgressDialog(this);
+        sProgressDialog.setIndeterminate(true);
+        sProgressDialog.setTitle("Cloudsdale is connecting");
+        sProgressDialog.setMessage("Please wait...");
+        sProgressDialog.setCancelable(false);
+        sProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (sProgressDialog != null && sProgressDialog.isShowing()) {
+            sProgressDialog.cancel();
+        }
+        sProgressDialog = null;
     }
 
     private void GetShowingCloud() {
@@ -193,7 +226,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
             mChatFrag.addMessage(message.getData());
             if (message.getData().getDrops() != null
                     && message.getData().getDrops().length > 0) {
-                for(Drop drop : message.getData().getDrops()) {
+                for (Drop drop : message.getData().getDrops()) {
                     mDropFrag.addDrop(drop);
                 }
             }

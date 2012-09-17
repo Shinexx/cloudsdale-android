@@ -75,7 +75,6 @@ public class TwitterUserGetQuery extends GetQuery {
 	@Deprecated
 	@Override
 	public Model[] executeForCollection(QueryData data, Context context) {
-		// Stub, will never be used in this class
-		return null;
+		throw new UnsupportedOperationException("This query cannot be executed for a collection");
 	}
 }

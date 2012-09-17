@@ -15,6 +15,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api_models.Message;
 import org.cloudsdale.android.models.queries.ChatMessageGetQuery;
@@ -135,7 +136,12 @@ public class ChatFragment extends SherlockFragment {
             data.setUrl(url);
 
             ChatMessageGetQuery query = new ChatMessageGetQuery(url);
-            return query.executeForCollection(data, getActivity());
+            try {
+                return query.executeForCollection(data, getActivity());
+            } catch (CloudsdaleQueryException e) {
+                // TODO error handling
+                return null;
+            }
         }
 
         @Override
@@ -198,7 +204,12 @@ public class ChatFragment extends SherlockFragment {
             qd.setJson(message.toString());
             MessagePostQuery q = new MessagePostQuery(sCloudUrl);
             q.addHeader("X-AUTH-TOKEN", PersistentData.getMe().getAuthToken());
-            return q.execute(qd, getActivity());
+            try {
+                return q.execute(qd, getActivity());
+            } catch (CloudsdaleQueryException e) {
+                // TODO error handling
+                return null;
+            }
         }
 
         @Override

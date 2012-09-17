@@ -83,6 +83,10 @@ public class Cloudsdale extends Application implements ServiceConnection,
         return sCloudShowing;
     }
 
+    public static Context getContext() {
+        return sAppObject;
+    }
+
     public static int dpToPx(int dp, Context ctx) {
         Resources r = ctx.getResources();
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
@@ -173,10 +177,17 @@ public class Cloudsdale extends Application implements ServiceConnection,
     }
 
     public static void bindFaye() {
-        Intent intent = new Intent();
-        intent.setClass(sAppObject.getApplicationContext(),
-                CloudsdaleFayeService.class);
-        sAppObject.bindService(intent, sAppObject, Context.BIND_AUTO_CREATE);
+        if (sFayeBinder == null) {
+            Intent intent = new Intent();
+            intent.setClass(sAppObject.getApplicationContext(),
+                    CloudsdaleFayeService.class);
+            sAppObject
+                    .bindService(intent, sAppObject, Context.BIND_AUTO_CREATE);
+        } else {
+            if (!sFayeBinder.getFayeClient().isFayeConnected()) {
+                sFayeBinder.getFayeClient().connect();
+            }
+        }
     }
 
     @Override
@@ -193,6 +204,8 @@ public class Cloudsdale extends Application implements ServiceConnection,
 
     @Override
     public void onServiceDisconnected(ComponentName className) {
+        sFayeConnected = false;
+        sFirstConnection = true;
         sFayeBinder = null;
     }
 
@@ -209,7 +222,9 @@ public class Cloudsdale extends Application implements ServiceConnection,
 
     public static void subscribeToMessages(FayeMessageHandler handler) {
         synchronized (sMessageHandlerList) {
-            sMessageHandlerList.add(handler);
+            if (!sMessageHandlerList.contains(handler)) {
+                sMessageHandlerList.add(handler);
+            }
         }
     }
 

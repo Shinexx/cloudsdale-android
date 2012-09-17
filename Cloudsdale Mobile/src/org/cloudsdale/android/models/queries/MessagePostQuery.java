@@ -9,6 +9,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api_models.Message;
 import org.cloudsdale.android.models.network_models.ApiMessageResponse;
@@ -26,7 +27,8 @@ public class MessagePostQuery extends PostQuery {
     }
 
     @Override
-    public Message execute(QueryData data, Context context) {
+    public Message execute(QueryData data, Context context)
+            throws CloudsdaleQueryException {
         try {
             mHttpPost.setEntity(new StringEntity(data.getJson()));
             setJsonContentType();
@@ -45,7 +47,9 @@ public class MessagePostQuery extends PostQuery {
                         Log.d("Message Post",
                                 response.getErrors()[0].getMessage());
                     }
-                    return null;
+                    throw new CloudsdaleQueryException(
+                            response.getErrors()[0].getMessage(),
+                            response.getStatus());
                 } else {
                     mResult = response.getResult();
                 }
@@ -67,7 +71,8 @@ public class MessagePostQuery extends PostQuery {
     @Deprecated
     @Override
     public Message[] executeForCollection(QueryData data, Context context) {
-        return null;
+        throw new UnsupportedOperationException(
+                "Message posting does not support simultaneous messages");
     }
 
 }

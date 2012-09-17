@@ -17,49 +17,87 @@ import java.util.Calendar;
  */
 public class User extends IdentityModel {
 
-    private final String     TAG = "Cloudsdale User";
+    protected final String     TAG = "Cloudsdale User";
 
-    // Private attributes from JSON
-    private String           name;
+    // protected attributes from JSON
+    protected String           name;
     @SerializedName("time_zone")
-    private String           timeZone;
+    protected String           timeZone;
     @SerializedName("member_since")
-    private String           memberSinceTemp;
-    private Calendar         memberSince;
+    protected String           memberSinceTemp;
+    protected Calendar         memberSince;
     @SerializedName("suspended_until")
-    private String           suspendedUntilTemp;
-    private Calendar         suspendedUntil;
+    protected String           suspendedUntilTemp;
+    protected Calendar         suspendedUntil;
     @SerializedName("reason_for_suspension")
-    private String           reasonForSuspension;
-    private AvatarContainer  avatar;
+    protected String           reasonForSuspension;
+    protected AvatarContainer  avatar;
     @SerializedName("is_registered")
-    private boolean          isRegistered;
+    protected boolean          isRegistered;
     @SerializedName("is_transient")
-    private boolean          transientStatus;
+    protected boolean          transientStatus;
     @SerializedName("is_banned")
-    private boolean          banStatus;
+    protected boolean          banStatus;
     @SerializedName("is_member_of_a_cloud")
-    private boolean          memberOfACloud;
+    protected boolean          memberOfACloud;
     @SerializedName("has_an_avatar")
-    private boolean          hasAvatar;
+    protected boolean          hasAvatar;
     @SerializedName("has_read_tnc")
-    private boolean          hasReadTnC;
+    protected boolean          hasReadTnC;
     @SerializedName("role")
-    private String           roleTemp;
-    private Role             userRole;
-    private Prosecution[]    prosecutions;
+    protected String           roleTemp;
+    protected Role             userRole;
+    protected Prosecution[]    prosecutions;
     @SerializedName("auth_token")
-    private String           authToken;
-    private String           email;
+    protected String           authToken;
+    protected String           email;
     @SerializedName("needs_to_confirm_registration")
-    private boolean          needsToConfirmRegistration;
+    protected boolean          needsToConfirmRegistration;
     @SerializedName("needs_password_change")
-    private boolean          needsToChangePassword;
+    protected boolean          needsToChangePassword;
     @SerializedName("needs_name_change")
-    private boolean          needsToChangeName;
+    protected boolean          needsToChangeName;
 
     // Child objects from JSON
-    private ArrayList<Cloud> clouds;
+    protected ArrayList<Cloud> clouds;
+    
+    
+
+    public User(String name, String timeZone, String memberSinceTemp,
+            Calendar memberSince, String suspendedUntilTemp,
+            Calendar suspendedUntil, String reasonForSuspension,
+            AvatarContainer avatar, boolean isRegistered,
+            boolean transientStatus, boolean banStatus, boolean memberOfACloud,
+            boolean hasAvatar, boolean hasReadTnC, String roleTemp,
+            Role userRole, Prosecution[] prosecutions, String authToken,
+            String email, boolean needsToConfirmRegistration,
+            boolean needsToChangePassword, boolean needsToChangeName,
+            ArrayList<Cloud> clouds) {
+        super();
+        this.name = name;
+        this.timeZone = timeZone;
+        this.memberSinceTemp = memberSinceTemp;
+        this.memberSince = memberSince;
+        this.suspendedUntilTemp = suspendedUntilTemp;
+        this.suspendedUntil = suspendedUntil;
+        this.reasonForSuspension = reasonForSuspension;
+        this.avatar = avatar;
+        this.isRegistered = isRegistered;
+        this.transientStatus = transientStatus;
+        this.banStatus = banStatus;
+        this.memberOfACloud = memberOfACloud;
+        this.hasAvatar = hasAvatar;
+        this.hasReadTnC = hasReadTnC;
+        this.roleTemp = roleTemp;
+        this.userRole = userRole;
+        this.prosecutions = prosecutions;
+        this.authToken = authToken;
+        this.email = email;
+        this.needsToConfirmRegistration = needsToConfirmRegistration;
+        this.needsToChangePassword = needsToChangePassword;
+        this.needsToChangeName = needsToChangeName;
+        this.clouds = clouds;
+    }
 
     public String getAuthToken() {
         return this.authToken;

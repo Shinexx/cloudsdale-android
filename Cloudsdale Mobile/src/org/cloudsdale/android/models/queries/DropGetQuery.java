@@ -38,29 +38,28 @@ public class DropGetQuery extends GetQuery {
     @Override
     public Drop[] executeForCollection(QueryData data, Context context) {
         setHeaders(data.getHeaders());
-        
+
         try {
             mHttpResponse = mhttpClient.execute(httpGet);
-            
-            if(mHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                return null;
-            }
-            
+
+            if (mHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
+
             mJsonString = EntityUtils.toString(mHttpResponse.getEntity());
-            if(Cloudsdale.DEBUG) {
+            if (Cloudsdale.DEBUG) {
                 Log.d("DropFetchQuery", mJsonString);
             }
-            
-            if(mJsonString != null) {
+
+            if (mJsonString != null) {
                 Gson gson = new Gson();
-                mResults = gson.fromJson(mJsonString, ApiDropArrayResponse.class).getResult();
+                mResults = gson.fromJson(mJsonString,
+                        ApiDropArrayResponse.class).getResult();
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         return mResults;
     }
 }

@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.apache.http.message.BasicNameValuePair;
+import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.annotations.GsonIgnoreExclusionStrategy;
@@ -21,53 +22,56 @@ import java.util.ArrayList;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 public class CloudsdaleAsyncAuth extends
-		AsyncTask<LoginBundle, String, LoggedUser> {
+        AsyncTask<LoginBundle, String, LoggedUser> {
 
-	public static final String	TAG	= "Cloudsdale AsyncAuth";
-	protected Gson				gson;
+    public static final String TAG = "Cloudsdale AsyncAuth";
+    protected Gson             gson;
 
-	@Override
-	protected LoggedUser doInBackground(LoginBundle... params) {
-		// Create the post object
-		QueryData data = new QueryData();
-		data.setUrl(params[0].getLoginUrl());
+    @Override
+    protected LoggedUser doInBackground(LoginBundle... params) {
+        // Create the post object
+        QueryData data = new QueryData();
+        data.setUrl(params[0].getLoginUrl());
 
-		// Set email/password if supplied, else set the json
-		if (params[0].getUsernameInput() != null
-				&& params[0].getPasswordInput() != null) {
-			ArrayList<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>(
-					2);
-			nameValuePairs.add(new BasicNameValuePair("email", params[0]
-					.getUsernameInput()));
-			nameValuePairs.add(new BasicNameValuePair("password", params[0]
-					.getPasswordInput()));
+        // Set email/password if supplied, else set the json
+        if (params[0].getUsernameInput() != null
+                && params[0].getPasswordInput() != null) {
+            ArrayList<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>(
+                    2);
+            nameValuePairs.add(new BasicNameValuePair("email", params[0]
+                    .getUsernameInput()));
+            nameValuePairs.add(new BasicNameValuePair("password", params[0]
+                    .getPasswordInput()));
 
-			data.setHeaders(nameValuePairs);
-		} else if (params[0].getoAuthBundle() != null) {
-			// Build the json serializer
-			GsonBuilder gb = new GsonBuilder();
-			gb.serializeNulls();
-			gb.setExclusionStrategies(new GsonIgnoreExclusionStrategy(
-					String[].class));
-			this.gson = gb.create();
+            data.setHeaders(nameValuePairs);
+        } else if (params[0].getoAuthBundle() != null) {
+            // Build the json serializer
+            GsonBuilder gb = new GsonBuilder();
+            gb.serializeNulls();
+            gb.setExclusionStrategies(new GsonIgnoreExclusionStrategy(
+                    String[].class));
+            this.gson = gb.create();
 
-			// Build the json to send off
-			String oAuthJson = " { \"oauth\": "
-					+ this.gson.toJson(params[0].getoAuthBundle(),
-							OAuthBundle.class) + "}";
-			data.setJson(oAuthJson);
-			Log.d(CloudsdaleAsyncAuth.TAG, oAuthJson);
-		}
+            // Build the json to send off
+            String oAuthJson = " { \"oauth\": "
+                    + this.gson.toJson(params[0].getoAuthBundle(),
+                            OAuthBundle.class) + "}";
+            data.setJson(oAuthJson);
+            Log.d(CloudsdaleAsyncAuth.TAG, oAuthJson);
+        }
 
-		// Query the server and return the User to the caller
-		SessionQuery query = new SessionQuery(data.getUrl());
-		LoggedUser u = query.execute(data, params[0].getContext());
+        // Query the server and return the User to the caller
+        SessionQuery query = new SessionQuery(data.getUrl());
+        try {
+            LoggedUser u = query.execute(data, params[0].getContext());
+            return u;
+        } catch (CloudsdaleQueryException e) {
+            return null;
+        }
+    }
 
-		return u;
-	}
-
-	public String stripHtml(String html) {
-		return Html.fromHtml(html).toString();
-	}
+    public String stripHtml(String html) {
+        return Html.fromHtml(html).toString();
+    }
 
 }

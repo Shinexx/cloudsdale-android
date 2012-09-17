@@ -15,12 +15,16 @@ public class Cloud extends IdentityModel {
     private String          createdTemp;
     private Calendar        createdAt;
     private String          rules;
+    private boolean         hidden;
     private AvatarContainer avatar;
     @SerializedName("is_transient")
     private boolean         isTransient;
     @SerializedName("owner")
-    private User            ownerId;
-    private User[]          moderators;
+    private String          ownerId;
+    @SerializedName("user_ids")
+    private String[]        userIds;
+    @SerializedName("moderator_ids")
+    private String[]        moderators;
     @SerializedName("topic")
     private Chat            chat;
 
@@ -31,36 +35,6 @@ public class Cloud extends IdentityModel {
     public void setHidden(boolean hidden) {
         this.hidden = hidden;
     }
-
-    public boolean isLocked() {
-        return locked;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
-
-    public boolean isFeatured() {
-        return featured;
-    }
-
-    public void setFeatured(boolean featured) {
-        this.featured = featured;
-    }
-
-    public int getMemberCount() {
-        return memberCount;
-    }
-
-    public void setMemberCount(int memberCount) {
-        this.memberCount = memberCount;
-    }
-
-    private boolean hidden;
-    private boolean locked;
-    private boolean featured;
-    @SerializedName("member_count")
-    private int     memberCount;
 
     public AvatarContainer getAvatar() {
         return this.avatar;
@@ -78,7 +52,7 @@ public class Cloud extends IdentityModel {
         return this.description;
     }
 
-    public User[] getModerators() {
+    public String[] getModerators() {
         return this.moderators;
     }
 
@@ -86,7 +60,7 @@ public class Cloud extends IdentityModel {
         return this.name;
     }
 
-    public User getOwnerId() {
+    public String getOwnerId() {
         return this.ownerId;
     }
 
@@ -118,7 +92,7 @@ public class Cloud extends IdentityModel {
         this.description = description;
     }
 
-    public void setModerators(User[] moderators) {
+    public void setModerators(String[] moderators) {
         this.moderators = moderators;
     }
 
@@ -126,7 +100,7 @@ public class Cloud extends IdentityModel {
         this.name = name;
     }
 
-    public void setOwnerId(User ownerId) {
+    public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 

@@ -19,16 +19,21 @@ import com.slidingmenu.lib.app.SlidingActivity;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.faye.FayeMessageHandler;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.Role;
+import org.cloudsdale.android.models.api_models.Cloud;
 import org.cloudsdale.android.models.api_models.User;
+import org.cloudsdale.android.models.queries.CloudGetQuery;
 import org.cloudsdale.android.models.queries.UserGetQuery;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 public class HomeActivity extends SlidingActivity implements FayeMessageHandler {
@@ -64,7 +69,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
         actionbar.setDisplayHomeAsUpEnabled(true);
 
         // Bind the Faye service
-        Cloudsdale.bindFaye();
         Cloudsdale.subscribeToMessages(this);
 
         // Set the item listener for the menu
@@ -102,7 +106,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
     @Override
     protected void onStart() {
         super.onStart();
-
         setViewContent();
     }
 
@@ -113,15 +116,15 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
         updateMe();
         getViews();
         setViewContent();
-
-        // Show the progress dialogue while Faye is connecting
-        if (sShowDialog) {
+        
+        if(!Cloudsdale.isFayeConnected()) {
+            Cloudsdale.bindFaye();
             showProgressDialog();
             new Thread() {
                 public void run() {
                     while (!Cloudsdale.isFayeConnected()) {
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -240,6 +243,13 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 
     private void updateMe() {
         new UserUpdateTask().execute();
+        new CloudUpdateTask().execute();
+    }
+
+    private void handleCloudsdaleError(CloudsdaleQueryException exception) {
+        if (Cloudsdale.DEBUG) {
+            Log.d(TAG, exception.getErrorCode() + ":" + exception.getMessage());
+        }
     }
 
     private class UserUpdateTask extends AsyncTask<Void, Void, User> {
@@ -253,15 +263,69 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
                                     PersistentData.getMe().getId()));
             query.addHeader("X-AUTH-TOKEN", PersistentData.getMe()
                     .getAuthToken());
-            return query.execute(data, HomeActivity.this);
+            try {
+                return query.execute(data, HomeActivity.this);
+            } catch (CloudsdaleQueryException e) {
+                HomeActivity.this.handleCloudsdaleError(e);
+                return null;
+            }
         }
-        
+
         @Override
         protected void onPostExecute(User result) {
-            LoggedUser user = (LoggedUser) result;
-            user.setAuthToken(PersistentData.getMe().getAuthToken());
-            PersistentData.storeLoggedUser(user);
+            LoggedUser me = PersistentData.getMe();
+            adjustUserProperties(me, result);
+            PersistentData.storeLoggedUser(me);
             setViewContent();
+            super.onPostExecute(result);
+        }
+
+        private void adjustUserProperties(LoggedUser me, User result) {
+            me.setName(result.getName());
+            me.setTimeZone(result.getTimeZone());
+            me.setMemberSince(result.getMemberSince());
+            me.setSuspendedUntil(me.getSuspendedUntil());
+            me.setReasonForSuspension(result.getReasonForSuspension());
+            me.setAvatar(result.getAvatar());
+            me.setRegistered(result.isRegistered());
+            me.setTransientStatus(result.isTransientStatus());
+            me.setBanStatus(result.isBanStatus());
+            me.setMemberOfACloud(result.isMemberOfACloud());
+            me.setHasAvatar(result.isHasAvatar());
+            me.setHasReadTnC(result.isHasReadTnC());
+            me.setUserRole(result.getRole());
+            me.setProsecutions(result.getProsecutions());
+        }
+
+    }
+
+    private class CloudUpdateTask extends AsyncTask<Void, Void, Cloud[]> {
+
+        @Override
+        protected Cloud[] doInBackground(Void... params) {
+            QueryData data = new QueryData();
+            LoggedUser me = PersistentData.getMe();
+            CloudGetQuery query = new CloudGetQuery(
+                    getString(R.string.cloudsdale_api_base)
+                            + getString(
+                                    R.string.cloudsdale_user_clouds_endpoint,
+                                    me.getId()));
+            query.addHeader("X-AUTH-TOKEN", me.getAuthToken());
+            try {
+                return query.executeForCollection(data, HomeActivity.this);
+            } catch (CloudsdaleQueryException e) {
+                HomeActivity.this.handleCloudsdaleError(e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Cloud[] result) {
+            LoggedUser me = PersistentData.getMe();
+            ArrayList<Cloud> clouds = new ArrayList<Cloud>(
+                    Arrays.asList(result));
+            me.setClouds(clouds);
+            PersistentData.storeLoggedUser(me);
             super.onPostExecute(result);
         }
 

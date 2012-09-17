@@ -24,9 +24,14 @@ public class CloudsAdapter extends BaseAdapter {
 
     public CloudsAdapter(Activity activity, ArrayList<Cloud> clouds) {
         this.mViewRoot = activity;
-        this.mCloudArray = clouds;
         this.mInflater = (LayoutInflater) this.mViewRoot
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        
+        if (clouds != null && clouds.size() > 0) {
+            this.mCloudArray = clouds;
+        } else {
+            this.mCloudArray = new ArrayList<Cloud>();
+        }
     }
 
     public void addCloud(Cloud cloud) {
@@ -63,8 +68,10 @@ public class CloudsAdapter extends BaseAdapter {
         // Get the view objects
         ImageView icon = (ImageView) cloudView.findViewById(R.id.cloud_icon);
         TextView nameView = (TextView) cloudView.findViewById(R.id.cloud_name);
-        TextView unreadCount = (TextView) cloudView.findViewById(R.id.cloud_unread);
-        TextView hiddenId = (TextView) cloudView.findViewById(R.id.cloud_hidden_id);
+        TextView unreadCount = (TextView) cloudView
+                .findViewById(R.id.cloud_unread);
+        TextView hiddenId = (TextView) cloudView
+                .findViewById(R.id.cloud_hidden_id);
 
         // Set view properties
         UrlImageViewHelper.setUrlDrawable(icon, cloud.getAvatar().getPreview(),

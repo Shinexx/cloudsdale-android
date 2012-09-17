@@ -21,7 +21,6 @@
 package org.cloudsdale.android.faye;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.b3rwynmobile.fayeclient.FayeClient;
 import com.google.gson.Gson;
@@ -46,6 +45,7 @@ import java.text.MessageFormat;
 public class CloudsdaleFayeClient extends FayeClient {
 
     protected CloudsdaleFayeListener mFayeListener;
+    protected IFayeCallback          callback;
 
     /**
      * Simplified constructor
@@ -94,6 +94,7 @@ public class CloudsdaleFayeClient extends FayeClient {
         options.setReceiveTextMessagesRaw(true);
         mWebSocket = new WebSocketConnection();
         try {
+            callback.connecting();
             mWebSocket.connect(mFayeUrl, new WebSocketHandler() {
 
                 public void onBinaryMessage(byte[] payload) {
@@ -157,6 +158,7 @@ public class CloudsdaleFayeClient extends FayeClient {
             if (message.isSuccessful()) {
                 mFayeConnected = true;
                 mFayeListener.connectedToServer(this);
+                callback.connected();
                 scheduleHeartbeat(message.getAdvice().getInterval());
                 if (DEBUG) {
                     Log.d(TAG, "Faye connected");
@@ -170,6 +172,7 @@ public class CloudsdaleFayeClient extends FayeClient {
         } else if (channel.equals(CloudsdaleFayeClient.DISCONNECT_CHANNEL)) {
             if (message.isSuccessful()) {
                 mFayeConnected = false;
+                callback.disconnected();
                 mFayeListener.disconnectedFromServer(this);
                 closeSocketConnection();
             } else {
@@ -221,5 +224,9 @@ public class CloudsdaleFayeClient extends FayeClient {
      */
     public void setFayeListener(CloudsdaleFayeListener fayeListener) {
         this.mFayeListener = fayeListener;
+    }
+
+    public void setCallbacks(IFayeCallback callback) {
+        this.callback = callback;
     }
 }

@@ -1,5 +1,6 @@
 package org.cloudsdale.android;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Environment;
 
@@ -127,12 +128,13 @@ public class PersistentData {
      * Refreshes the cache with all the clouds on the file system
      */
     public static void loadClouds() {
+        if (!sCloudFile.exists()) {
+            initialize(Cloudsdale.getContext());
+        }
         new Thread() {
-
             public void run() {
                 try {
                     synchronized (sCloudFile) {
-                        if (!sCloudFile.exists()) { return; }
 
                         // Build the JSON
                         BufferedReader br = new BufferedReader(new FileReader(
@@ -158,7 +160,6 @@ public class PersistentData {
                     BugSenseHandler.log(PersistentData.TAG, e);
                 }
             };
-
         }.start();
     }
 
@@ -354,6 +355,11 @@ public class PersistentData {
     public static void loadLoggedUser() {
         try {
             String json;
+
+            if (sUserFile == null) {
+                initialize(Cloudsdale.getContext());
+            }
+
             synchronized (sUserFile) {
                 if (!sUserFile.exists()) { return; }
 

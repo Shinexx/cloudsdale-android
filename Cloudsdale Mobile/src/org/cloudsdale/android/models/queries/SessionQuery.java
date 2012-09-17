@@ -11,6 +11,8 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
+import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.Model;
 import org.cloudsdale.android.models.QueryData;
@@ -32,98 +34,88 @@ import java.io.UnsupportedEncodingException;
  */
 public class SessionQuery extends PostQuery {
 
-	public SessionQuery(String url) {
+    public SessionQuery(String url) {
         super(url);
     }
 
-    private static final String	TAG	= "Session Query";
+    private static final String TAG = "Session Query";
 
-	private String				mJsonString;
-	private LoggedUser			mUser;
+    private String              mJsonString;
+    private LoggedUser          mUser;
 
-	/**
-	 * Execute the query, establishing a session with Cloudsdale
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws ExternalServiceException
-	 */
-	@Override
-	public LoggedUser execute(QueryData data, Context context) {
-		// Set the entity
-		if (data.getHeaders() != null) {
-			try {
-				this.mHttpPost.setEntity(new UrlEncodedFormEntity(data
-						.getHeaders()));
-			} catch (UnsupportedEncodingException e) {
-				BugSenseHandler.log(SessionQuery.TAG, e);
-			}
-		} else if (data.getJson() != null) {
-			try {
-				this.mHttpPost.setEntity(new StringEntity(data.getJson()));
-			} catch (UnsupportedEncodingException e) {
-				BugSenseHandler.log(SessionQuery.TAG, e);
-			}
-		}
+    /**
+     * Execute the query, establishing a session with Cloudsdale
+     * 
+     * @throws NotAuthorizedException
+     * @throws ExternalServiceException
+     * @throws CloudsdaleQueryException
+     */
+    @Override
+    public LoggedUser execute(QueryData data, Context context)
+            throws CloudsdaleQueryException {
+        // Set the entity
+        if (data.getHeaders() != null) {
+            try {
+                this.mHttpPost.setEntity(new UrlEncodedFormEntity(data
+                        .getHeaders()));
+            } catch (UnsupportedEncodingException e) {
+                BugSenseHandler.log(SessionQuery.TAG, e);
+            }
+        } else if (data.getJson() != null) {
+            try {
+                this.mHttpPost.setEntity(new StringEntity(data.getJson()));
+            } catch (UnsupportedEncodingException e) {
+                BugSenseHandler.log(SessionQuery.TAG, e);
+            }
+        }
 
-		// Query the API
-		try {
-			// Get the response
-			mHttpResponse = mhttpClient.execute(mHttpPost);
+        // Query the API
+        try {
+            // Get the response
+            mHttpResponse = mhttpClient.execute(mHttpPost);
 
-			if (mHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-				return null;
-			} else if (String.valueOf(
-					this.mHttpResponse.getStatusLine().getStatusCode())
-					.startsWith("5")) { return null; }
+            // Build the json
+            mJsonString = EntityUtils.toString(mHttpResponse.getEntity());
 
-			// Build the json
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					this.mHttpResponse.getEntity().getContent(), "UTF-8"));
-			StringBuilder sb = new StringBuilder();
-			for (String line = null; (line = reader.readLine()) != null;) {
-				sb.append(line);
-			}
-			mJsonString = sb.toString();
-			mJsonString = stripHtml(mJsonString);
+            // [DEBUG] Logcat the json response
+            Log.d(SessionQuery.TAG, "Session API response: " + mJsonString);
 
-			// [DEBUG] Logcat the json response
-			Log.d(SessionQuery.TAG, "Session API response: " + mJsonString);
+            // Deserialize
+            Gson gson = new Gson();
+            if (this.mJsonString != null) {
+                LoginResponse resp = gson.fromJson(mJsonString,
+                        LoginResponse.class);
+                if (resp.getStatus() == 200) {
+                    mUser = (LoggedUser) resp.getResult().getUser();
+                    mUser.setClientId(resp.getResult().getClientId());
+                } else {
+                    throw new CloudsdaleQueryException(
+                            resp.getErrors()[0].getMessage(), resp.getStatus());
+                }
+            }
+        } catch (ClientProtocolException e) {
+            Log.d(SessionQuery.TAG, "Client Protocol Exception");
+            BugSenseHandler.log(SessionQuery.TAG, e);
+        } catch (IOException e) {
+            Log.d(SessionQuery.TAG, "IO Exception");
+            BugSenseHandler.log(SessionQuery.TAG, e);
+        }
 
-			// Deserialize
-			GsonBuilder gb = new GsonBuilder();
-			gb.setExclusionStrategies(new GsonIgnoreExclusionStrategy(
-					String[].class));
-			Gson gson = gb.create();
-			if (this.mJsonString != null) {
-				LoginResponse resp = gson.fromJson(mJsonString,
-						LoginResponse.class);
-				mUser = (LoggedUser) resp.getResult()
-						.getUser();
-				mUser.setClientId(resp.getResult()
-						.getClientId());
-			}
-		} catch (ClientProtocolException e) {
-			Log.d(SessionQuery.TAG, "Client Protocol Exception");
-			BugSenseHandler.log(SessionQuery.TAG, e);
-		} catch (IOException e) {
-			Log.d(SessionQuery.TAG, "IO Exception");
-			BugSenseHandler.log(SessionQuery.TAG, e);
-		}
+        Log.d(SessionQuery.TAG, "User: "
+                + (this.mUser == null ? "Null" : "Not Null"));
 
-		Log.d(SessionQuery.TAG, "User: "
-				+ (this.mUser == null ? "Null" : "Not Null"));
+        return this.mUser;
+    }
 
-		return this.mUser;
-	}
-
-	/**
-	 * Not implemented for sessions, will always return null. Use
-	 * {@link #execute(QueryData, Context)} instead
-	 */
-	@Deprecated
-	@Override
-	public Model[] executeForCollection(QueryData data, Context context) {
-		// Stub, will never be used in this class
-		return null;
-	}
+    /**
+     * Not implemented for sessions, will always return null. Use
+     * {@link #execute(QueryData, Context)} instead
+     */
+    @Deprecated
+    @Override
+    public Model[] executeForCollection(QueryData data, Context context)
+            throws CloudsdaleQueryException {
+        throw new UnsupportedOperationException(
+                "Cannot execute session queries for collections");
+    }
 }
