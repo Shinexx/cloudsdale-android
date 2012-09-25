@@ -10,6 +10,10 @@
 	<classpathentry exported="true" kind="src" path="/Facebook SDK"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="src" path="/Faye Client"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Faye"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ActionbarSherlock"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/HoloEverywhere"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/SlidingMenu"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/UrlImageViewHelper"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

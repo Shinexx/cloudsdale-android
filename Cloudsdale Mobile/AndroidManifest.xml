@@ -60,6 +60,18 @@
         <!-- Services -->
         <service android:name="org.cloudsdale.android.faye.CloudsdaleFayeService" >
         </service>
+        <service
+            android:name=".sync.AccountAuthenticatorService"
+            android:exported="true"
+            android:process=":auth" >
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
     </application>
 
 </manifest>

@@ -26,5 +26,6 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_home">Home</string>
     <string name="cloud_view_avatar_description">User avatar</string>
+    <string name="auth_token_type">org.cloudsdale.android</string>
 
 </resources>
