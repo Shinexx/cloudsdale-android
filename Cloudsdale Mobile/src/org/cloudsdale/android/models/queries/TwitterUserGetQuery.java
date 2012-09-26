@@ -12,7 +12,7 @@ import oauth.signpost.exception.OAuthMessageSignerException;
 import org.apache.http.client.ClientProtocolException;
 import org.cloudsdale.android.models.Model;
 import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.network_models.TwitterResponse;
+import org.cloudsdale.android.models.network.TwitterResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 

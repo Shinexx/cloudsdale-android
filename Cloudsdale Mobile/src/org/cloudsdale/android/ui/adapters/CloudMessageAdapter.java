@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.api_models.Message;
-import org.cloudsdale.android.models.api_models.User;
+import org.cloudsdale.android.models.api.Message;
+import org.cloudsdale.android.models.api.User;
 
 import java.util.ArrayList;
 

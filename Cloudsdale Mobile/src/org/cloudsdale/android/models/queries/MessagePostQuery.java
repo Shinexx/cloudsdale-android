@@ -9,10 +9,10 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.api_models.Message;
-import org.cloudsdale.android.models.network_models.ApiMessageResponse;
+import org.cloudsdale.android.models.api.Message;
+import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.network.ApiMessageResponse;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -28,7 +28,7 @@ public class MessagePostQuery extends PostQuery {
 
     @Override
     public Message execute(QueryData data, Context context)
-            throws CloudsdaleQueryException {
+            throws QueryException {
         try {
             mHttpPost.setEntity(new StringEntity(data.getJson()));
             setJsonContentType();
@@ -47,7 +47,7 @@ public class MessagePostQuery extends PostQuery {
                         Log.d("Message Post",
                                 response.getErrors()[0].getMessage());
                     }
-                    throw new CloudsdaleQueryException(
+                    throw new QueryException(
                             response.getErrors()[0].getMessage(),
                             response.getStatus());
                 } else {

@@ -8,7 +8,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.google.gson.Gson;
 
 import org.cloudsdale.android.models.LoggedUser;
-import org.cloudsdale.android.models.api_models.Cloud;
+import org.cloudsdale.android.models.api.Cloud;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -3,22 +3,22 @@ package org.cloudsdale.android;
 import java.util.ArrayList;
 
 import org.apache.http.message.BasicNameValuePair;
-import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.authentication.Provider;
+import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.queries.SessionQuery;
 
 public class NetworkManager {
 
 	private static LoggedUser sLoggedUser;
-	private static CloudsdaleQueryException sExceptionThrown;
+	private static QueryException sExceptionThrown;
 
 	/*
 	 * Public method to authenticate users via Cloudsdale credentials
 	 */
 	public static LoggedUser authenticate(String email, String password)
-			throws CloudsdaleQueryException {
+			throws QueryException {
 		// TODO authenticate using Cloudsdale credentials
 		// Reset the exception
 		sExceptionThrown = null;
@@ -45,7 +45,7 @@ public class NetworkManager {
 				SessionQuery query = new SessionQuery(apiUrl);
 				try {
 					sLoggedUser = query.execute(data, Cloudsdale.getContext());
-				} catch (CloudsdaleQueryException e) {
+				} catch (QueryException e) {
 					sExceptionThrown = e;
 				}
 			};

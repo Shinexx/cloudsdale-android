@@ -16,7 +16,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.api_models.Drop;
+import org.cloudsdale.android.models.api.Drop;
 import org.cloudsdale.android.models.queries.DropGetQuery;
 import org.cloudsdale.android.ui.adapters.CloudDropAdapter;
 

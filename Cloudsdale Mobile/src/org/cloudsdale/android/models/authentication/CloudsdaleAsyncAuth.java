@@ -8,10 +8,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.apache.http.message.BasicNameValuePair;
-import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.annotations.GsonIgnoreExclusionStrategy;
+import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.queries.SessionQuery;
 
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class CloudsdaleAsyncAuth extends
         try {
             LoggedUser u = query.execute(data, params[0].getContext());
             return u;
-        } catch (CloudsdaleQueryException e) {
+        } catch (QueryException e) {
             return null;
         }
     }

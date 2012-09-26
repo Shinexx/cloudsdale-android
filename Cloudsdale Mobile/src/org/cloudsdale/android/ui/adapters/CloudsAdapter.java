@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.api_models.Cloud;
+import org.cloudsdale.android.models.api.Cloud;
 
 import java.util.ArrayList;
 

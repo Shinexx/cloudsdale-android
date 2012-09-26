@@ -1,6 +1,6 @@
 package org.cloudsdale.android.models.parsers;
 
-import org.cloudsdale.android.models.api_models.Message;
+import org.cloudsdale.android.models.api.Message;
 
 public class ApiMessageParser extends Parser {
 

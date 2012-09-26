@@ -9,10 +9,10 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.api_models.Message;
-import org.cloudsdale.android.models.network_models.ApiMessageArrayResponse;
+import org.cloudsdale.android.models.api.Message;
+import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.network.ApiMessageArrayResponse;
 
 import java.io.IOException;
 
@@ -28,14 +28,14 @@ public class ChatMessageGetQuery extends GetQuery {
     @Deprecated
     @Override
     public Message execute(QueryData data, Context context)
-            throws CloudsdaleQueryException {
+            throws QueryException {
         throw new UnsupportedOperationException(
                 "Messages can only be queried for a collection");
     }
 
     @Override
     public Message[] executeForCollection(QueryData data, Context context)
-            throws CloudsdaleQueryException {
+            throws QueryException {
         setHeaders(data.getHeaders());
 
         try {
@@ -54,7 +54,7 @@ public class ChatMessageGetQuery extends GetQuery {
                 if (resp.getStatus() == 200) {
                     mResults = resp.getResult();
                 } else {
-                    throw new CloudsdaleQueryException(
+                    throw new QueryException(
                             resp.getErrors()[0].getMessage(), resp.getStatus());
                 }
             }

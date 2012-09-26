@@ -9,11 +9,11 @@ import com.google.gson.Gson;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
-import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.Model;
 import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.api_models.User;
-import org.cloudsdale.android.models.network_models.ApiUserResponse;
+import org.cloudsdale.android.models.api.User;
+import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.network.ApiUserResponse;
 
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class UserGetQuery extends GetQuery {
      */
     @Override
     public User execute(final QueryData data, final Context context)
-            throws CloudsdaleQueryException {
+            throws QueryException {
         setHeaders(data.getHeaders());
 
         // Query the API
@@ -61,7 +61,7 @@ public class UserGetQuery extends GetQuery {
                 if (response.getStatus() == 200) {
                     u = response.getResult();
                 } else {
-                    throw new CloudsdaleQueryException(
+                    throw new QueryException(
                             response.getErrors()[0].getMessage(),
                             response.getStatus());
                 }

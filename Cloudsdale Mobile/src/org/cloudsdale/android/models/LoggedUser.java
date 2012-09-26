@@ -1,6 +1,6 @@
 package org.cloudsdale.android.models;
 
-import org.cloudsdale.android.models.api_models.User;
+import org.cloudsdale.android.models.api.User;
 
 public class LoggedUser extends User {
 

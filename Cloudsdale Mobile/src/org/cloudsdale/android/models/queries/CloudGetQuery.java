@@ -10,12 +10,12 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.api_models.Cloud;
-import org.cloudsdale.android.models.network_models.ApiCloudArrayResponse;
-import org.cloudsdale.android.models.network_models.ApiCloudResponse;
-import org.cloudsdale.android.models.network_models.ApiResponse;
+import org.cloudsdale.android.models.api.Cloud;
+import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.network.ApiCloudArrayResponse;
+import org.cloudsdale.android.models.network.ApiCloudResponse;
+import org.cloudsdale.android.models.network.ApiResponse;
 
 import java.io.IOException;
 
@@ -33,7 +33,7 @@ public class CloudGetQuery extends GetQuery {
 
     @Override
     public Cloud[] executeForCollection(QueryData data, Context context)
-            throws CloudsdaleQueryException {
+            throws QueryException {
         setHeaders(data.getHeaders());
 
         // Query the API
@@ -58,7 +58,7 @@ public class CloudGetQuery extends GetQuery {
                 } else {
                     ApiResponse response = gson.fromJson(mJsonString,
                             ApiResponse.class);
-                    throw new CloudsdaleQueryException(
+                    throw new QueryException(
                             response.getErrors()[0].getMessage(),
                             response.getStatus());
                 }
@@ -74,7 +74,7 @@ public class CloudGetQuery extends GetQuery {
 
     @Override
     public Cloud execute(QueryData data, Context context)
-            throws CloudsdaleQueryException {
+            throws QueryException {
         setupHttpObjects(data.getUrl());
         setHeaders(data.getHeaders());
 
@@ -96,7 +96,7 @@ public class CloudGetQuery extends GetQuery {
                 if (response.getStatus() == 200) {
                     mResult = response.getResult();
                 } else {
-                    throw new CloudsdaleQueryException(
+                    throw new QueryException(
                             response.getErrors()[0].getMessage(),
                             response.getStatus());
                 }

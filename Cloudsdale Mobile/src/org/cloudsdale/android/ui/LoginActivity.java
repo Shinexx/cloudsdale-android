@@ -45,7 +45,7 @@ import org.cloudsdale.android.models.authentication.CloudsdaleAsyncAuth;
 import org.cloudsdale.android.models.authentication.LoginBundle;
 import org.cloudsdale.android.models.authentication.OAuthBundle;
 import org.cloudsdale.android.models.authentication.Provider;
-import org.cloudsdale.android.models.network_models.FacebookResponse;
+import org.cloudsdale.android.models.network.FacebookResponse;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterException;

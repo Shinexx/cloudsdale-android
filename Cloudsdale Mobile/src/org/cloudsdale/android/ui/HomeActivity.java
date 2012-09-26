@@ -19,14 +19,14 @@ import com.slidingmenu.lib.app.SlidingActivity;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.exceptions.CloudsdaleQueryException;
 import org.cloudsdale.android.faye.FayeMessageHandler;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.Role;
-import org.cloudsdale.android.models.api_models.Cloud;
-import org.cloudsdale.android.models.api_models.User;
+import org.cloudsdale.android.models.api.Cloud;
+import org.cloudsdale.android.models.api.User;
+import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.queries.CloudGetQuery;
 import org.cloudsdale.android.models.queries.UserGetQuery;
 
@@ -246,7 +246,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
         new CloudUpdateTask().execute();
     }
 
-    private void handleCloudsdaleError(CloudsdaleQueryException exception) {
+    private void handleCloudsdaleError(QueryException exception) {
         if (Cloudsdale.DEBUG) {
             Log.d(TAG, exception.getErrorCode() + ":" + exception.getMessage());
         }
@@ -265,7 +265,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
                     .getAuthToken());
             try {
                 return query.execute(data, HomeActivity.this);
-            } catch (CloudsdaleQueryException e) {
+            } catch (QueryException e) {
                 HomeActivity.this.handleCloudsdaleError(e);
                 return null;
             }
@@ -313,7 +313,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
             query.addHeader("X-AUTH-TOKEN", me.getAuthToken());
             try {
                 return query.executeForCollection(data, HomeActivity.this);
-            } catch (CloudsdaleQueryException e) {
+            } catch (QueryException e) {
                 HomeActivity.this.handleCloudsdaleError(e);
                 return null;
             }

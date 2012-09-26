@@ -10,8 +10,8 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.api_models.Drop;
-import org.cloudsdale.android.models.network_models.ApiDropArrayResponse;
+import org.cloudsdale.android.models.api.Drop;
+import org.cloudsdale.android.models.network.ApiDropArrayResponse;
 
 import java.io.IOException;
 

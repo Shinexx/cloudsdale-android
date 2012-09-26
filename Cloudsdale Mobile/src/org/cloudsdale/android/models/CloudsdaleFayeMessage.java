@@ -3,7 +3,7 @@ package org.cloudsdale.android.models;
 import com.b3rwynmobile.fayeclient.models.FayeAdvice;
 import com.google.gson.annotations.SerializedName;
 
-import org.cloudsdale.android.models.api_models.Message;
+import org.cloudsdale.android.models.api.Message;
 
 public class CloudsdaleFayeMessage {
 
