@@ -1,12 +1,21 @@
 package org.cloudsdale.android.models;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+@DatabaseTable(tableName = "avatars")
 public class AvatarContainer extends Model {
 
 	// Private attributes
+    @DatabaseField
 	private String	normal;
+    @DatabaseField
 	private String	mini;
+    @DatabaseField
 	private String	thumb;
+    @DatabaseField
 	private String	preview;
+    @DatabaseField
 	private String	chat;
 
 	/**

@@ -1,5 +1,7 @@
 package org.cloudsdale.android.models;
 
+import com.j256.ormlite.field.DatabaseField;
+
 /**
  * Model class to pass on identity properties to child models
  * 
@@ -7,6 +9,7 @@ package org.cloudsdale.android.models;
  */
 public class IdentityModel extends Model {
 
+    @DatabaseField(id = true)
 	protected String	id;
 
 	public String getId() {

@@ -2,6 +2,8 @@ package org.cloudsdale.android.models.api;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import org.cloudsdale.android.models.AvatarContainer;
 import org.cloudsdale.android.models.IdentityModel;
@@ -15,53 +17,80 @@ import java.util.Calendar;
  * 
  * @author Jamison Greeley (Berwyn@cloudsdale.org)
  */
+@DatabaseTable(tableName = "users")
 public class User extends IdentityModel {
 
     protected final String     TAG = "Cloudsdale User";
 
     // protected attributes from JSON
+    @DatabaseField
     protected String           name;
+    @DatabaseField
     @SerializedName("time_zone")
     protected String           timeZone;
+    @DatabaseField
     @SerializedName("member_since")
     protected String           memberSinceTemp;
     protected Calendar         memberSince;
+    @DatabaseField(canBeNull = true)
     @SerializedName("suspended_until")
     protected String           suspendedUntilTemp;
     protected Calendar         suspendedUntil;
+    @DatabaseField(canBeNull = true)
     @SerializedName("reason_for_suspension")
     protected String           reasonForSuspension;
+    @DatabaseField
     protected AvatarContainer  avatar;
+    @DatabaseField
     @SerializedName("is_registered")
     protected boolean          isRegistered;
+    @DatabaseField
     @SerializedName("is_transient")
     protected boolean          transientStatus;
+    @DatabaseField
     @SerializedName("is_banned")
     protected boolean          banStatus;
+    @DatabaseField
     @SerializedName("is_member_of_a_cloud")
     protected boolean          memberOfACloud;
+    @DatabaseField
     @SerializedName("has_an_avatar")
     protected boolean          hasAvatar;
+    @DatabaseField
     @SerializedName("has_read_tnc")
     protected boolean          hasReadTnC;
+    @DatabaseField
     @SerializedName("role")
     protected String           roleTemp;
     protected Role             userRole;
+    @DatabaseField
     protected Prosecution[]    prosecutions;
+    @DatabaseField
     @SerializedName("auth_token")
     protected String           authToken;
+    @DatabaseField
     protected String           email;
+    @DatabaseField
     @SerializedName("needs_to_confirm_registration")
     protected boolean          needsToConfirmRegistration;
+    @DatabaseField
     @SerializedName("needs_password_change")
     protected boolean          needsToChangePassword;
+    @DatabaseField
     @SerializedName("needs_name_change")
     protected boolean          needsToChangeName;
+    @DatabaseField(canBeNull = true)
+    @SerializedName("confirmed_registration_at")
+    protected String           confirmedRegistrationAtTemp;
+    protected Calendar         confirmedRegistrationAt;
+    @DatabaseField(canBeNull = true)
+    @SerializedName("tnc_last_accepted")
+    protected String           tncLastAcceptedTemp;
+    protected Calendar         tncLastAccepted;
 
     // Child objects from JSON
+    @DatabaseField
     protected ArrayList<Cloud> clouds;
-    
-    
 
     public User(String name, String timeZone, String memberSinceTemp,
             Calendar memberSince, String suspendedUntilTemp,
@@ -125,6 +154,30 @@ public class User extends IdentityModel {
 
     public String getMemberSinceTemp() {
         return this.memberSinceTemp;
+    }
+
+    public Calendar getConfirmedRegistrationAt() {
+        if (this.confirmedRegistrationAt != null) {
+            return this.confirmedRegistrationAt;
+        } else {
+            return convertIsoString(this.confirmedRegistrationAtTemp);
+        }
+    }
+
+    public String getConfirmedRegistrationAtTemp() {
+        return confirmedRegistrationAtTemp;
+    }
+
+    public Calendar getTncLastAccpeted() {
+        if (this.tncLastAccepted != null) {
+            return this.tncLastAccepted;
+        } else {
+            return convertIsoString(this.tncLastAcceptedTemp);
+        }
+    }
+
+    public String getTncLastAcceptedTemp() {
+        return tncLastAcceptedTemp;
     }
 
     public String getName() {
@@ -252,6 +305,24 @@ public class User extends IdentityModel {
     public void setMemberSinceTemp(String iso8601) {
         this.memberSinceTemp = iso8601;
         this.memberSince = convertIsoString(iso8601);
+    }
+
+    public void setConfirmedRegistrationAtTemp(String iso8601) {
+        this.confirmedRegistrationAtTemp = iso8601;
+        this.confirmedRegistrationAt = convertIsoString(iso8601);
+    }
+
+    public void setConfirmedRegistrationAt(Calendar confirmedRegistrationAt) {
+        this.confirmedRegistrationAt = confirmedRegistrationAt;
+    }
+
+    public void setTncLastAcceptedTemp(String iso8601) {
+        this.tncLastAcceptedTemp = iso8601;
+        this.tncLastAccepted = convertIsoString(iso8601);
+    }
+
+    public void setTncLastAccpeted(Calendar tncLastAccepted) {
+        this.tncLastAccepted = tncLastAccepted;
     }
 
     public void setName(String name) {

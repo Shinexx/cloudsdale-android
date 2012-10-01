@@ -1,30 +1,44 @@
 package org.cloudsdale.android.models.api;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import org.cloudsdale.android.models.AvatarContainer;
 import org.cloudsdale.android.models.IdentityModel;
 
 import java.util.Calendar;
 
+@DatabaseTable(tableName = "clouds")
 public class Cloud extends IdentityModel {
 
+    @DatabaseField
     private String          name;
+    @DatabaseField
     private String          description;
+    @DatabaseField
     @SerializedName("created_at")
     private String          createdTemp;
     private Calendar        createdAt;
+    @DatabaseField
     private String          rules;
+    @DatabaseField
     private boolean         hidden;
+    @DatabaseField
     private AvatarContainer avatar;
+    @DatabaseField
     @SerializedName("is_transient")
     private boolean         isTransient;
+    @DatabaseField
     @SerializedName("owner")
     private String          ownerId;
+    @DatabaseField
     @SerializedName("user_ids")
     private String[]        userIds;
+    @DatabaseField
     @SerializedName("moderator_ids")
     private String[]        moderators;
+    @DatabaseField
     @SerializedName("topic")
     private Chat            chat;
 
