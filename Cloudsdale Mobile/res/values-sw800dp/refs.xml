@@ -1,5 +1,0 @@
-<resources>
-
-    <item name="main_activity_cloud_list" type="layout">@layout/activity_main_cloud_twopane</item>
-
-</resources>

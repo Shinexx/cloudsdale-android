@@ -11,16 +11,18 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
     <application
-        android:name=".Cloudsdale"
+        android:name="org.cloudsdale.android.Cloudsdale"
+        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.CloudsdaleLight" >
 
         <!-- Activities -->
         <activity
-            android:name=".StartActivity"
+            android:name="org.cloudsdale.android.StartActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.LoginActivity"
+            android:name="org.cloudsdale.android.ui.LoginActivity"
             android:configChanges="orientation"
             android:label="@string/app_name" >
             <intent-filter>
@@ -44,14 +46,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.HomeActivity"
+            android:name="org.cloudsdale.android.ui.HomeActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_home" >
             <intent-filter>
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.CloudActivity"
+            android:name="org.cloudsdale.android.ui.CloudActivity"
             android:label="@string/title_activity_home" >
             <intent-filter>
             </intent-filter>
@@ -61,7 +63,7 @@
         <service android:name="org.cloudsdale.android.faye.CloudsdaleFayeService" >
         </service>
         <service
-            android:name=".sync.AccountAuthenticatorService"
+            android:name="org.cloudsdale.android.account.AccountAuthenticatorService"
             android:exported="true"
             android:process=":auth" >
             <intent-filter>
@@ -72,6 +74,12 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+
+        <activity
+            android:name=".ui.NewLoginActivity"
+            android:label="@string/title_activity_new_login"
+            android:windowSoftInputMode="adjustResize|stateVisible" >
+        </activity>
     </application>
 
 </manifest>
