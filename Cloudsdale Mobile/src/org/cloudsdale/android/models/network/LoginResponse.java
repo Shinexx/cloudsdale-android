@@ -1,7 +1,10 @@
 package org.cloudsdale.android.models.network;
 
+import com.google.gson.annotations.Expose;
+
 public class LoginResponse extends Response {
 
+	@Expose
 	private LoginResult	result;
 
 	/**

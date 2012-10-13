@@ -1,23 +1,31 @@
 package org.cloudsdale.android.models;
 
-import com.j256.ormlite.field.DatabaseField;
+import android.content.Context;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Model class to pass on identity properties to child models
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
-public class IdentityModel extends Model {
-
-    @DatabaseField(id = true)
-	protected String	id;
-
-	public String getId() {
-		return this.id;
+public class IdentityModel<T> extends Model<T> {
+	
+	public IdentityModel(Context context) {
+		super(context);
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	@Expose
+	@SerializedName("id")
+	protected String	stringId;
+
+	public String getStringId() {
+		return this.stringId;
+	}
+
+	public void setStringId(String id) {
+		this.stringId = id;
 	}
 
 }

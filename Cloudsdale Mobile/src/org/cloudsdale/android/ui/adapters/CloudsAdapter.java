@@ -79,10 +79,10 @@ public class CloudsAdapter extends BaseAdapter {
         nameView.setText(cloud.getName());
         nameView.setSelected(true);
         unreadCount.setText("0");
-        hiddenId.setText(cloud.getId());
+        hiddenId.setText(cloud.getStringId());
 
         // Set the view's id to the cloud's id
-        cloudView.setId(cloud.getId().hashCode());
+        cloudView.setId(cloud.getStringId().hashCode());
         return cloudView;
     }
 

@@ -1,25 +1,25 @@
-package org.cloudsdale.android;
+package org.cloudsdale.android.managers;
 
-import java.util.ArrayList;
-
-import org.apache.http.message.BasicNameValuePair;
+import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.authentication.Provider;
 import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.queries.SessionQuery;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class NetworkManager {
 
-	private static LoggedUser sLoggedUser;
-	private static QueryException sExceptionThrown;
+	private static LoggedUser		sLoggedUser;
+	private static QueryException	sExceptionThrown;
 
 	/*
 	 * Public method to authenticate users via Cloudsdale credentials
 	 */
 	public static LoggedUser authenticate(String email, String password)
 			throws QueryException {
-		// TODO authenticate using Cloudsdale credentials
 		// Reset the exception
 		sExceptionThrown = null;
 
@@ -31,25 +31,30 @@ public class NetworkManager {
 		final String apiUrl = apiBase + sessionEndpoint;
 
 		// Build the query data
-		final QueryData data = new QueryData();
-		data.setUrl(apiUrl);
-		ArrayList<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>(
-				2);
-		nameValuePairs.add(new BasicNameValuePair("email", email));
-		nameValuePairs.add(new BasicNameValuePair("password", password));
-		data.setHeaders(nameValuePairs);
+		try {
+			final QueryData data = new QueryData();
+			data.setUrl(apiUrl);
+			JSONObject json = new JSONObject();
+			json.put("email", email);
+			json.put("password", password);
+			data.setJson(json.toString());
 
-		// Execute the query
-		new Thread() {
-			public void run() {
-				SessionQuery query = new SessionQuery(apiUrl);
-				try {
-					sLoggedUser = query.execute(data, Cloudsdale.getContext());
-				} catch (QueryException e) {
-					sExceptionThrown = e;
-				}
-			};
-		}.start();
+			// Execute the query
+			new Thread() {
+				public void run() {
+					SessionQuery query = new SessionQuery(apiUrl);
+					try {
+						sLoggedUser = query.execute(data,
+								Cloudsdale.getContext());
+					} catch (QueryException e) {
+						sExceptionThrown = e;
+					}
+				};
+			}.start();
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		if (sExceptionThrown != null) {
 			return sLoggedUser;
 		} else {

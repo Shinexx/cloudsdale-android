@@ -1,21 +1,34 @@
 package org.cloudsdale.android.models;
 
-import com.j256.ormlite.field.DatabaseField;
+import android.content.Context;
+
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "avatars")
-public class AvatarContainer extends Model {
+import org.cloudsdale.android.Cloudsdale;
 
+import java.io.Serializable;
+
+@DatabaseTable(tableName = "avatars")
+public class AvatarContainer extends Model<AvatarContainer> implements Serializable {
+	
+	public AvatarContainer() {
+		this(Cloudsdale.getContext());
+	}
+
+	public AvatarContainer(Context context) {
+		super(context);
+	}
+
+	/**
+	 * Generated SUID
+	 */
+	private static final long	serialVersionUID	= 1359536748460453528L;
+	
 	// Private attributes
-    @DatabaseField
 	private String	normal;
-    @DatabaseField
 	private String	mini;
-    @DatabaseField
 	private String	thumb;
-    @DatabaseField
 	private String	preview;
-    @DatabaseField
 	private String	chat;
 
 	/**

@@ -1,11 +1,28 @@
 package org.cloudsdale.android.models.api;
 
+import android.content.Context;
+
+import com.google.gson.annotations.Expose;
+
+import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.Model;
 
-public class Flash extends Model {
+public class Flash extends Model<Flash> {
+	
+	@Expose
 	private String	message;
+	@Expose
 	private String	type;
+	@Expose
 	private String	title;
+	
+	public Flash() {
+		this(Cloudsdale.getContext());
+	}
+	
+	public Flash(Context context) {
+		super(context);
+	}
 
 	/**
 	 * @return the message

@@ -1,6 +1,7 @@
 package org.cloudsdale.android.models.network;
 
-import org.cloudsdale.android.models.Model;
+import com.google.gson.annotations.Expose;
+
 import org.cloudsdale.android.models.api.Error;
 import org.cloudsdale.android.models.api.Flash;
 
@@ -9,10 +10,14 @@ import org.cloudsdale.android.models.api.Flash;
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
-public class Response extends Model {
+public class Response {
+	
 	// Data objects
+	@Expose
 	protected int		status;
+	@Expose
 	protected Error[]	errors;
+	@Expose
 	protected Flash		flash;
 
 	/**

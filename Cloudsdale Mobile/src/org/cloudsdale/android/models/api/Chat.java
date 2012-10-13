@@ -1,61 +1,79 @@
 package org.cloudsdale.android.models.api;
 
+import android.content.Context;
+
+import com.google.gson.annotations.Expose;
+
+import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.Model;
 
 import java.util.ArrayList;
 
-public class Chat extends Model {
+public class Chat extends Model<Chat> {
 
-    // Relationships
-    private Cloud              cloud;
-    private ArrayList<Message> messages;
-    private String             token;
+	// Relationships
+	@Expose
+	private Cloud				cloud;
+	@Expose
+	private ArrayList<Message>	messages;
+	@Expose
+	private String				token;
 
-    public ArrayList<Message> getMessages() {
-        return messages;
-    }
+	public ArrayList<Message> getMessages() {
+		return messages;
+	}
 
-    public void setMessages(ArrayList<Message> messages) {
-        this.messages = messages;
-    }
+	public void setMessages(ArrayList<Message> messages) {
+		this.messages = messages;
+	}
 
-    public String getToken() {
-        return token;
-    }
+	public String getToken() {
+		return token;
+	}
 
-    public void setToken(String token) {
-        this.token = token;
-    }
+	public void setToken(String token) {
+		this.token = token;
+	}
 
-    /**
-     * Default constructor
-     */
-    public Chat() {
-        this.cloud = null;
-    }
+	/**
+	 * Default constructor
+	 */
+	public Chat() {
+		this(Cloudsdale.getContext());
+	}
 
-    /**
-     * Parameterized constructor
-     * 
-     * @param cloud
-     *            cloud that this chat belongs to
-     */
-    public Chat(Cloud cloud) {
-        this.cloud = cloud;
-    }
+	/**
+	 * Parameterized constructor for Sugar
+	 * 
+	 * @param context
+	 */
+	public Chat(Context context) {
+		this(null, context);
+	}
 
-    public Cloud getCloud() {
-        return this.cloud;
-    }
+	/**
+	 * Parameterized constructor
+	 * 
+	 * @param cloud
+	 *            cloud that this chat belongs to
+	 */
+	public Chat(Cloud cloud, Context context) {
+		super(context);
+		this.cloud = cloud;
+	}
 
-    /**
-     * Set the cloud that this chat belongs to
-     * 
-     * @param cloud
-     *            the cloud that this chat belongs to
-     */
-    public void setCloud(Cloud cloud) {
-        this.cloud = cloud;
-    }
+	public Cloud getCloud() {
+		return this.cloud;
+	}
+
+	/**
+	 * Set the cloud that this chat belongs to
+	 * 
+	 * @param cloud
+	 *            the cloud that this chat belongs to
+	 */
+	public void setCloud(Cloud cloud) {
+		this.cloud = cloud;
+	}
 
 }

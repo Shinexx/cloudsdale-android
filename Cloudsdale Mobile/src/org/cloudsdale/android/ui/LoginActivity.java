@@ -1,23 +1,39 @@
 package org.cloudsdale.android.ui;
 
+import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.bugsense.trace.BugSenseHandler;
+import com.google.gson.JsonObject;
 import com.zubhium.ZubhiumSDK;
 
+import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.authentication.CloudsdaleAsyncAuth;
+import org.cloudsdale.android.managers.DatabaseManager;
+import org.cloudsdale.android.managers.UserAccountManager;
+import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.models.QueryData;
+import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.queries.SessionQuery;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * Controller for the login view
@@ -27,10 +43,7 @@ import org.cloudsdale.android.models.authentication.CloudsdaleAsyncAuth;
  */
 public class LoginActivity extends SherlockActivity {
 
-	public static final String	TAG			= "Cloudsdale LoginViewActivity";
-
-	// Login progress
-	private CloudsdaleAsyncAuth	mAuthTask	= null;
+	public static final String	TAG	= "Cloudsdale LoginViewActivity";
 
 	// Fields
 	private String				mEmail;
@@ -141,12 +154,125 @@ public class LoginActivity extends SherlockActivity {
 	}
 
 	/**
+	 * Hide the soft keyboard if it's showing
+	 */
+	private void hideSoftKeyboard() {
+		if (mEmailView.hasFocus()) {
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(mEmailView.getWindowToken(), 0);
+		} else if (mPasswordView.hasFocus()) {
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(mPasswordView.getWindowToken(), 0);
+		}
+	}
+
+	/**
+	 * Stores the user account, both in the account manager and in the SQL
+	 * database
+	 * 
+	 * @param user
+	 *            The user that has logged in
+	 */
+	private void storeAccount(LoggedUser user) {
+		boolean accountCreated = UserAccountManager.storeAccount(user);
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			if (accountCreated) {
+				AccountAuthenticatorResponse response = extras
+						.getParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
+				Bundle result = new Bundle();
+				result.putString(AccountManager.KEY_ACCOUNT_NAME,
+						user.getName());
+				result.putString(AccountManager.KEY_ACCOUNT_TYPE,
+						getString(R.string.account_type));
+				response.onResult(result);
+				DatabaseManager.storeUser(user);
+			}
+		}
+	}
+
+	/**
 	 * Sends Cloudsdale credentials to Cloudsdale
 	 */
 	private void startCloudsdaleAuthentication() {
 		// Get inputted email and password
 		mEmail = this.mEmailView.getText().toString();
 		mPassword = this.mPasswordView.getText().toString();
+
+		if (mEmail == null || mEmail.length() == 0) {
+			mEmailView.setError("Email can't be empty");
+		} else if (mPassword == null || mPassword.length() == 0) {
+			mPasswordView.setError("Password can't be empty");
+		} else {
+			hideSoftKeyboard();
+			showProgress(true);
+			CloudsdaleAuthTask auth = new CloudsdaleAuthTask();
+			auth.execute();
+			try {
+				LoggedUser user = auth.get();
+				storeAccount(user);
+				Intent intent = new Intent();
+				intent.setClass(this, HomeActivity.class);
+				startActivity(intent);
+				finish();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Helper class to asynchronously log the user in using Cloudsdale
+	 * credentials
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com)
+	 *         Copyright (c) 2012 Cloudsdale.org
+	 * 
+	 */
+	private class CloudsdaleAuthTask extends AsyncTask<Void, Void, LoggedUser> {
+
+		@Override
+		protected LoggedUser doInBackground(Void... params) {
+			String sessionUrl = getString(R.string.cloudsdale_api_base)
+					+ getString(R.string.cloudsdale_sessions_endpoint);
+			QueryData data = new QueryData();
+			SessionQuery query = new SessionQuery(sessionUrl);
+
+			JsonObject json = new JsonObject();
+			json.addProperty("email", mEmail);
+			json.addProperty("password", mPassword);
+			data.setJson(json.toString());
+
+			if (Cloudsdale.DEBUG) {
+				Log.d(TAG, "Json: " + json);
+			}
+
+			try {
+				return query.execute(data, LoginActivity.this);
+			} catch (QueryException e) {
+				if (e.getErrorCode() == 500)
+					mEmailView.setError("Something went wrong during login");
+				else if (e.getErrorCode() == 404)
+					mEmailView.setError("Couldn't connect to Cloudsdale");
+				return null;
+			}
+		}
+
+		@Override
+		protected void onCancelled() {
+			showProgress(false);
+			super.onCancelled();
+		}
+
+		@Override
+		protected void onPostExecute(LoggedUser result) {
+			showProgress(false);
+			super.onPostExecute(result);
+		}
 
 	}
 }

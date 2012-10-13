@@ -5,10 +5,10 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Message;
 import org.cloudsdale.android.models.exceptions.QueryException;
@@ -36,7 +36,7 @@ public class ChatMessageGetQuery extends GetQuery {
     @Override
     public Message[] executeForCollection(QueryData data, Context context)
             throws QueryException {
-        setHeaders(data.getHeaders());
+    	addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser().getAuthToken());
 
         try {
             mHttpResponse = mhttpClient.execute(httpGet);

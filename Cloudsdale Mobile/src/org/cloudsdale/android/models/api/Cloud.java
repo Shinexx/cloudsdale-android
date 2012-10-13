@@ -1,46 +1,57 @@
 package org.cloudsdale.android.models.api;
 
+import android.content.Context;
+
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.AvatarContainer;
 import org.cloudsdale.android.models.IdentityModel;
 
 import java.util.Calendar;
 
 @DatabaseTable(tableName = "clouds")
-public class Cloud extends IdentityModel {
+public class Cloud extends IdentityModel<Cloud> {
 
-    @DatabaseField
+    @Expose
     private String          name;
-    @DatabaseField
+    @Expose
     private String          description;
-    @DatabaseField
+    @Expose
     @SerializedName("created_at")
     private String          createdTemp;
     private Calendar        createdAt;
-    @DatabaseField
+    @Expose
     private String          rules;
-    @DatabaseField
+    @Expose
     private boolean         hidden;
-    @DatabaseField
+    @Expose
     private AvatarContainer avatar;
-    @DatabaseField
+    @Expose
     @SerializedName("is_transient")
     private boolean         isTransient;
-    @DatabaseField
+    @Expose
     @SerializedName("owner")
     private String          ownerId;
-    @DatabaseField
+    @Expose
     @SerializedName("user_ids")
     private String[]        userIds;
-    @DatabaseField
+    @Expose
     @SerializedName("moderator_ids")
     private String[]        moderators;
-    @DatabaseField
+    @Expose
     @SerializedName("topic")
     private Chat            chat;
+    
+    public Cloud() {
+    	this(Cloudsdale.getContext());
+    }
+    
+    public Cloud(Context context) {
+    	super(context);
+    }
 
     public boolean isHidden() {
         return hidden;
@@ -99,7 +110,7 @@ public class Cloud extends IdentityModel {
     }
 
     public void setCreatedTemp(String createdTemp) {
-        this.createdAt = convertIsoString(createdTemp);
+        this.createdAt = convertDateString(createdTemp);
     }
 
     public void setDescription(String description) {

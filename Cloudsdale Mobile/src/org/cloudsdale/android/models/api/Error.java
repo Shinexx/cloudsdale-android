@@ -1,18 +1,36 @@
 package org.cloudsdale.android.models.api;
 
+import android.content.Context;
+
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.Model;
 
-public class Error extends Model {
+public class Error extends Model<Error> {
+	
+	@Expose
 	private String	type;
+	@Expose
 	@SerializedName("ref_type")
 	private String	refType;
+	@Expose
 	@SerializedName("ref_id")
 	private String	refId;
+	@Expose
 	@SerializedName("ref_node")
 	private String	refNode;
+	@Expose
 	private String	message;
+	
+	public Error() {
+		this(Cloudsdale.getContext());
+	}
+	
+	public Error(Context context) {
+		super(context);
+	}
 
 	/**
 	 * @return the message

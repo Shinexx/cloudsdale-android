@@ -1,24 +1,45 @@
 package org.cloudsdale.android.models.api;
 
+import android.content.Context;
+
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.Model;
 
 import java.util.Date;
 
-public class Message extends Model {
+public class Message extends Model<Message> {
 
     // Object attributes
+	@Expose
     private Date     timestamp;
+	@Expose
     private String   content;
+	@Expose
     @SerializedName("author")
     private User     user;
+	@Expose
     private String[] urls;
+	@Expose
     private String   device;
+	@Expose
     @SerializedName("author_id")
     private String   authorId;
+	@Expose
     private Drop[]   drops;
 
+    public Message() {
+    	this(Cloudsdale.getContext());
+    	this.timestamp = new Date();
+    	this.content = "";
+    }
+    
+    public Message(Context context) {
+    	super(context);
+    }
+    
     public User getAuthor() {
         return user;
     }
@@ -33,11 +54,6 @@ public class Message extends Model {
 
     public void setUrls(String[] urls) {
         this.urls = urls;
-    }
-
-    public Message() {
-        this.timestamp = new Date();
-        this.content = "";
     }
 
     /**

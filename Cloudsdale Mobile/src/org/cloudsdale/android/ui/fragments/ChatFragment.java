@@ -13,8 +13,8 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
 
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Message;
 import org.cloudsdale.android.models.exceptions.QueryException;
@@ -109,7 +109,7 @@ public class ChatFragment extends SherlockFragment {
     }
 
     public void addMessage(Message message) {
-        if (!message.getAuthorId().equals(PersistentData.getMe().getId())
+        if (!message.getAuthorId().equals(UserManager.getLoggedInUser().getStringId())
                 || !message.getDevice().equals("mobile")) {
             sMessageAdapter.addMessage(message);
         }
@@ -189,7 +189,7 @@ public class ChatFragment extends SherlockFragment {
             try {
                 body.put("device", "mobile");
                 body.put("content", sInputField.getText().toString());
-                body.put("client_id", PersistentData.getMe().getId());
+                body.put("client_id", UserManager.getLoggedInUser().getStringId());
                 message.put("message", body);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -203,7 +203,7 @@ public class ChatFragment extends SherlockFragment {
             QueryData qd = new QueryData();
             qd.setJson(message.toString());
             MessagePostQuery q = new MessagePostQuery(sCloudUrl);
-            q.addHeader("X-AUTH-TOKEN", PersistentData.getMe().getAuthToken());
+            q.addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser().getAuthToken());
             try {
                 return q.execute(qd, getActivity());
             } catch (QueryException e) {

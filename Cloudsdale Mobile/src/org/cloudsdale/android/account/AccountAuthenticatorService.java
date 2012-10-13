@@ -7,7 +7,6 @@ import android.os.IBinder;
 
 public class AccountAuthenticatorService extends Service {
 
-	private static final String	            TAG	                  = "Cloudsdale Authenticator Service";
 	private static AccountAuthenticator	sAccountAuthenticator	= null;
 
 	@Override

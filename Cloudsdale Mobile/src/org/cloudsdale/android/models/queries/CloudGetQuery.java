@@ -6,10 +6,10 @@ import android.util.Log;
 import com.bugsense.trace.BugSenseHandler;
 import com.google.gson.Gson;
 
-import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.exceptions.QueryException;
@@ -34,7 +34,7 @@ public class CloudGetQuery extends GetQuery {
     @Override
     public Cloud[] executeForCollection(QueryData data, Context context)
             throws QueryException {
-        setHeaders(data.getHeaders());
+    	addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser().getAuthToken());
 
         // Query the API
         try {
@@ -75,9 +75,8 @@ public class CloudGetQuery extends GetQuery {
     @Override
     public Cloud execute(QueryData data, Context context)
             throws QueryException {
-        setupHttpObjects(data.getUrl());
-        setHeaders(data.getHeaders());
-
+    	addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser().getAuthToken());
+    	
         // Query the API
         try {
             // Get the response

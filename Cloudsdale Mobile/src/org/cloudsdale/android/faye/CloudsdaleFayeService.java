@@ -45,109 +45,110 @@ import org.cloudsdale.android.ui.HomeActivity;
  */
 public class CloudsdaleFayeService extends FayeService implements IFayeCallback {
 
-    // Data objects
-    protected CloudsdaleFayeClient mFayeClient;
-    protected CloudsdaleFayeBinder mFayeBinder;
+	// Data objects
+	protected CloudsdaleFayeClient	mFayeClient;
+	protected CloudsdaleFayeBinder	mFayeBinder;
+	protected PendingIntent			mPendingIntent;
 
-    /**
-     * Default constructor
-     */
-    public CloudsdaleFayeService() {
-        super();
-    }
+	/**
+	 * Default constructor
+	 */
+	public CloudsdaleFayeService() {
+		super();
+	}
 
-    /**
-     * Returns the Binder to interact with Faye. This is the prefered method to
-     * run the service, and starting from an Intent is not currently supported
-     */
-    @Override
-    public IBinder onBind(Intent intent) {
-        setup();
-        return this.mFayeBinder;
-    }
+	/**
+	 * Returns the Binder to interact with Faye. This is the prefered method to
+	 * run the service, and starting from an Intent is not currently supported
+	 */
+	@Override
+	public IBinder onBind(Intent intent) {
+		setup();
+		return this.mFayeBinder;
+	}
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        setup();
-    }
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		setup();
+	}
 
-    /**
-     * Stops Faye when the Service is being destroyed by the OS
-     */
-    @Override
-    public void onDestroy() {
-        stopFaye();
-        super.onDestroy();
-    }
+	/**
+	 * Stops Faye when the Service is being destroyed by the OS
+	 */
+	@Override
+	public void onDestroy() {
+		stopFaye();
+		super.onDestroy();
+	}
 
-    @Override
-    protected void setup() {
-        // Debug toast
-        if (Cloudsdale.DEBUG) {
-            Toast.makeText(getApplicationContext(), "Faye Service created",
-                    Toast.LENGTH_SHORT).show();
-        }
-        String fayeUrl = FayeService.FAYE_HOST + ":" + FayeService.FAYE_PORT
-                + FayeService.INITIAL_CHANNEL;
+	@Override
+	protected void setup() {
+		// Debug toast
+		if (Cloudsdale.DEBUG) {
+			Toast.makeText(getApplicationContext(), "Faye Service created",
+					Toast.LENGTH_SHORT).show();
+		}
+		String fayeUrl = FayeService.FAYE_HOST + ":" + FayeService.FAYE_PORT
+				+ FayeService.INITIAL_CHANNEL;
 
-        // Create the client
-        mFayeClient = new CloudsdaleFayeClient(fayeUrl);
-        mFayeClient.setCallbacks(this);
+		// Create the client
+		mFayeClient = new CloudsdaleFayeClient(fayeUrl);
+		mFayeClient.setCallbacks(this);
 
-        // Create the binder
-        mFayeBinder = new CloudsdaleFayeBinder(this, this.mFayeClient);
-    }
+		// Create the binder
+		mFayeBinder = new CloudsdaleFayeBinder(this, this.mFayeClient);
+	}
 
-    /**
-     * Starts the Faye client
-     */
-    @Override
-    public void startFaye() {
-        mFayeClient.connect();
-    }
+	/**
+	 * Starts the Faye client
+	 */
+	@Override
+	public void startFaye() {
+		mFayeClient.connect();
+	}
 
-    /**
-     * Stops the Faye client
-     */
-    @Override
-    public void stopFaye() {
-        mFayeClient.disconnect();
-    }
+	/**
+	 * Stops the Faye client
+	 */
+	@Override
+	public void stopFaye() {
+		mFayeClient.disconnect();
+	}
 
-    @Override
-    public void connected() {
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification note = makeNotification("Cloudsdale is connected",
-                "Cloudsdale is now connected to the chat server");
-        manager.notify(1337, note);
-    }
+	@Override
+	public void connected() {
+		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification note = makeNotification("Cloudsdale is connected",
+				"Cloudsdale is now connected to the chat server");
+		manager.notify(1337, note);
+	}
 
-    @Override
-    public void disconnected() {
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification note = makeNotification("Cloudsdale has disconnected",
-                "Cloudsdale has disconnected from the chat server");
-        manager.notify(1337, note);
-    }
+	@Override
+	public void disconnected() {
+		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification note = makeNotification("Cloudsdale has disconnected",
+				"Cloudsdale has disconnected from the chat server");
+		manager.notify(1337, note);
+	}
 
-    @Override
-    public void connecting() {
-        Notification note = makeNotification("Cloudsdale is connecting",
-                "Cloudsale is currently connecting to the chat server");
-        startForeground(1337, note);
-    }
+	@Override
+	public void connecting() {
+		Notification note = makeNotification("Cloudsdale is connecting",
+				"Cloudsale is currently connecting to the chat server");
+		startForeground(1337, note);
+	}
 
-    private Notification makeNotification(String title, String content) {
-        Bitmap icon = BitmapFactory.decodeResource(getApplicationContext()
-                .getResources(), R.drawable.color_icon);
-        Notification note = new NotificationCompat.Builder(
-                getApplicationContext()).setContentTitle(title)
-                .setContentText(content).setSmallIcon(R.drawable.color_icon)
-                .setLargeIcon(icon).getNotification();
-        Intent i = new Intent(this, HomeActivity.class);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
-        note.flags |= Notification.FLAG_NO_CLEAR;
-        return note;
-    }
+	private Notification makeNotification(String title, String content) {
+		Bitmap icon = BitmapFactory.decodeResource(getApplicationContext()
+				.getResources(), R.drawable.color_icon);
+		Notification note = new NotificationCompat.Builder(
+				getApplicationContext()).setContentTitle(title)
+				.setContentText(content).setSmallIcon(R.drawable.color_icon)
+				.setLargeIcon(icon).getNotification();
+		Intent i = new Intent(this, HomeActivity.class);
+		mPendingIntent = PendingIntent.getActivity(this, 0, i, 0);
+		note.flags |= Notification.FLAG_NO_CLEAR;
+		return note;
+	}
 }

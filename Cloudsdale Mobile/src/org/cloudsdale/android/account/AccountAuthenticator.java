@@ -14,8 +14,6 @@ import org.cloudsdale.android.ui.LoginActivity;
 class AccountAuthenticator extends
         AbstractAccountAuthenticator {
 	
-	private static final String TAG = "Cloudsdale Account Authenticator";
-	
 	private Context	mContext;
 
 	public AccountAuthenticator(Context context) {

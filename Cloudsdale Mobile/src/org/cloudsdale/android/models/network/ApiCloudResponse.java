@@ -1,9 +1,12 @@
 package org.cloudsdale.android.models.network;
 
+import com.google.gson.annotations.Expose;
+
 import org.cloudsdale.android.models.api.Cloud;
 
 public class ApiCloudResponse extends ApiResponse {
 
+	@Expose
     private Cloud result;
 
     public Cloud getResult() {

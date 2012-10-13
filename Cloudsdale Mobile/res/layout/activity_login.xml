@@ -67,9 +67,28 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="16dp"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
                 android:text="@string/login_view_login_button_text" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <Button
+                    android:id="@+id/facebook_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:enabled="false"
+                    android:text="@string/login_view_facebook_button_text" />
+
+                <Button
+                    android:id="@+id/twitter_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:enabled="false"
+                    android:text="@string/login_view_twitter_button_text" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

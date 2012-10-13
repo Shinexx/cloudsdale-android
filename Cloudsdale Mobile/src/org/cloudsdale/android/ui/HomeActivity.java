@@ -17,11 +17,10 @@ import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingActivity;
 
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.PersistentData;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.faye.FayeMessageHandler;
+import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
-import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.Role;
 import org.cloudsdale.android.models.api.Cloud;
@@ -38,296 +37,271 @@ import java.util.Date;
 
 public class HomeActivity extends SlidingActivity implements FayeMessageHandler {
 
-    private static final String   TAG = "Home Activity";
+	private static final String		TAG	= "Home Activity";
 
-    private ImageView             mAvatarView;
-    private TextView              mUsernameView;
-    private TextView              mAccountLevelView;
-    private TextView              mDateRegisteredView;
-    private TextView              mCloudCountView;
-    private SlidingMenu           mSlidingMenu;
-    private static ProgressDialog sProgressDialog;
-    private static boolean        sShowDialog;
+	private ImageView				mAvatarView;
+	private TextView				mUsernameView;
+	private TextView				mAccountLevelView;
+	private TextView				mDateRegisteredView;
+	private TextView				mCloudCountView;
+	private SlidingMenu				mSlidingMenu;
+	private static ProgressDialog	sProgressDialog;
+	private static boolean			sShowDialog;
 
-    @SuppressWarnings("rawtypes")
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        sShowDialog = true;
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		sShowDialog = true;
 
-        // Set the layouts
-        setContentView(R.layout.activity_home);
-        setBehindContentView(R.layout.menu);
+		// Set the layouts
+		setContentView(R.layout.activity_home);
+		setBehindContentView(R.layout.menu);
 
-        // Get the view objects
-        getViews();
-        mSlidingMenu = getSlidingMenu();
-        Cloudsdale.prepareSlideMenu(mSlidingMenu, this);
+		// Get the view objects
+		getViews();
+		mSlidingMenu = getSlidingMenu();
+		Cloudsdale.prepareSlideMenu(mSlidingMenu, this);
 
-        // Customize actionbar
-        ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
+		// Customize actionbar
+		ActionBar actionbar = getSupportActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
 
-        // Bind the Faye service
-        Cloudsdale.subscribeToMessages(this);
+		// Bind the Faye service
+		Cloudsdale.subscribeToMessages(this);
 
-        // Set the item listener for the menu
-        ((AdapterView) mSlidingMenu.findViewById(android.R.id.list))
-                .setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		// Set the item listener for the menu
+		((AdapterView) mSlidingMenu.findViewById(android.R.id.list))
+				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view,
-                            int position, long id) {
-                        showAbove();
-                        Cloudsdale.navigate(((TextView) view
-                                .findViewById(R.id.cloud_hidden_id)).getText()
-                                .toString(), HomeActivity.this);
-                    }
-                });
-    }
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view,
+							int position, long id) {
+						showAbove();
+						Cloudsdale.navigate(((TextView) view
+								.findViewById(R.id.cloud_hidden_id)).getText()
+								.toString(), HomeActivity.this);
+					}
+				});
+	}
 
-    private void showProgressDialog() {
-        sProgressDialog = new ProgressDialog(this);
-        sProgressDialog.setIndeterminate(true);
-        sProgressDialog.setTitle("Cloudsdale is connecting");
-        sProgressDialog.setMessage("Please wait...");
-        sProgressDialog.setCancelable(false);
-        sProgressDialog.show();
-    }
+	private void showProgressDialog() {
+		sProgressDialog = new ProgressDialog(this);
+		sProgressDialog.setIndeterminate(true);
+		sProgressDialog.setTitle("Cloudsdale is connecting");
+		sProgressDialog.setMessage("Please wait...");
+		sProgressDialog.setCancelable(false);
+		sProgressDialog.show();
+	}
 
-    private void hideProgressDialog() {
-        if (sProgressDialog != null && sProgressDialog.isShowing()) {
-            sProgressDialog.cancel();
-            sShowDialog = false;
-        }
-        sProgressDialog = null;
-    }
+	private void hideProgressDialog() {
+		if (sProgressDialog != null && sProgressDialog.isShowing()) {
+			sProgressDialog.cancel();
+			sShowDialog = false;
+		}
+		sProgressDialog = null;
+	}
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        setViewContent();
-    }
+	@Override
+	protected void onResume() {
+		super.onResume();
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+		updateMe();
+		getViews();
+		setViewContent();
 
-        updateMe();
-        getViews();
-        setViewContent();
-        
-        if(!Cloudsdale.isFayeConnected()) {
-            Cloudsdale.bindFaye();
-            showProgressDialog();
-            new Thread() {
-                public void run() {
-                    while (!Cloudsdale.isFayeConnected()) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    hideProgressDialog();
-                };
-            }.start();
-        }
-    }
+		// if (!Cloudsdale.isFayeConnected()) {
+		// Cloudsdale.bindFaye();
+		// showProgressDialog();
+		// new Thread() {
+		// public void run() {
+		// while (!Cloudsdale.isFayeConnected()) {
+		// try {
+		// Thread.sleep(100);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// }
+		// hideProgressDialog();
+		// };
+		// }.start();
+		// }
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if (mSlidingMenu.isBehindShowing()) {
-                    mSlidingMenu.showAbove();
-                } else {
-                    mSlidingMenu.showBehind();
-                }
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				if (mSlidingMenu.isBehindShowing()) {
+					mSlidingMenu.showAbove();
+				} else {
+					mSlidingMenu.showBehind();
+				}
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-    private void getViews() {
-        if (mAvatarView == null) {
-            mAvatarView = (ImageView) findViewById(R.id.home_user_avatar);
-        }
+	private void getViews() {
+		if (mAvatarView == null) {
+			mAvatarView = (ImageView) findViewById(R.id.home_user_avatar);
+		}
 
-        if (mUsernameView == null) {
-            mUsernameView = (TextView) findViewById(R.id.home_username_label);
-        }
+		if (mUsernameView == null) {
+			mUsernameView = (TextView) findViewById(R.id.home_username_label);
+		}
 
-        if (mAccountLevelView == null) {
-            mAccountLevelView = (TextView) findViewById(R.id.home_account_level_label);
-        }
+		if (mAccountLevelView == null) {
+			mAccountLevelView = (TextView) findViewById(R.id.home_account_level_label);
+		}
 
-        if (mDateRegisteredView == null) {
-            mDateRegisteredView = (TextView) findViewById(R.id.home_register_date_label);
-        }
+		if (mDateRegisteredView == null) {
+			mDateRegisteredView = (TextView) findViewById(R.id.home_register_date_label);
+		}
 
-        if (mCloudCountView == null) {
-            mCloudCountView = (TextView) findViewById(R.id.home_cloud_count_label);
-        }
-    }
+		if (mCloudCountView == null) {
+			mCloudCountView = (TextView) findViewById(R.id.home_cloud_count_label);
+		}
+	}
 
-    private void setViewContent() {
-        User me = PersistentData.getMe();
+	private void setViewContent() {
+		User me = UserManager.getLoggedInUser();
 
-        // Set the user's avatar in the view
-        UrlImageViewHelper.setUrlDrawable(mAvatarView, me.getAvatar()
-                .getNormal(), R.drawable.unknown_user);
+		// Set the user's avatar in the view
+		UrlImageViewHelper.setUrlDrawable(mAvatarView, me.getAvatar()
+				.getNormal(), R.drawable.unknown_user);
 
-        // Set the user's username in the view
-        mUsernameView.setText(me.getName());
+		// Set the user's username in the view
+		mUsernameView.setText(me.getName());
 
-        // Set the user's other properties in the main view
-        mAccountLevelView.setText(createAccountLevelText(me.getRole()));
+		// Set the user's other properties in the main view
+		mAccountLevelView.setText(createAccountLevelText(me.getRole()));
 
-        // Format and set the user's join date
-        Date date = me.getMemberSince().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd MM, yyyy");
-        mDateRegisteredView.setText(MessageFormat.format(
-                "You registered on {0}", df.format(date)));
+		// Format and set the user's join date
+		Date date = me.getMemberSince().getTime();
+		SimpleDateFormat df = new SimpleDateFormat("dd MM, yyyy");
+		mDateRegisteredView.setText(MessageFormat.format(
+				"You registered on {0}", df.format(date)));
 
-        // Set the user's cloud count
-        mCloudCountView.setText("You are a member of "
-                + String.valueOf(me.getClouds().size()) + " clouds");
+		// Set the user's cloud count
+		mCloudCountView.setText("You are a member of "
+				+ String.valueOf(me.getClouds().size()) + " clouds");
 
-    }
+	}
 
-    private String createAccountLevelText(Role role) {
-        String text = "";
+	private String createAccountLevelText(Role role) {
+		String text = "";
 
-        switch (role) {
-            case NORMAL:
-                text = "Welcome back!";
-                break;
-            case DONOR:
-                text = "Thanks for donating!";
-                break;
-            case PLACEHOLDER:
-                text = "Now, either someone was expirementing on you, or you broke something";
-                break;
-            case MODERATOR:
-                text = "Get to work moderation monkey!";
-                break;
-            case DEVELOPER:
-            case ADMIN:
-                text = "You have code to write! Get to it!";
-                break;
-            case FOUNDER:
-                text = "Go back to iOS douchebag!";
-                break;
-        }
+		switch (role) {
+			case NORMAL:
+				text = "Welcome back!";
+				break;
+			case DONOR:
+				text = "Thanks for donating!";
+				break;
+			case PLACEHOLDER:
+				text = "Now, either someone was expirementing on you, or you broke something";
+				break;
+			case MODERATOR:
+				text = "Get to work moderation monkey!";
+				break;
+			case DEVELOPER:
+			case ADMIN:
+				text = "You have code to write! Get to it!";
+				break;
+			case FOUNDER:
+				text = "Go back to iOS douchebag!";
+				break;
+		}
 
-        return text;
-    }
+		return text;
+	}
 
-    @Override
-    public void handleMessage(CloudsdaleFayeMessage message) {
-        String channel = message.getChannel().substring(1);
-        String cloudId = channel.split("/")[1];
-        if (Cloudsdale.DEBUG) {
-            Log.d(TAG, "Handling message for channel " + channel
-                    + " which generated a cloud id of " + cloudId);
-        }
-        // TODO Handle the unread message counts
-    }
+	@Override
+	public void handleMessage(CloudsdaleFayeMessage message) {
+		String channel = message.getChannel().substring(1);
+		String cloudId = channel.split("/")[1];
+		if (Cloudsdale.DEBUG) {
+			Log.d(TAG, "Handling message for channel " + channel
+					+ " which generated a cloud id of " + cloudId);
+		}
+		// TODO Handle the unread message counts
+	}
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        sProgressDialog.cancel();
-        super.onConfigurationChanged(newConfig);
-    }
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		sProgressDialog.cancel();
+		super.onConfigurationChanged(newConfig);
+	}
 
-    private void updateMe() {
-        new UserUpdateTask().execute();
-        new CloudUpdateTask().execute();
-    }
+	private void updateMe() {
+		new UserUpdateTask().execute();
+		new CloudUpdateTask().execute();
+	}
 
-    private void handleCloudsdaleError(QueryException exception) {
-        if (Cloudsdale.DEBUG) {
-            Log.d(TAG, exception.getErrorCode() + ":" + exception.getMessage());
-        }
-    }
+	private void handleCloudsdaleError(QueryException exception) {
+		if (Cloudsdale.DEBUG) {
+			Log.d(TAG, exception.getErrorCode() + ":" + exception.getMessage());
+		}
+	}
 
-    private class UserUpdateTask extends AsyncTask<Void, Void, User> {
+	private class UserUpdateTask extends AsyncTask<Void, Void, User> {
 
-        @Override
-        protected User doInBackground(Void... params) {
-            QueryData data = new QueryData();
-            UserGetQuery query = new UserGetQuery(
-                    getString(R.string.cloudsdale_api_base)
-                            + getString(R.string.cloudsdale_user_endpoint,
-                                    PersistentData.getMe().getId()));
-            query.addHeader("X-AUTH-TOKEN", PersistentData.getMe()
-                    .getAuthToken());
-            try {
-                return query.execute(data, HomeActivity.this);
-            } catch (QueryException e) {
-                HomeActivity.this.handleCloudsdaleError(e);
-                return null;
-            }
-        }
+		@Override
+		protected User doInBackground(Void... params) {
+			QueryData data = new QueryData();
+			UserGetQuery query = new UserGetQuery(
+					getString(R.string.cloudsdale_api_base)
+							+ getString(R.string.cloudsdale_user_endpoint,
+									UserManager.getLoggedInUser().getStringId()));
+			query.addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser()
+					.getAuthToken());
+			try {
+				return query.execute(data, HomeActivity.this);
+			} catch (QueryException e) {
+				HomeActivity.this.handleCloudsdaleError(e);
+				return null;
+			}
+		}
 
-        @Override
-        protected void onPostExecute(User result) {
-            LoggedUser me = PersistentData.getMe();
-            adjustUserProperties(me, result);
-            PersistentData.storeLoggedUser(me);
-            setViewContent();
-            super.onPostExecute(result);
-        }
+		@Override
+		protected void onPostExecute(User result) {
+			UserManager.storeUser(result);
+			setViewContent();
+			super.onPostExecute(result);
+		}
 
-        private void adjustUserProperties(LoggedUser me, User result) {
-            me.setName(result.getName());
-            me.setTimeZone(result.getTimeZone());
-            me.setMemberSince(result.getMemberSince());
-            me.setSuspendedUntil(me.getSuspendedUntil());
-            me.setReasonForSuspension(result.getReasonForSuspension());
-            me.setAvatar(result.getAvatar());
-            me.setRegistered(result.isRegistered());
-            me.setTransientStatus(result.isTransientStatus());
-            me.setBanStatus(result.isBanStatus());
-            me.setMemberOfACloud(result.isMemberOfACloud());
-            me.setHasAvatar(result.isHasAvatar());
-            me.setHasReadTnC(result.isHasReadTnC());
-            me.setUserRole(result.getRole());
-            me.setProsecutions(result.getProsecutions());
-        }
+	}
 
-    }
+	private class CloudUpdateTask extends AsyncTask<Void, Void, Cloud[]> {
 
-    private class CloudUpdateTask extends AsyncTask<Void, Void, Cloud[]> {
+		@Override
+		protected Cloud[] doInBackground(Void... params) {
+			QueryData data = new QueryData();
+			User me = UserManager.getLoggedInUser();
+			CloudGetQuery query = new CloudGetQuery(
+					getString(R.string.cloudsdale_api_base)
+							+ getString(
+									R.string.cloudsdale_user_clouds_endpoint,
+									me.getStringId()));
+			query.addHeader("X-AUTH-TOKEN", me.getAuthToken());
+			try {
+				return query.executeForCollection(data, HomeActivity.this);
+			} catch (QueryException e) {
+				HomeActivity.this.handleCloudsdaleError(e);
+				return null;
+			}
+		}
 
-        @Override
-        protected Cloud[] doInBackground(Void... params) {
-            QueryData data = new QueryData();
-            LoggedUser me = PersistentData.getMe();
-            CloudGetQuery query = new CloudGetQuery(
-                    getString(R.string.cloudsdale_api_base)
-                            + getString(
-                                    R.string.cloudsdale_user_clouds_endpoint,
-                                    me.getId()));
-            query.addHeader("X-AUTH-TOKEN", me.getAuthToken());
-            try {
-                return query.executeForCollection(data, HomeActivity.this);
-            } catch (QueryException e) {
-                HomeActivity.this.handleCloudsdaleError(e);
-                return null;
-            }
-        }
+		@Override
+		protected void onPostExecute(Cloud[] result) {
+			User me = UserManager.getLoggedInUser();
+			ArrayList<Cloud> clouds = new ArrayList<Cloud>(
+					Arrays.asList(result));
+			me.setClouds(clouds);
+			UserManager.storeUser(me);
+			super.onPostExecute(result);
+		}
 
-        @Override
-        protected void onPostExecute(Cloud[] result) {
-            LoggedUser me = PersistentData.getMe();
-            ArrayList<Cloud> clouds = new ArrayList<Cloud>(
-                    Arrays.asList(result));
-            me.setClouds(clouds);
-            PersistentData.storeLoggedUser(me);
-            super.onPostExecute(result);
-        }
-
-    }
+	}
 }

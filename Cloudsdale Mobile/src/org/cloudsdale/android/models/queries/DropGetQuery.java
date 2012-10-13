@@ -9,6 +9,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Drop;
 import org.cloudsdale.android.models.network.ApiDropArrayResponse;
@@ -37,7 +38,7 @@ public class DropGetQuery extends GetQuery {
 
     @Override
     public Drop[] executeForCollection(QueryData data, Context context) {
-        setHeaders(data.getHeaders());
+    	addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser().getAuthToken());
 
         try {
             mHttpResponse = mhttpClient.execute(httpGet);

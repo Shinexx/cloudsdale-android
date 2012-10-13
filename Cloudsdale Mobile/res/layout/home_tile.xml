@@ -51,4 +51,5 @@
         android:layout_margin="8dp"
         android:text="You&apos;re a member of 25 clouds" />
 
+
 </LinearLayout>

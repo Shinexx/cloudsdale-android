@@ -1,8 +1,11 @@
 package org.cloudsdale.android.models;
 
-import org.cloudsdale.android.ISO8601;
+import android.content.Context;
+
+import com.orm.SugarRecord;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -10,19 +13,25 @@ import java.util.Calendar;
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
-public class Model {
-
+public class Model<T> extends SugarRecord<T> {
+	
 	/**
-	 * Helper method to convert ISO8601 strings to Calendar objects
-	 * 
-	 * @param isoString
-	 *            The ISO8601 date string to convert
-	 * @return Calendar object with the date of the ISO8601 string
+	 * Constructor for Sugar
+	 * @param context
 	 */
-	protected Calendar convertIsoString(String isoString) {
+	public Model(Context context) {
+		super(context);
+	}
+
+	protected Calendar convertDateString(String dateString) {
+		// 2012/02/02 18:34:31 +0000
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/dd/MM HH:mm:ss Z");
+		Calendar cal = Calendar.getInstance();
 		try {
-			return ISO8601.toCalendar(isoString);
+			cal.setTime(sdf.parse(dateString));
+			return cal;
 		} catch (ParseException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
