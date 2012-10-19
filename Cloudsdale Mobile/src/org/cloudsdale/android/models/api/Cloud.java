@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.j256.ormlite.table.DatabaseTable;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.AvatarContainer;
@@ -12,7 +11,6 @@ import org.cloudsdale.android.models.IdentityModel;
 
 import java.util.Calendar;
 
-@DatabaseTable(tableName = "clouds")
 public class Cloud extends IdentityModel<Cloud> {
 
     @Expose

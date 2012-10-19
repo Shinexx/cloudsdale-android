@@ -1,6 +1,7 @@
 package org.cloudsdale.android.managers;
 
 import android.os.AsyncTask;
+import android.os.Looper;
 
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
@@ -161,6 +162,7 @@ public class DatabaseManager {
 
 		@Override
 		protected Boolean doInBackground(User... params) {
+			Looper.prepare();
 			for (User u : params) {
 				u.save();
 			}
@@ -173,6 +175,7 @@ public class DatabaseManager {
 
 		@Override
 		protected User doInBackground(String... params) {
+			Looper.prepare();
 			return User.find(User.class, "stringId=?",
 					new String[] { params[0] }).get(0);
 		}
@@ -183,6 +186,7 @@ public class DatabaseManager {
 
 		@Override
 		protected Boolean doInBackground(Cloud... params) {
+			Looper.prepare();
 			for (Cloud c : params) {
 				c.save();
 			}
@@ -195,6 +199,7 @@ public class DatabaseManager {
 
 		@Override
 		protected Cloud doInBackground(String... params) {
+			Looper.prepare();
 			return Cloud.find(Cloud.class, "stringId=?",
 					new String[] { params[0] }).get(0);
 		}

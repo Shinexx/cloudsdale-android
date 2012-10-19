@@ -2,13 +2,10 @@ package org.cloudsdale.android.models;
 
 import android.content.Context;
 
-import com.j256.ormlite.table.DatabaseTable;
-
 import org.cloudsdale.android.Cloudsdale;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = "avatars")
 public class AvatarContainer extends Model<AvatarContainer> implements Serializable {
 	
 	public AvatarContainer() {

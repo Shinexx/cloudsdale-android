@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.WazaBe.HoloEverywhere.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.bugsense.trace.BugSenseHandler;
@@ -26,8 +27,8 @@ import com.zubhium.ZubhiumSDK;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.managers.DatabaseManager;
 import org.cloudsdale.android.managers.UserAccountManager;
+import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.exceptions.QueryException;
@@ -173,7 +174,7 @@ public class LoginActivity extends SherlockActivity {
 	 * @param user
 	 *            The user that has logged in
 	 */
-	private void storeAccount(LoggedUser user) {
+	private boolean storeAccount(LoggedUser user) {
 		boolean accountCreated = UserAccountManager.storeAccount(user);
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -186,9 +187,9 @@ public class LoginActivity extends SherlockActivity {
 				result.putString(AccountManager.KEY_ACCOUNT_TYPE,
 						getString(R.string.account_type));
 				response.onResult(result);
-				DatabaseManager.storeUser(user);
 			}
 		}
+		return UserManager.storeLoggedInUser(user);
 	}
 
 	/**
@@ -210,11 +211,17 @@ public class LoginActivity extends SherlockActivity {
 			auth.execute();
 			try {
 				LoggedUser user = auth.get();
-				storeAccount(user);
-				Intent intent = new Intent();
-				intent.setClass(this, HomeActivity.class);
-				startActivity(intent);
-				finish();
+				boolean success = storeAccount(user);
+				if (success) {
+					Intent intent = new Intent();
+					intent.setClass(this, HomeActivity.class);
+					startActivity(intent);
+					finish();
+				} else {
+					Toast.makeText(this,
+							"There was an error logging in, please try again",
+							Toast.LENGTH_SHORT).show();
+				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

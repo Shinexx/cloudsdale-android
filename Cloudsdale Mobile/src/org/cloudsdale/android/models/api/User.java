@@ -2,10 +2,10 @@ package org.cloudsdale.android.models.api;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.cloudsdale.andorid.models.db.UserCloudJoin;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.AvatarContainer;
 import org.cloudsdale.android.models.IdentityModel;
@@ -21,84 +21,86 @@ import java.util.Calendar;
  */
 public class User extends IdentityModel<User> {
 
-	protected final String			TAG	= "Cloudsdale User";
+	protected final String				TAG	= "Cloudsdale User";
 
 	// protected attributes from JSON
 	@Expose
-	protected String				name;
+	protected String					name;
 	@Expose
 	@SerializedName("time_zone")
-	protected String				timeZone;
+	protected String					timeZone;
 	@Expose
 	@SerializedName("member_since")
-	protected String				memberSinceTemp;
-	protected Calendar				memberSince;
+	protected String					memberSinceTemp;
+	protected Calendar					memberSince;
 	@Expose
 	@SerializedName("suspended_until")
-	protected String				suspendedUntilTemp;
-	protected Calendar				suspendedUntil;
+	protected String					suspendedUntilTemp;
+	protected Calendar					suspendedUntil;
 	@Expose
 	@SerializedName("reason_for_suspension")
-	protected String				reasonForSuspension;
+	protected String					reasonForSuspension;
 	@Expose
-	protected AvatarContainer		avatar;
+	protected AvatarContainer			avatar;
 	@Expose
 	@SerializedName("is_registered")
-	protected boolean				isRegistered;
+	protected boolean					isRegistered;
 	@Expose
 	@SerializedName("is_transient")
-	protected boolean				transientStatus;
+	protected boolean					transientStatus;
 	@Expose
 	@SerializedName("is_banned")
-	protected boolean				banStatus;
+	protected boolean					banStatus;
 	@Expose
 	@SerializedName("is_member_of_a_cloud")
-	protected boolean				memberOfACloud;
+	protected boolean					memberOfACloud;
 	@Expose
 	@SerializedName("has_an_avatar")
-	protected boolean				hasAvatar;
+	protected boolean					hasAvatar;
 	@Expose
 	@SerializedName("has_read_tnc")
-	protected boolean				hasReadTnC;
+	protected boolean					hasReadTnC;
 	@Expose
 	@SerializedName("role")
-	protected String				roleTemp;
-	protected Role					userRole;
+	protected String					roleTemp;
+	protected Role						userRole;
 	@Expose
-	protected Prosecution[]			prosecutions;
+	protected Prosecution[]				prosecutions;
 	@Expose
 	@SerializedName("auth_token")
-	protected String				authToken;
+	protected String					authToken;
 	@Expose
-	protected String				email;
+	protected String					email;
 	@Expose
 	@SerializedName("needs_to_confirm_registration")
-	protected boolean				needsToConfirmRegistration;
+	protected boolean					needsToConfirmRegistration;
 	@Expose
 	@SerializedName("needs_password_change")
-	protected boolean				needsToChangePassword;
+	protected boolean					needsToChangePassword;
 	@Expose
 	@SerializedName("needs_name_change")
-	protected boolean				needsToChangeName;
+	protected boolean					needsToChangeName;
 	@Expose
 	@SerializedName("confirmed_registration_at")
-	protected String				confirmedRegistrationAtTemp;
-	protected Calendar				confirmedRegistrationAt;
+	protected String					confirmedRegistrationAtTemp;
+	protected Calendar					confirmedRegistrationAt;
 	@Expose
 	@SerializedName("tnc_last_accepted")
-	protected String				tncLastAcceptedTemp;
-	protected Calendar				tncLastAccepted;
+	protected String					tncLastAcceptedTemp;
+	protected Calendar					tncLastAccepted;
 	@Expose
 	@SerializedName("skype_name")
-	protected String				skypeName;
+	protected String					skypeName;
 
 	// Child objects from JSON
-	protected ArrayList<Cloud> clouds;
-	
+	@Expose
+	protected ArrayList<Cloud>			clouds;
+	protected ArrayList<UserCloudJoin>	mCloudJoins;
+
 	public User() {
 		this(Cloudsdale.getContext());
 	}
-	
+
 	public User(Context context) {
 		super(context);
 	}
@@ -112,6 +114,14 @@ public class User extends IdentityModel<User> {
 	}
 
 	public ArrayList<Cloud> getClouds() {
+		if (clouds == null) {
+			clouds = new ArrayList<Cloud>();
+		}
+		if (clouds.isEmpty()) {
+			for (UserCloudJoin ucj : mCloudJoins) {
+				clouds.add(ucj.getCloud());
+			}
+		}
 		return clouds;
 	}
 
@@ -253,8 +263,16 @@ public class User extends IdentityModel<User> {
 		this.banStatus = banStatus;
 	}
 
-	public void setClouds(ArrayList<Cloud> clouds) {
+	public void setClouds(final ArrayList<Cloud> clouds) {
 		this.clouds = clouds;
+		mCloudJoins = new ArrayList<UserCloudJoin>();
+		new Thread() {
+			public void run() {
+				for (Cloud c : clouds) {
+					mCloudJoins.add(new UserCloudJoin(User.this, c));
+				}
+			};
+		}.start();
 	}
 
 	public void setEmail(String email) {
@@ -364,6 +382,11 @@ public class User extends IdentityModel<User> {
 	public void setUserRole(Role userRole) {
 		this.userRole = userRole;
 	}
+	
+	public void addCloud(Cloud cloud) {
+		clouds.add(cloud);
+		mCloudJoins.add(new UserCloudJoin(this, cloud));
+	}
 
 	/**
 	 * Converts the user to a JSON string
@@ -371,7 +394,7 @@ public class User extends IdentityModel<User> {
 	 * @return json representation of the user
 	 */
 	public String toJson() {
-		return new Gson().toJson(this, this.getClass());
+		return Cloudsdale.getJsonDeserializer().toJson(this, this.getClass());
 	}
 
 	/**

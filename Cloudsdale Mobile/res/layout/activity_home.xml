@@ -39,6 +39,7 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="0.5"
+            android:scaleType="centerInside"
             android:src="@drawable/bg_pony_center" />
     </LinearLayout>
 
