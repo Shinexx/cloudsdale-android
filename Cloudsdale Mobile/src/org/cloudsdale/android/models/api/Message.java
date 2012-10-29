@@ -1,16 +1,13 @@
 package org.cloudsdale.android.models.api;
 
-import android.content.Context;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.Model;
 
 import java.util.Date;
 
-public class Message extends Model<Message> {
+public class Message extends Model {
 
     // Object attributes
 	@Expose
@@ -31,13 +28,8 @@ public class Message extends Model<Message> {
     private Drop[]   drops;
 
     public Message() {
-    	this(Cloudsdale.getContext());
     	this.timestamp = new Date();
     	this.content = "";
-    }
-    
-    public Message(Context context) {
-    	super(context);
     }
     
     public User getAuthor() {

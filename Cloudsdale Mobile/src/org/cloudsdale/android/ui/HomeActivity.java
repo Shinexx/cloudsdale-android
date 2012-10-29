@@ -253,7 +253,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 			UserGetQuery query = new UserGetQuery(
 					getString(R.string.cloudsdale_api_base)
 							+ getString(R.string.cloudsdale_user_endpoint,
-									UserManager.getLoggedInUser().getStringId()));
+									UserManager.getLoggedInUser().getId()));
 			query.addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser()
 					.getAuthToken());
 			try {
@@ -283,7 +283,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 					getString(R.string.cloudsdale_api_base)
 							+ getString(
 									R.string.cloudsdale_user_clouds_endpoint,
-									me.getStringId()));
+									me.getId()));
 			query.addHeader("X-AUTH-TOKEN", me.getAuthToken());
 			try {
 				return query.executeForCollection(data, HomeActivity.this);

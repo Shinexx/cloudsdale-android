@@ -34,7 +34,7 @@ public class UserAccountManager {
 		Account account = new Account(user.getName(),
 				appContext.getString(R.string.account_type));
 		Bundle extras = new Bundle();
-		extras.putString(KEY_ID, user.getStringId());
+		extras.putString(KEY_ID, user.getId());
 		AccountManager am = AccountManager.get(appContext);
 		boolean accountCreated = am.addAccountExplicitly(account,
 				user.getAuthToken(), extras);

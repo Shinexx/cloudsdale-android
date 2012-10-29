@@ -14,7 +14,7 @@ public class PostMessageBuilder {
 		try {
 			body.put("device", "mobile");
 			body.put("content", message);
-			body.put("client_id", UserManager.getLoggedInUser().getStringId());
+			body.put("client_id", UserManager.getLoggedInUser().getId());
 			this.message.put("message", body.toString());
 		} catch (JSONException e) {
 			e.printStackTrace();

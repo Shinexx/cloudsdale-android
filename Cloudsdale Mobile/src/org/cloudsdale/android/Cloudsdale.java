@@ -2,6 +2,7 @@ package org.cloudsdale.android;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +24,6 @@ import com.b3rwynmobile.fayeclient.models.FayeMessage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
-import com.orm.SugarApp;
 import com.slidingmenu.lib.SlidingMenu;
 
 import org.cloudsdale.android.faye.CloudsdaleFayeBinder;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
-public class Cloudsdale extends SugarApp implements ServiceConnection,
+public class Cloudsdale extends Application implements ServiceConnection,
 		CloudsdaleFayeListener {
 
 	// Debug fields

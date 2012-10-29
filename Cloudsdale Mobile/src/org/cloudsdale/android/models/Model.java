@@ -1,9 +1,5 @@
 package org.cloudsdale.android.models;
 
-import android.content.Context;
-
-import com.orm.SugarRecord;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -13,15 +9,7 @@ import java.util.Calendar;
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
-public class Model<T> extends SugarRecord<T> {
-	
-	/**
-	 * Constructor for Sugar
-	 * @param context
-	 */
-	public Model(Context context) {
-		super(context);
-	}
+public class Model {
 
 	protected Calendar convertDateString(String dateString) {
 		// 2012/02/02 18:34:31 +0000

@@ -57,7 +57,7 @@ public class CloudDropAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int index) {
-        return mDrops.get(index).getStringId().hashCode();
+        return mDrops.get(index).getId().hashCode();
     }
 
     @Override

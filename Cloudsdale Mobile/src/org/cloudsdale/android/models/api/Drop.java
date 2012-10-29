@@ -1,13 +1,10 @@
 package org.cloudsdale.android.models.api;
 
-import android.content.Context;
-
 import com.google.gson.annotations.Expose;
 
-import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.IdentityModel;
 
-public class Drop extends IdentityModel<Drop> {
+public class Drop extends IdentityModel {
     
 	@Expose
     private String url;
@@ -17,14 +14,6 @@ public class Drop extends IdentityModel<Drop> {
     private String title;
 	@Expose
     private String preview;
-    
-    public Drop() {
-    	this(Cloudsdale.getContext());
-    }
-    
-    public Drop(Context context) {
-    	super(context);
-    }
     
     public String getUrl() {
         return url;

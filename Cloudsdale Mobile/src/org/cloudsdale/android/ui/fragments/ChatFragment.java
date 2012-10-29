@@ -109,7 +109,7 @@ public class ChatFragment extends SherlockFragment {
     }
 
     public void addMessage(Message message) {
-        if (!message.getAuthorId().equals(UserManager.getLoggedInUser().getStringId())
+        if (!message.getAuthorId().equals(UserManager.getLoggedInUser().getId())
                 || !message.getDevice().equals("mobile")) {
             sMessageAdapter.addMessage(message);
         }
@@ -189,7 +189,7 @@ public class ChatFragment extends SherlockFragment {
             try {
                 body.put("device", "mobile");
                 body.put("content", sInputField.getText().toString());
-                body.put("client_id", UserManager.getLoggedInUser().getStringId());
+                body.put("client_id", UserManager.getLoggedInUser().getId());
                 message.put("message", body);
             } catch (JSONException e) {
                 e.printStackTrace();

@@ -1,17 +1,14 @@
 package org.cloudsdale.android.models.api;
 
-import android.content.Context;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.AvatarContainer;
 import org.cloudsdale.android.models.IdentityModel;
 
 import java.util.Calendar;
 
-public class Cloud extends IdentityModel<Cloud> {
+public class Cloud extends IdentityModel {
 
     @Expose
     private String          name;
@@ -42,14 +39,6 @@ public class Cloud extends IdentityModel<Cloud> {
     @Expose
     @SerializedName("topic")
     private Chat            chat;
-    
-    public Cloud() {
-    	this(Cloudsdale.getContext());
-    }
-    
-    public Cloud(Context context) {
-    	super(context);
-    }
 
     public boolean isHidden() {
         return hidden;

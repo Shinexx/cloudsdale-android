@@ -1,15 +1,12 @@
 package org.cloudsdale.android.models.api;
 
-import android.content.Context;
-
 import com.google.gson.annotations.Expose;
 
-import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.Model;
 
 import java.util.ArrayList;
 
-public class Chat extends Model<Chat> {
+public class Chat extends Model {
 
 	// Relationships
 	@Expose
@@ -39,16 +36,6 @@ public class Chat extends Model<Chat> {
 	 * Default constructor
 	 */
 	public Chat() {
-		this(Cloudsdale.getContext());
-	}
-
-	/**
-	 * Parameterized constructor for Sugar
-	 * 
-	 * @param context
-	 */
-	public Chat(Context context) {
-		this(null, context);
 	}
 
 	/**
@@ -57,8 +44,7 @@ public class Chat extends Model<Chat> {
 	 * @param cloud
 	 *            cloud that this chat belongs to
 	 */
-	public Chat(Cloud cloud, Context context) {
-		super(context);
+	public Chat(Cloud cloud) {
 		this.cloud = cloud;
 	}
 

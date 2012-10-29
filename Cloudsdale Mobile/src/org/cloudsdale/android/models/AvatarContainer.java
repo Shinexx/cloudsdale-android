@@ -6,16 +6,8 @@ import org.cloudsdale.android.Cloudsdale;
 
 import java.io.Serializable;
 
-public class AvatarContainer extends Model<AvatarContainer> implements Serializable {
+public class AvatarContainer implements Serializable {
 	
-	public AvatarContainer() {
-		this(Cloudsdale.getContext());
-	}
-
-	public AvatarContainer(Context context) {
-		super(context);
-	}
-
 	/**
 	 * Generated SUID
 	 */

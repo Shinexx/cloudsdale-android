@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.cloudsdale.android.models.LoggedUser;
-import org.cloudsdale.android.models.api.User;
 
 public class LoginResult extends Result {
 

@@ -1,7 +1,5 @@
 package org.cloudsdale.android.models.api;
 
-import android.content.Context;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -19,7 +17,7 @@ import java.util.Calendar;
  * 
  * @author Jamison Greeley (Berwyn@cloudsdale.org)
  */
-public class User extends IdentityModel<User> {
+public class User extends IdentityModel {
 
 	protected final String				TAG	= "Cloudsdale User";
 
@@ -96,14 +94,6 @@ public class User extends IdentityModel<User> {
 	@Expose
 	protected ArrayList<Cloud>			clouds;
 	protected ArrayList<UserCloudJoin>	mCloudJoins;
-
-	public User() {
-		this(Cloudsdale.getContext());
-	}
-
-	public User(Context context) {
-		super(context);
-	}
 
 	public String getAuthToken() {
 		return this.authToken;

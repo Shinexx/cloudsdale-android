@@ -1,14 +1,11 @@
 package org.cloudsdale.android.models.api;
 
-import android.content.Context;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.Model;
 
-public class Error extends Model<Error> {
+public class Error extends Model {
 	
 	@Expose
 	private String	type;
@@ -24,14 +21,6 @@ public class Error extends Model<Error> {
 	@Expose
 	private String	message;
 	
-	public Error() {
-		this(Cloudsdale.getContext());
-	}
-	
-	public Error(Context context) {
-		super(context);
-	}
-
 	/**
 	 * @return the message
 	 */

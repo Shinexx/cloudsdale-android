@@ -7,7 +7,7 @@ import org.cloudsdale.android.models.Model;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 
-public class UserCloudJoin extends Model<UserCloudJoin> {
+public class UserCloudJoin extends Model {
 	
 	private User mUser;
 	private Cloud mCloud;
@@ -21,7 +21,6 @@ public class UserCloudJoin extends Model<UserCloudJoin> {
 	}
 	
 	public UserCloudJoin(User user, Cloud cloud, Context context) {
-		super(context);
 		this.mUser = user;
 		this.mCloud = cloud;
 	}
