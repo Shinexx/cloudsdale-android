@@ -62,11 +62,6 @@ public class LoginActivity extends SherlockActivity {
 		// Setup BugSense
 		BugSenseHandler.setup(this, "2bccbeb2");
 
-		// Setup Zubhium
-		ZubhiumSDK sdk = ZubhiumSDK.getZubhiumSDKInstance(
-				getApplicationContext(), "65de0ea209fa414beee8518bd08b05");
-		sdk.enableCrashReporting(true);
-
 		// Hide the Cloudsdale text and icon in the ActionBar
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
