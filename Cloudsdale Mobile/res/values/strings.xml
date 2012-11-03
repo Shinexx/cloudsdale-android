@@ -2,7 +2,7 @@
 <resources>
 
     <string name="account_type">org.cloudsdale.android.account</string>
-    <string name="app_name">Cloudsdale</string>
+    <string name="app_name">Cloudsdale Beta</string>
     <string name="auth_token_type">org.cloudsdale.android</string>
     <string name="cloudsdale_logo_description">Cloudsdale logo</string>
     <string name="cloud_list_item_icon_description">Cloud icon</string>

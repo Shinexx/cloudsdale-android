@@ -1,5 +1,7 @@
 package org.cloudsdale.android;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
@@ -31,6 +33,7 @@ import org.cloudsdale.android.faye.CloudsdaleFayeClient;
 import org.cloudsdale.android.faye.CloudsdaleFayeListener;
 import org.cloudsdale.android.faye.CloudsdaleFayeService;
 import org.cloudsdale.android.faye.FayeMessageHandler;
+import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api.Cloud;

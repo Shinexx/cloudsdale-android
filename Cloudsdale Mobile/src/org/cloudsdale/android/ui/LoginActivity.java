@@ -23,7 +23,6 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.bugsense.trace.BugSenseHandler;
 import com.google.gson.JsonObject;
-import com.zubhium.ZubhiumSDK;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
@@ -184,7 +183,8 @@ public class LoginActivity extends SherlockActivity {
 				response.onResult(result);
 			}
 		}
-		return UserManager.storeLoggedInUser(user);
+		UserManager.storeUser(user);
+		return accountCreated;
 	}
 
 	/**

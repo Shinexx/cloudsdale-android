@@ -1,9 +1,7 @@
 package org.cloudsdale.android.models.api;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.cloudsdale.andorid.models.db.UserCloudJoin;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.AvatarContainer;
 import org.cloudsdale.android.models.IdentityModel;
@@ -22,78 +20,54 @@ public class User extends IdentityModel {
 	protected final String				TAG	= "Cloudsdale User";
 
 	// protected attributes from JSON
-	@Expose
 	protected String					name;
-	@Expose
 	@SerializedName("time_zone")
 	protected String					timeZone;
-	@Expose
 	@SerializedName("member_since")
 	protected String					memberSinceTemp;
 	protected Calendar					memberSince;
-	@Expose
 	@SerializedName("suspended_until")
 	protected String					suspendedUntilTemp;
 	protected Calendar					suspendedUntil;
-	@Expose
 	@SerializedName("reason_for_suspension")
 	protected String					reasonForSuspension;
-	@Expose
 	protected AvatarContainer			avatar;
-	@Expose
 	@SerializedName("is_registered")
 	protected boolean					isRegistered;
-	@Expose
 	@SerializedName("is_transient")
 	protected boolean					transientStatus;
-	@Expose
 	@SerializedName("is_banned")
 	protected boolean					banStatus;
-	@Expose
 	@SerializedName("is_member_of_a_cloud")
 	protected boolean					memberOfACloud;
-	@Expose
 	@SerializedName("has_an_avatar")
 	protected boolean					hasAvatar;
-	@Expose
 	@SerializedName("has_read_tnc")
 	protected boolean					hasReadTnC;
-	@Expose
 	@SerializedName("role")
 	protected String					roleTemp;
 	protected Role						userRole;
-	@Expose
 	protected Prosecution[]				prosecutions;
-	@Expose
 	@SerializedName("auth_token")
 	protected String					authToken;
-	@Expose
 	protected String					email;
-	@Expose
 	@SerializedName("needs_to_confirm_registration")
 	protected boolean					needsToConfirmRegistration;
-	@Expose
 	@SerializedName("needs_password_change")
 	protected boolean					needsToChangePassword;
-	@Expose
 	@SerializedName("needs_name_change")
 	protected boolean					needsToChangeName;
-	@Expose
 	@SerializedName("confirmed_registration_at")
 	protected String					confirmedRegistrationAtTemp;
 	protected Calendar					confirmedRegistrationAt;
-	@Expose
 	@SerializedName("tnc_last_accepted")
 	protected String					tncLastAcceptedTemp;
 	protected Calendar					tncLastAccepted;
-	@Expose
 	@SerializedName("skype_name")
 	protected String					skypeName;
 
 	// Child objects from JSON
-	@Expose
 	protected ArrayList<Cloud>			clouds;
-	protected ArrayList<UserCloudJoin>	mCloudJoins;
 
 	public String getAuthToken() {
 		return this.authToken;
@@ -106,11 +80,6 @@ public class User extends IdentityModel {
 	public ArrayList<Cloud> getClouds() {
 		if (clouds == null) {
 			clouds = new ArrayList<Cloud>();
-		}
-		if (clouds.isEmpty()) {
-			for (UserCloudJoin ucj : mCloudJoins) {
-				clouds.add(ucj.getCloud());
-			}
 		}
 		return clouds;
 	}
@@ -255,16 +224,8 @@ public class User extends IdentityModel {
 
 	public void setClouds(final ArrayList<Cloud> clouds) {
 		this.clouds = clouds;
-		mCloudJoins = new ArrayList<UserCloudJoin>();
-		new Thread() {
-			public void run() {
-				for (Cloud c : clouds) {
-					mCloudJoins.add(new UserCloudJoin(User.this, c));
-				}
-			};
-		}.start();
 	}
-
+	
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -375,7 +336,6 @@ public class User extends IdentityModel {
 	
 	public void addCloud(Cloud cloud) {
 		clouds.add(cloud);
-		mCloudJoins.add(new UserCloudJoin(this, cloud));
 	}
 
 	/**

@@ -2,66 +2,65 @@ package org.cloudsdale.android.managers;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.Context;
 import android.os.AsyncTask;
 
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.queries.UserGetQuery;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class UserManager {
 
-	private static User	sLoggedUser;
+	private static ArrayList<User>	mStoredUsers;
+
+	static {
+		mStoredUsers = new ArrayList<User>();
+	}
 
 	public static User getLoggedInUser() {
-		if (sLoggedUser == null) {
-			Context context = Cloudsdale.getContext();
-			AccountManager am = AccountManager.get(context);
-			Account account = UserAccountManager.getAccount();
-			User user = DatabaseManager.readUser(am.getUserData(account,
-					UserAccountManager.KEY_ID));
-			if (user != null) {
-				sLoggedUser = user;
-			} else {
-				String id = am.getUserData(account, UserAccountManager.KEY_ID);
-				String url = context.getString(R.string.cloudsdale_api_base)
-						+ context.getString(R.string.cloudsdale_user_endpoint,
-								id);
-				String[] strings = new String[2];
-				strings[UserFetchTask.KEY_URL] = url;
-				strings[UserFetchTask.KEY_AUTH_TOKEN] = am.getPassword(account);
-				UserFetchTask task = new UserFetchTask();
-				task.execute(strings);
-				try {
-					sLoggedUser = task.get();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		return sLoggedUser;
+		Account userAccount = UserAccountManager.getAccount();
+		AccountManager am = AccountManager.get(Cloudsdale.getContext());
+		return getUserById(am.getUserData(userAccount,
+				UserAccountManager.KEY_ID));
 	}
-	
-	public static boolean storeLoggedInUser(LoggedUser user) {
-		sLoggedUser = user;
-		return storeUser(user);
-	}
-	
+
 	public static User getUserById(String id) {
-		return DatabaseManager.readUser(id);
+		if (mStoredUsers != null && !mStoredUsers.isEmpty()) {
+			UserLoadTask task = new UserLoadTask();
+			task.execute(id);
+			try {
+				return task.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return null;
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else return null;
 	}
-	
-	public static boolean storeUser(User user) {
-		return DatabaseManager.storeUser(user);
+
+	public static void storeUser(User user) {
+		synchronized (mStoredUsers) {
+			mStoredUsers.add(user);
+		}
+	}
+
+	static class UserLoadTask extends AsyncTask<String, Void, User> {
+		@Override
+		protected User doInBackground(String... params) {
+			ArrayList<User> users;
+			synchronized (mStoredUsers) {
+				users = new ArrayList<User>(mStoredUsers);
+			}
+			for (User u : users) {
+				if (u.getId().equals(params[0])) { return u; }
+			}
+			return null;
+		}
 	}
 
 	static class UserFetchTask extends AsyncTask<String, Void, User> {
