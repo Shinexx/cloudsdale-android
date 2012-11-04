@@ -6,11 +6,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
@@ -53,6 +56,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
 	private int					mDropFragIndex;
 	private int					mOnlineFragIndex;
 	private ProgressDialog		sProgressDialog;
+	private FrameLayout			mFragmentFrame;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -77,9 +81,8 @@ public class CloudActivity extends SlidingFragmentActivity implements
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
 		// TODO Check for the frame, see if we're in tablet mode
-		mDualView = false;
-
-		setupFragments();
+		mFragmentFrame = (FrameLayout) findViewById(R.id.cloud_fragment_frame);
+		mDualView = (mFragmentFrame != null);
 
 		if (savedInstanceState != null) {
 			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
@@ -136,19 +139,19 @@ public class CloudActivity extends SlidingFragmentActivity implements
 					.setIndicator("Chat"), ChatFragment.class, null);
 			mChatFrag = (ChatFragment) mTabsAdapter.getItem(CHAT_INDEX);
 		} else {
-			// TODO Tablet chat goes in the frame, silly filly!
+			mChatFrag = new ChatFragment();
+			FragmentManager fm = getSupportFragmentManager();
+			FragmentTransaction ft = fm.beginTransaction();
+			ft.add(R.id.cloud_fragment_frame, mChatFrag);
+			ft.commit();
 		}
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-		GetShowingCloud();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		GetShowingCloud();
+		setupFragments();
 		if (!Cloudsdale.isFayeConnected()) {
 			showProgressDialog();
 			Cloudsdale.bindFaye();
@@ -166,7 +169,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
 			};
 		}
 		Cloudsdale.subscribeToMessages(this);
-		GetShowingCloud();
 	}
 
 	@Override

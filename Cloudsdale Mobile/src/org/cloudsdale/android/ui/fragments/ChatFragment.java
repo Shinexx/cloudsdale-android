@@ -46,12 +46,6 @@ public class ChatFragment extends SherlockFragment {
 	}
 
 	@Override
-	public void onStart() {
-		attachViews();
-		super.onStart();
-	}
-
-	@Override
 	public void onResume() {
 		attachViews();
 		super.onResume();
