@@ -1,18 +1,17 @@
 package org.cloudsdale.android.managers;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.content.Context;
-import android.os.AsyncTask;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.queries.CloudGetQuery;
 import org.cloudsdale.android.models.queries.UserGetQuery;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
+import java.util.Arrays;
 
 /**
  * Manager class designed to store and retrieve Cloudsdale users.
@@ -35,10 +34,16 @@ public class UserManager {
 	 * @return The user that's logged in
 	 */
 	public static User getLoggedInUser() {
-		Account userAccount = UserAccountManager.getAccount();
-		AccountManager am = AccountManager.get(Cloudsdale.getContext());
-		String id = am.getUserData(userAccount, UserAccountManager.KEY_ID);
-		return getUserById(id);
+		String id = Cloudsdale
+				.getContext()
+				.getSharedPreferences(UserAccountManager.PREFERENCES_NAME,
+						Context.MODE_PRIVATE)
+				.getString(UserAccountManager.KEY_ID, "");
+		User user = getUserById(id);
+		if (user.getClouds() == null || user.getClouds().isEmpty()) {
+			getCloudsForUser(user);
+		}
+		return user;
 	}
 
 	/**
@@ -52,16 +57,10 @@ public class UserManager {
 		if (mStoredUsers != null && !mStoredUsers.isEmpty()) {
 			ArrayList<User> users;
 			synchronized (mStoredUsers) {
-				if (mStoredUsers != null) {
-					users = new ArrayList<User>(mStoredUsers);
-				} else {
-					users = null;
-				}
+				users = new ArrayList<User>(mStoredUsers);
 			}
-			if (users != null && !users.isEmpty()) {
-				for (User u : users) {
-					if (u.getId().equals(id)) { return u; }
-				}
+			for (User u : users) {
+				if (u.getId().equals(id)) { return u; }
 			}
 			return null;
 		} else {
@@ -70,18 +69,54 @@ public class UserManager {
 			String url = appContext.getString(R.string.cloudsdale_api_base)
 					+ appContext.getString(R.string.cloudsdale_user_endpoint,
 							id);
-			String authToken = appContext
-					.getString(R.string.cloudsdale_auth_token);
 
 			// Build and execute the query
 			UserGetQuery query = new UserGetQuery(url);
-			query.addHeader("X-AUTH-TOKEN", authToken);
 			try {
-				return query.execute(null, null);
+				User user = query.execute(null, null);
+				mStoredUsers.add(user);
+				return user;
 			} catch (QueryException e) {
 				return null;
 			}
 		}
+	}
+
+	/**
+	 * Gets the clouds for a user from the API
+	 * 
+	 * @param user
+	 *            The user to fetch clouds for
+	 */
+	public static void getCloudsForUser(User user) {
+		Context appContext = Cloudsdale.getContext();
+		String url = appContext.getString(R.string.cloudsdale_api_base)
+				+ appContext.getString(
+						R.string.cloudsdale_user_clouds_endpoint, user.getId());
+		CloudGetQuery query = new CloudGetQuery(url);
+		try {
+			ArrayList<Cloud> clouds = new ArrayList<Cloud>(Arrays.asList(query
+					.executeForCollection(null, null)));
+			user.setClouds(clouds);
+		} catch (QueryException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Get a cloud from a user by ID
+	 * 
+	 * @param user
+	 *            The user to get the cloud from
+	 * @param id
+	 *            The ID of the cloud to get
+	 * @return The cloud if the user is a member of it, null otherwise
+	 */
+	public static Cloud getCloudFromUser(User user, String id) {
+		for (Cloud c : user.getClouds()) {
+			if (c.getId().equals(id)) { return c; }
+		}
+		return null;
 	}
 
 	/**

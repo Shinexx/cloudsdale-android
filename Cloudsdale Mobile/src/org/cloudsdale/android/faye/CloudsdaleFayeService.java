@@ -46,7 +46,7 @@ import org.cloudsdale.android.ui.HomeActivity;
 public class CloudsdaleFayeService extends FayeService implements IFayeCallback {
 
 	// Data objects
-	protected CloudsdaleFayeClient	mFayeClient;
+	protected CloudsdaleFayeClient	mFaye;
 	protected CloudsdaleFayeBinder	mFayeBinder;
 	protected PendingIntent			mPendingIntent;
 
@@ -93,11 +93,11 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 				+ FayeService.INITIAL_CHANNEL;
 
 		// Create the client
-		mFayeClient = new CloudsdaleFayeClient(fayeUrl);
-		mFayeClient.setCallbacks(this);
+		mFaye = new CloudsdaleFayeClient(fayeUrl);
+		mFaye.setCallbacks(this);
 
 		// Create the binder
-		mFayeBinder = new CloudsdaleFayeBinder(this, this.mFayeClient);
+		mFayeBinder = new CloudsdaleFayeBinder(this, this.mFaye);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 	 */
 	@Override
 	public void startFaye() {
-		mFayeClient.connect();
+		mFaye.connect();
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 	 */
 	@Override
 	public void stopFaye() {
-		mFayeClient.disconnect();
+		mFaye.disconnect();
 	}
 
 	@Override
@@ -151,4 +151,6 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 		note.flags |= Notification.FLAG_NO_CLEAR;
 		return note;
 	}
+	
+	
 }

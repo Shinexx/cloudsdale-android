@@ -1,5 +1,6 @@
 package org.cloudsdale.android.models.queries;
 
+import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Message;
@@ -30,7 +32,9 @@ public class MessagePostQuery extends PostQuery {
     @Override
     public Message execute(QueryData data, Context context)
             throws QueryException {
-    	addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser().getAuthToken());
+    	AccountManager am = AccountManager.get(Cloudsdale.getContext());
+		addHeader("X-AUTH-TOKEN",
+				am.getPassword(UserAccountManager.getAccount()));
     	
         try {
             mHttpPost.setEntity(new StringEntity(data.getJson()));

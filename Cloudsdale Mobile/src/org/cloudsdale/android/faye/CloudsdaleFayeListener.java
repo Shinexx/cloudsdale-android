@@ -20,11 +20,9 @@
 
 package org.cloudsdale.android.faye;
 
-import com.b3rwynmobile.fayeclient.FayeListener;
-
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 
-public interface CloudsdaleFayeListener extends FayeListener {
+public interface CloudsdaleFayeListener {
 
     /**
      * Method to handle logic when the client connects to the server

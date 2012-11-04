@@ -1,5 +1,6 @@
 package org.cloudsdale.android.models.queries;
 
+import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import com.google.gson.Gson;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Cloud;
@@ -34,7 +36,7 @@ public class CloudGetQuery extends GetQuery {
     @Override
     public Cloud[] executeForCollection(QueryData data, Context context)
             throws QueryException {
-    	addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser().getAuthToken());
+    	
 
         // Query the API
         try {
@@ -46,7 +48,7 @@ public class CloudGetQuery extends GetQuery {
             mJsonString = stripHtml(mJsonString);
 
             // Deserialize
-            Gson gson = new Gson();
+            Gson gson = Cloudsdale.getJsonDeserializer();
             if (mJsonString != null) {
                 if (Cloudsdale.DEBUG) {
                     Log.d(TAG, mJsonString);
@@ -75,7 +77,9 @@ public class CloudGetQuery extends GetQuery {
     @Override
     public Cloud execute(QueryData data, Context context)
             throws QueryException {
-    	addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser().getAuthToken());
+    	AccountManager am = AccountManager.get(Cloudsdale.getContext());
+		addHeader("X-AUTH-TOKEN",
+				am.getPassword(UserAccountManager.getAccount()));
     	
         // Query the API
         try {
@@ -87,7 +91,7 @@ public class CloudGetQuery extends GetQuery {
             mJsonString = stripHtml(mJsonString);
 
             // Deserialize
-            Gson gson = new Gson();
+            Gson gson = Cloudsdale.getJsonDeserializer();
             if (mJsonString != null) {
                 Log.d(TAG, mJsonString);
                 ApiCloudResponse response = gson.fromJson(mJsonString,

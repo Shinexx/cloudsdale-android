@@ -47,7 +47,7 @@ public class ChatMessageGetQuery extends GetQuery {
                 Log.d("ChatMessageGetQuery", mJsonString);
             }
 
-            Gson gson = new Gson();
+            Gson gson = Cloudsdale.getJsonDeserializer();
             if (mJsonString != null) {
                 ApiMessageArrayResponse resp = gson.fromJson(mJsonString,
                         ApiMessageArrayResponse.class);

@@ -20,9 +20,9 @@
 
 package org.cloudsdale.android.faye;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
-import com.b3rwynmobile.fayeclient.FayeClient;
 import com.google.gson.Gson;
 
 import de.tavendo.autobahn.WebSocketConnection;
@@ -35,6 +35,8 @@ import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class handles interactions with the Faye server, such as connecting,
@@ -42,191 +44,430 @@ import java.text.MessageFormat;
  * 
  * @author Jamison Greeley (atomicrat552@gmail.com)
  */
-public class CloudsdaleFayeClient extends FayeClient {
+public class CloudsdaleFayeClient {
 
-    protected CloudsdaleFayeListener mFayeListener;
-    protected IFayeCallback          callback;
+	// Cloudsdale.DEBUG tag
+	protected static final String		TAG					= "Faye Client";
 
-    /**
-     * Simplified constructor
-     * 
-     * @param fayeUrl
-     *            Url of the Faye server
-     * @param mAuthToken
-     *            Token for Faye authentication
-     */
-    public CloudsdaleFayeClient(String fayeUrl) {
-        super(fayeUrl, "");
-    }
+	// Channel constants
+	protected static final String		HANDSHAKE_CHANNEL	= "/meta/handshake";
+	protected static final String		CONNECT_CHANNEL		= "/meta/connect";
+	protected static final String		DISCONNECT_CHANNEL	= "/meta/disconnect";
+	protected static final String		SUBSCRIBE_CHANNEL	= "/meta/subscribe";
+	protected static final String		UNSUBSCRIBE_CHANNEL	= "/meta/unsubscribe";
 
-    /**
-     * Simplified constructor
-     * 
-     * @param fayeUrl
-     *            Url of they Faye server
-     * @param mAuthToken
-     *            Token for Faye authentication
-     * @param channel
-     *            Channel to subscribe to after handshake
-     */
-    public CloudsdaleFayeClient(String fayeUrl, String channel) {
-        super(fayeUrl, channel, "");
-    }
+	// Data objects
+	protected WebSocketConnection		mWebSocket;
+	protected CloudsdaleFayeListener	mFayeListener;
+	protected IFayeCallback				callback;
 
-    /**
-     * Full constructor
-     * 
-     * @param fayeUrl
-     *            Url of they Faye server
-     * @param authToken
-     *            Token for Faye authentication
-     * @param channel
-     *            Channel to subscribe to after handshake
-     * @param authToken
-     *            Auth token for authenticated Faye hosts
-     */
-    public CloudsdaleFayeClient(String fayeUrl, String channel, String authToken) {
-        super(fayeUrl, channel, authToken);
-    }
+	// Connection fields
+	protected String					mFayeUrl;
+	protected String					mAuthToken;
+	protected List<String>				mActiveSubchannels;
+	protected String					mClientId;
 
-    protected void openSocketConnection() {
-        WebSocketOptions options = new WebSocketOptions();
-        options.setReceiveTextMessagesRaw(true);
-        mWebSocket = new WebSocketConnection();
-        try {
-            callback.connecting();
-            mWebSocket.connect(mFayeUrl, new WebSocketHandler() {
+	// Status fields
+	protected boolean					mFayeConnected;
+	protected boolean					mDisconnectExpected;
 
-                public void onBinaryMessage(byte[] payload) {
-                    onTextMessage(new String(payload));
-                }
+	/**
+	 * Simplified constructor
+	 * 
+	 * @param fayeUrl
+	 *            Url of the Faye server
+	 * @param mAuthToken
+	 *            Token for Faye authentication
+	 */
+	public CloudsdaleFayeClient(String fayeUrl) {
+		this(fayeUrl, "");
+	}
 
-                public void onClose(int code, String reason) {
-                    processClose(code);
-                }
+	/**
+	 * Simplified constructor
+	 * 
+	 * @param fayeUrl
+	 *            Url of they Faye server
+	 * @param mAuthToken
+	 *            Token for Faye authentication
+	 * @param channel
+	 *            Channel to subscribe to after handshake
+	 */
+	public CloudsdaleFayeClient(String fayeUrl, String channel) {
+		this(fayeUrl, channel, "");
+	}
 
-                public void onOpen() {
-                    String handshakeString = "{\"supportedConnectionTypes\":[\"websocket\"],\"minimumVersion\":\"1.0beta\",\"version\":\"1.0\",\"channel\":\""
-                            + CloudsdaleFayeClient.HANDSHAKE_CHANNEL + "\"}";
-                    try {
-                        mWebSocket.sendBinaryMessage(handshakeString
-                                .getBytes("UTF-8"));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
+	/**
+	 * Full constructor
+	 * 
+	 * @param fayeUrl
+	 *            Url of they Faye server
+	 * @param authToken
+	 *            Token for Faye authentication
+	 * @param channel
+	 *            Channel to subscribe to after handshake
+	 * @param authToken
+	 *            Auth token for authenticated Faye hosts
+	 */
+	public CloudsdaleFayeClient(String fayeUrl, String channel, String authToken) {
+		this.mFayeUrl = fayeUrl;
+		this.mActiveSubchannels = new ArrayList<String>();
+		this.mFayeConnected = false;
+		this.mDisconnectExpected = false;
+		this.mAuthToken = authToken;
 
-                public void onRawTextMessage(byte[] payload) {
-                    onTextMessage(new String(payload));
-                }
+		// Add any non-blank channel
+		if (!channel.equals("")) {
+			this.mActiveSubchannels.add(channel);
+		}
+	}
 
-                public void onTextMessage(String payload) {
-                    if (Cloudsdale.DEBUG) {
-                        Log.d(CloudsdaleFayeClient.TAG,
-                                "Text message payload: " + payload);
-                    }
-                    Gson gson = new Gson();
-                    CloudsdaleFayeMessage[] messages = gson.fromJson(payload,
-                            CloudsdaleFayeMessage[].class);
-                    for (CloudsdaleFayeMessage message : messages) {
-                        String channel = message.getChannel();
-                        processTextMessage(message, channel);
-                    }
-                }
-            }, options);
-            if (DEBUG) {
-                Log.d(CloudsdaleFayeClient.TAG,
-                        "Service is opening the web socket");
-            }
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-        }
-    }
+	/**
+	 * Whether or not the client disconnection is expected
+	 * 
+	 * @return The status of whether disconnect was expected
+	 */
+	public boolean isDisconnectExpected() {
+		return this.mDisconnectExpected;
+	}
 
-    private void processTextMessage(CloudsdaleFayeMessage message,
-            String channel) {
-        if (channel.equals(CloudsdaleFayeClient.HANDSHAKE_CHANNEL)) {
-            if (message.isSuccessful()) {
-                mClientId = message.getClientId();
-                openFayeConnection();
-            } else {
-                if (DEBUG) {
-                    Log.e(CloudsdaleFayeClient.TAG, "Faye failed to handshake");
-                }
-            }
-        } else if (channel.equals(CloudsdaleFayeClient.CONNECT_CHANNEL)) {
-            if (message.isSuccessful()) {
-                mFayeConnected = true;
-                mFayeListener.connectedToServer(this);
-                callback.connected();
-                scheduleHeartbeat(message.getAdvice().getInterval());
-                if (DEBUG) {
-                    Log.d(TAG, "Faye connected");
-                }
-            } else {
-                mFayeConnected = false;
-                if (DEBUG) {
-                    Log.e(CloudsdaleFayeClient.TAG, "Faye failed to connect");
-                }
-            }
-        } else if (channel.equals(CloudsdaleFayeClient.DISCONNECT_CHANNEL)) {
-            if (message.isSuccessful()) {
-                mFayeConnected = false;
-                callback.disconnected();
-                mFayeListener.disconnectedFromServer(this);
-                closeSocketConnection();
-            } else {
-                mFayeConnected = true;
-                if (DEBUG) {
-                    Log.e(CloudsdaleFayeClient.TAG, "Faye failed to disconnect");
-                }
-            }
-        } else if (channel.equals(CloudsdaleFayeClient.SUBSCRIBE_CHANNEL)) {
-            if (message.isSuccessful()) {
-                if (DEBUG) {
-                    Log.i(CloudsdaleFayeClient.TAG,
-                            "Faye subscribed to channel"
-                                    + message.getSubscription());
-                }
-                mActiveSubchannels.add(message.getSubscription());
-            } else {
-                if (DEBUG) {
-                    Log.e(CloudsdaleFayeClient.TAG,
-                            MessageFormat
-                                    .format("Faye failed to connect to channel {0} with error {1}",
-                                            message.getSubscription(),
-                                            message.getError()));
-                }
-                // TODO Handle failed subscribe
-            }
-        } else if (channel.equals(CloudsdaleFayeClient.UNSUBSCRIBE_CHANNEL)) {
-            if (DEBUG) {
-                Log.i(CloudsdaleFayeClient.TAG,
-                        "Faye unsubscribed from channel "
-                                + message.getSubscription());
-            }
-        } else if (this.mActiveSubchannels.contains(channel)) {
-            mFayeListener.messageReceived(this, message);
-        } else {
-            if (DEBUG) {
-                Log.e(CloudsdaleFayeClient.TAG,
-                        "Faye recieved a message with no subscription for channel "
-                                + message.getSubscription());
-            }
-        }
-    }
+	/**
+	 * Whether or not the client has a connection to the push server
+	 * 
+	 * @return The status of the push server connection
+	 */
+	public boolean isFayeConnected() {
+		return this.mFayeConnected;
+	}
 
-    /**
-     * Sets the FayeListener attached to the client
-     * 
-     * @param mFayeListener
-     *            The FayeListener to attach to the client
-     */
-    public void setFayeListener(CloudsdaleFayeListener fayeListener) {
-        this.mFayeListener = fayeListener;
-    }
+	/**
+	 * Whether or not the client has a websocket connection to the push server
+	 * 
+	 * @return The status of the websocket connection
+	 */
+	public boolean isSocketConnected() {
+		return this.mWebSocket.isConnected();
+	}
 
-    public void setCallbacks(IFayeCallback callback) {
-        this.callback = callback;
-    }
+	protected void openFayeConnection() {
+		String connectString = "{\"channel\":\""
+				+ CloudsdaleFayeClient.CONNECT_CHANNEL + "\",\"clientId\":\""
+				+ this.mClientId + "\",\"connectionType\":\"websocket\"}";
+		try {
+			mWebSocket.sendBinaryMessage(connectString.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected void closeFayeConnection() {
+		if (this.mClientId == null) { return; }
+
+		String disconnectString = "{\"channel\":\""
+				+ CloudsdaleFayeClient.DISCONNECT_CHANNEL
+				+ "\",\"clientID\":\"" + this.mClientId + "\"}";
+		if (Cloudsdale.DEBUG) {
+			Log.d(CloudsdaleFayeClient.TAG, "Disconnect: " + disconnectString);
+		}
+		this.mWebSocket.sendTextMessage(disconnectString);
+		this.mClientId = null;
+	}
+
+	protected void openSocketConnection() {
+		WebSocketOptions options = new WebSocketOptions();
+		options.setReceiveTextMessagesRaw(true);
+		mWebSocket = new WebSocketConnection();
+		try {
+			callback.connecting();
+			mWebSocket.connect(mFayeUrl, new WebSocketHandler() {
+
+				public void onBinaryMessage(byte[] payload) {
+					onTextMessage(new String(payload));
+				}
+
+				public void onClose(int code, String reason) {
+					processClose(code);
+				}
+
+				public void onOpen() {
+					String handshakeString = "{\"supportedConnectionTypes\":[\"websocket\"],\"minimumVersion\":\"1.0beta\",\"version\":\"1.0\",\"channel\":\""
+							+ CloudsdaleFayeClient.HANDSHAKE_CHANNEL + "\"}";
+					try {
+						mWebSocket.sendBinaryMessage(handshakeString
+								.getBytes("UTF-8"));
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+				}
+
+				public void onRawTextMessage(byte[] payload) {
+					onTextMessage(new String(payload));
+				}
+
+				public void onTextMessage(String payload) {
+					if (Cloudsdale.DEBUG) {
+						Log.d(CloudsdaleFayeClient.TAG,
+								"Text message payload: " + payload);
+					}
+					Gson gson = Cloudsdale.getJsonDeserializer();
+					CloudsdaleFayeMessage[] messages = gson.fromJson(payload,
+							CloudsdaleFayeMessage[].class);
+					for (CloudsdaleFayeMessage message : messages) {
+						processTextMessage(message);
+					}
+				}
+			}, options);
+			if (Cloudsdale.DEBUG) {
+				Log.d(CloudsdaleFayeClient.TAG,
+						"Service is opening the web socket");
+			}
+		} catch (WebSocketException e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected void closeSocketConnection() {
+		if (this.mWebSocket != null) {
+			if (this.mWebSocket.isConnected()) {
+				this.mWebSocket.disconnect();
+			}
+			this.mWebSocket = null;
+		}
+	}
+
+	private void processTextMessage(CloudsdaleFayeMessage message) {
+		new ProcessMessageTask().execute(message);
+	}
+
+	protected void processClose(int code) {
+		switch (code) {
+			case WebSocketHandler.CLOSE_INTERNAL_ERROR:
+				CloudsdaleFayeClient.this.mWebSocket = new WebSocketConnection();
+				connect();
+				break;
+			case WebSocketHandler.CLOSE_PROTOCOL_ERROR:
+			case WebSocketHandler.CLOSE_CANNOT_CONNECT:
+			case WebSocketHandler.CLOSE_CONNECTION_LOST:
+				while (!CloudsdaleFayeClient.this.mWebSocket.isConnected()) {
+					try {
+						connect();
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			case WebSocketHandler.CLOSE_NORMAL:
+				break;
+		}
+	}
+
+	/**
+	 * Sets the FayeListener attached to the client
+	 * 
+	 * @param mFayeListener
+	 *            The FayeListener to attach to the client
+	 */
+	public void setFayeListener(CloudsdaleFayeListener fayeListener) {
+		this.mFayeListener = fayeListener;
+	}
+
+	public void setCallbacks(IFayeCallback callback) {
+		this.callback = callback;
+	}
+
+	/**
+	 * Disconnects the socket if needed, build and connect the socket, then
+	 * handshake
+	 */
+	public void connect() {
+		this.mDisconnectExpected = false;
+		openSocketConnection();
+	}
+
+	/**
+	 * Disconnects Faye and the socket gracefully
+	 */
+	public void disconnect() {
+		this.mDisconnectExpected = true;
+		closeFayeConnection();
+		closeSocketConnection();
+	}
+
+	protected void scheduleHeartbeat(int interval) {
+		openFayeConnection();
+	}
+
+	/**
+	 * Subscribes the push client to a channel on the push server
+	 * 
+	 * @param channel
+	 *            The channel to subscribe to
+	 */
+	public void subscribe(String channel) {
+		String subscribe = "{\"clientId\":\""
+				+ this.mClientId
+				+ "\",\"subscription\":\""
+				+ channel
+				+ "\",\"channel\":\"/meta/subscribe\",\"ext\":{\"authToken\":\""
+				+ this.mAuthToken + "\"}}";
+		if (Cloudsdale.DEBUG) {
+			Log.d(CloudsdaleFayeClient.TAG,
+					"Faye is attempting to subscribe to channel \"" + channel
+							+ "\"");
+		}
+		try {
+			this.mWebSocket.sendBinaryMessage(subscribe.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Unsubscribes the push client from a channel on the push server
+	 * 
+	 * @param channel
+	 *            The channel to unsubscribe to
+	 */
+	public void unsubscribe(String channel) {
+		String unsubscribe = "{\"clientId\":\"" + this.mClientId
+				+ "\",\"subscription\":\"" + channel
+				+ "\",\"channel\":\"/meta/unsubscribe\"}";
+		if (Cloudsdale.DEBUG) {
+			Log.d(CloudsdaleFayeClient.TAG,
+					"Faye is attempting to unsubscribe from channel \""
+							+ channel + "\"");
+		}
+		try {
+			this.mWebSocket.sendBinaryMessage(unsubscribe.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sends a text message to the Faye server
+	 * 
+	 * @param message
+	 *            The string message to send to the server
+	 */
+	public void sendTextMessage(String message) {
+		if (isFayeConnected()) {
+			mWebSocket.sendTextMessage(message);
+		}
+	}
+
+	/**
+	 * Sends a text message as UTF-8 encoded binary to the Faye server
+	 * 
+	 * @param message
+	 *            The string message to send to the server
+	 */
+	public void sendRawTextMessage(String message) {
+		if (isFayeConnected()) {
+			try {
+				mWebSocket.sendRawTextMessage(message.getBytes("UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Sends a binary payload to the Faye server
+	 * 
+	 * @param payload
+	 *            The binary byte[] payload to send to the server
+	 */
+	public void sendBinaryMessage(byte[] payload) {
+		if (isFayeConnected()) {
+			mWebSocket.sendBinaryMessage(payload);
+		}
+	}
+
+	class ProcessMessageTask extends
+			AsyncTask<CloudsdaleFayeMessage, Void, Void> {
+
+		@Override
+		protected Void doInBackground(CloudsdaleFayeMessage... params) {
+			CloudsdaleFayeMessage message = params[0];
+			String channel = params[0].getChannel();
+			if (channel.equals(CloudsdaleFayeClient.HANDSHAKE_CHANNEL)) {
+				if (message.isSuccessful()) {
+					mClientId = message.getClientId();
+					openFayeConnection();
+				} else {
+					if (Cloudsdale.DEBUG) {
+						Log.e(CloudsdaleFayeClient.TAG,
+								"Faye failed to handshake");
+					}
+				}
+			} else if (channel.equals(CloudsdaleFayeClient.CONNECT_CHANNEL)) {
+				if (message.isSuccessful()) {
+					mFayeConnected = true;
+					mFayeListener.connectedToServer(CloudsdaleFayeClient.this);
+					callback.connected();
+					scheduleHeartbeat(message.getAdvice().getInterval());
+					if (Cloudsdale.DEBUG) {
+						Log.d(TAG, "Faye connected");
+					}
+				} else {
+					mFayeConnected = false;
+					if (Cloudsdale.DEBUG) {
+						Log.e(CloudsdaleFayeClient.TAG,
+								"Faye failed to connect");
+					}
+				}
+			} else if (channel.equals(CloudsdaleFayeClient.DISCONNECT_CHANNEL)) {
+				if (message.isSuccessful()) {
+					mFayeConnected = false;
+					callback.disconnected();
+					mFayeListener
+							.disconnectedFromServer(CloudsdaleFayeClient.this);
+					closeSocketConnection();
+				} else {
+					mFayeConnected = true;
+					if (Cloudsdale.DEBUG) {
+						Log.e(CloudsdaleFayeClient.TAG,
+								"Faye failed to disconnect");
+					}
+				}
+			} else if (channel.equals(CloudsdaleFayeClient.SUBSCRIBE_CHANNEL)) {
+				if (message.isSuccessful()) {
+					if (Cloudsdale.DEBUG) {
+						Log.i(CloudsdaleFayeClient.TAG,
+								"Faye subscribed to channel"
+										+ message.getSubscription());
+					}
+					mActiveSubchannels.add(message.getSubscription());
+				} else {
+					if (Cloudsdale.DEBUG) {
+						Log.e(CloudsdaleFayeClient.TAG,
+								MessageFormat
+										.format("Faye failed to connect to channel {0} with error {1}",
+												message.getSubscription(),
+												message.getError()));
+					}
+					// TODO Handle failed subscribe
+				}
+			} else if (channel.equals(CloudsdaleFayeClient.UNSUBSCRIBE_CHANNEL)) {
+				if (Cloudsdale.DEBUG) {
+					Log.i(CloudsdaleFayeClient.TAG,
+							"Faye unsubscribed from channel "
+									+ message.getSubscription());
+				}
+			} else if (mActiveSubchannels.contains(channel)) {
+				mFayeListener.messageReceived(CloudsdaleFayeClient.this,
+						message);
+			} else {
+				if (Cloudsdale.DEBUG) {
+					Log.e(CloudsdaleFayeClient.TAG,
+							"Faye recieved a message with no subscription for channel "
+									+ message.getSubscription());
+				}
+			}
+			return null;
+		}
+
+	}
 }

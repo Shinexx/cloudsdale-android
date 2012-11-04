@@ -3,6 +3,7 @@ package org.cloudsdale.android.managers;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import org.cloudsdale.android.Cloudsdale;
@@ -18,7 +19,8 @@ import org.cloudsdale.android.models.LoggedUser;
  */
 public class UserAccountManager {
 
-	public static final String	KEY_ID	= "id";
+	public static final String	KEY_ID				= "id";
+	public static final String	PREFERENCES_NAME	= "LoggedUserPrefs";
 
 	private static Account		sUserAccount;
 
@@ -34,12 +36,16 @@ public class UserAccountManager {
 		Account account = new Account(user.getName(),
 				appContext.getString(R.string.account_type));
 		final Bundle extras = new Bundle();
-		extras.putString(KEY_ID, user.getId());
 		AccountManager am = AccountManager.get(appContext);
 		boolean accountCreated = am.addAccountExplicitly(account,
 				user.getAuthToken(), extras);
 		if (accountCreated) {
 			sUserAccount = account;
+			SharedPreferences prefs = appContext.getSharedPreferences(
+					PREFERENCES_NAME, Context.MODE_PRIVATE);
+			SharedPreferences.Editor prefsEdit = prefs.edit();
+			prefsEdit.putString(KEY_ID, user.getId());
+			prefsEdit.commit();
 		}
 		return accountCreated;
 	}

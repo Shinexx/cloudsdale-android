@@ -40,6 +40,7 @@ import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.ui.CloudActivity;
 import org.cloudsdale.android.ui.HomeActivity;
+import org.cloudsdale.android.ui.StaticNavigation;
 import org.cloudsdale.android.ui.adapters.CloudsAdapter;
 
 import java.util.ArrayList;
@@ -87,6 +88,12 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		sMessageHandlerList = new ArrayList<FayeMessageHandler>();
 		sAppObject = this;
 		sFayeConnected = false;
+	}
+
+	@Override
+	public void onCreate() {
+		bindFaye();
+		super.onCreate();
 	}
 
 	public static boolean isFayeConnected() {
@@ -153,8 +160,8 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		sSlideMenuContextTemp = context;
 
 		// View settings
-		slidingMenu.showAbove();
 		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
+		slidingMenu.setFadeEnabled(true);
 
 		// Get all the layout items
 		LayoutInflater inflater = (LayoutInflater) context
@@ -240,10 +247,14 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		if (Cloudsdale.DEBUG) {
 			Log.d(TAG, "Starting cloud subscriptions");
 		}
-		for (Cloud c : me.getClouds()) {
-			sFayeBinder.getFayeClient().subscribe(
-					"/clouds/" + c.getId() + "/chat/messages");
-		}
+		new Thread() {
+			public void run() {
+				for (Cloud c : me.getClouds()) {
+					sFayeBinder.getFayeClient().subscribe(
+							"/clouds/" + c.getId() + "/chat/messages");
+				}
+			};
+		}.start();
 	}
 
 	public static void subscribeToMessages(FayeMessageHandler handler) {
@@ -283,11 +294,11 @@ public class Cloudsdale extends Application implements ServiceConnection,
 
 	@Override
 	public void connectedToServer(CloudsdaleFayeClient faye) {
+		sFayeConnected = true;
 		if (sFirstConnection) {
 			subscribeToClouds();
 			sFirstConnection = false;
 		}
-		sFayeConnected = true;
 	}
 
 	@Override
@@ -303,21 +314,6 @@ public class Cloudsdale extends Application implements ServiceConnection,
 				handler.handleMessage(msg);
 			}
 		}
-	}
-
-	@Override
-	public void connectedToServer(FayeClient faye) {
-		// STUB because we're using the child class in this case
-	}
-
-	@Override
-	public void disconnectedFromServer(FayeClient faye) {
-		// STUB because we're using the child class in this case
-	}
-
-	@Override
-	public void messageReceived(FayeClient faye, FayeMessage message) {
-		// STUB because we're using the child class in this case
 	}
 
 	static class SlideMenuFillTask extends AsyncTask<View, Void, User> {

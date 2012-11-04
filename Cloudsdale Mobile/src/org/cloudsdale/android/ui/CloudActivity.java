@@ -23,7 +23,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.faye.FayeMessageHandler;
-import org.cloudsdale.android.managers.CloudManager;
+import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.Drop;
@@ -194,7 +194,8 @@ public class CloudActivity extends SlidingFragmentActivity implements
 	private void GetShowingCloud() {
 		Intent intent = getIntent();
 		mCloudShowingId = intent.getExtras().getString("cloudId");
-		mCloudShowing = CloudManager.getCloudById(mCloudShowingId);
+		mCloudShowing = UserManager.getCloudFromUser(
+				UserManager.getLoggedInUser(), mCloudShowingId);
 		Cloudsdale.setShowingCloud(mCloudShowingId);
 		getSherlock().setTitle(mCloudShowing.getName());
 	}
@@ -220,16 +221,22 @@ public class CloudActivity extends SlidingFragmentActivity implements
 	}
 
 	@Override
-	public void handleMessage(CloudsdaleFayeMessage message) {
+	public void handleMessage(final CloudsdaleFayeMessage message) {
 		String channel = message.getChannel().substring(1).split("/")[1];
 		if (channel.equals(mCloudShowingId)) {
-			mChatFrag.addMessage(message.getData());
-			if (message.getData().getDrops() != null
-					&& message.getData().getDrops().length > 0) {
-				for (Drop drop : message.getData().getDrops()) {
-					mDropFrag.addDrop(drop);
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					mChatFrag.addMessage(message.getData());
+					if (message.getData().getDrops() != null
+							&& message.getData().getDrops().length > 0) {
+						for (Drop drop : message.getData().getDrops()) {
+							mDropFrag.addDrop(drop);
+						}
+					}
 				}
-			}
+			});
 		}
 	}
 

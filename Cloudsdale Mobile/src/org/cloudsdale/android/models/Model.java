@@ -24,5 +24,10 @@ public class Model {
 			return null;
 		}
 	}
+	
+	protected String convertCalendar(Calendar date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/dd/MM HH:mm:ss Z");
+		return sdf.format(date);
+	}
 
 }

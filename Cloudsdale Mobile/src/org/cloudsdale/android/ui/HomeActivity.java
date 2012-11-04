@@ -1,6 +1,11 @@
 package org.cloudsdale.android.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.WazaBe.HoloEverywhere.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
@@ -45,11 +51,15 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 	private TextView			mDateRegisteredView;
 	private TextView			mCloudCountView;
 	private SlidingMenu			mSlidingMenu;
+	private Activity			mActivityContext;
+	private boolean				mAccountLoaded;
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mActivityContext = this;
+		mAccountLoaded = false;
 
 		// Set the layouts
 		setContentView(R.layout.activity_home);
@@ -58,7 +68,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		// Get the view objects
 		getViews();
 		mSlidingMenu = getSlidingMenu();
-//		Cloudsdale.prepareSlideMenu(mSlidingMenu, this);
+		mSlidingMenu.setSlidingEnabled(false);
 
 		// Customize actionbar
 		ActionBar actionbar = getSupportActionBar();
@@ -96,7 +106,14 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 				if (mSlidingMenu.isBehindShowing()) {
 					mSlidingMenu.showAbove();
 				} else {
-					mSlidingMenu.showBehind();
+					if (mAccountLoaded) {
+						mSlidingMenu.showBehind();
+					} else {
+						Toast.makeText(
+								this,
+								"Please wait for your account to finish loading",
+								Toast.LENGTH_LONG).show();
+					}
 				}
 				return true;
 			default:
@@ -153,6 +170,44 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		return text;
 	}
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+	private void showProgress(final boolean show) {
+		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+		// for very easy animations. If available, use these APIs to fade-in
+		// the progress spinner.
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+			int shortAnimTime = getResources().getInteger(
+					android.R.integer.config_shortAnimTime);
+
+			mLoadingView.setVisibility(View.VISIBLE);
+			mLoadingView.animate().setDuration(shortAnimTime)
+					.alpha(show ? 1 : 0)
+					.setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+							mLoadingView.setVisibility(show ? View.VISIBLE
+									: View.GONE);
+						}
+					});
+
+			mContentView.setVisibility(View.VISIBLE);
+			mContentView.animate().setDuration(shortAnimTime)
+					.alpha(show ? 0 : 1)
+					.setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+							mContentView.setVisibility(show ? View.GONE
+									: View.VISIBLE);
+						}
+					});
+		} else {
+			// The ViewPropertyAnimator APIs are not available, so simply show
+			// and hide the relevant UI components.
+			mLoadingView.setVisibility(show ? View.VISIBLE : View.GONE);
+			mContentView.setVisibility(show ? View.GONE : View.VISIBLE);
+		}
+	}
+
 	/**
 	 * Handles Cloudsdale messages directed at this activity
 	 */
@@ -191,10 +246,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 				Log.d(TAG, "UserViewFillTask is now filling in the home view");
 			}
 
-			// Switch the visible layout
-			mLoadingView.setVisibility(View.GONE);
-			mContentView.setVisibility(View.VISIBLE);
-
 			// Set the user's avatar in the view
 			UrlImageViewHelper.setUrlDrawable(mAvatarView, result.getAvatar()
 					.getNormal(), R.drawable.unknown_user);
@@ -207,13 +258,18 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 
 			// Format and set the user's join date
 			Date date = result.getMemberSince().getTime();
-			SimpleDateFormat df = new SimpleDateFormat("dd MM, yyyy");
+			SimpleDateFormat df = new SimpleDateFormat("dd MMMM, yyyy");
 			mDateRegisteredView.setText(MessageFormat.format(
 					"You registered on {0}", df.format(date)));
 
 			// Set the user's cloud count
 			mCloudCountView.setText("You are a member of "
 					+ String.valueOf(result.getClouds().size()) + " clouds");
+
+			showProgress(false);
+			Cloudsdale.prepareSlideMenu(mSlidingMenu, mActivityContext);
+			mSlidingMenu.setSlidingEnabled(true);
+			mAccountLoaded = true;
 
 			super.onPostExecute(result);
 		}

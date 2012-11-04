@@ -204,26 +204,6 @@ public class LoginActivity extends SherlockActivity {
 			showProgress(true);
 			CloudsdaleAuthTask auth = new CloudsdaleAuthTask();
 			auth.execute();
-			try {
-				LoggedUser user = auth.get();
-				boolean success = storeAccount(user);
-				if (success) {
-					Intent intent = new Intent();
-					intent.setClass(this, HomeActivity.class);
-					startActivity(intent);
-					finish();
-				} else {
-					Toast.makeText(this,
-							"There was an error logging in, please try again",
-							Toast.LENGTH_SHORT).show();
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -273,6 +253,17 @@ public class LoginActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(LoggedUser result) {
 			showProgress(false);
+			boolean success = storeAccount(result);
+			if (success) {
+				Intent intent = new Intent();
+				intent.setClass(LoginActivity.this, HomeActivity.class);
+				startActivity(intent);
+				finish();
+			} else {
+				Toast.makeText(LoginActivity.this,
+						"There was an error logging in, please try again",
+						Toast.LENGTH_SHORT).show();
+			}
 			super.onPostExecute(result);
 		}
 
