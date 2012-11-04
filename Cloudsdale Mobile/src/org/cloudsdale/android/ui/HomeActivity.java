@@ -75,6 +75,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		actionbar.setDisplayHomeAsUpEnabled(true);
 
 		// Bind the Faye service
+		Cloudsdale.bindFaye();
 		Cloudsdale.subscribeToMessages(this);
 
 		// Set the item listener for the menu

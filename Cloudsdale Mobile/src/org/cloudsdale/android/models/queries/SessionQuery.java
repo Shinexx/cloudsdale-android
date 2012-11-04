@@ -53,7 +53,7 @@ public class SessionQuery extends PostQuery {
 				json.setContentType("application/json");
 				mHttpPost.setEntity(json);
 			} catch (UnsupportedEncodingException e) {
-				BugSenseHandler.log(SessionQuery.TAG, e);
+				BugSenseHandler.sendException(e);
 			}
 		}
 
@@ -85,10 +85,10 @@ public class SessionQuery extends PostQuery {
 			}
 		} catch (ClientProtocolException e) {
 			Log.d(SessionQuery.TAG, "Client Protocol Exception");
-			BugSenseHandler.log(SessionQuery.TAG, e);
+			BugSenseHandler.sendException(e);
 		} catch (IOException e) {
 			Log.d(SessionQuery.TAG, "IO Exception");
-			BugSenseHandler.log(SessionQuery.TAG, e);
+			BugSenseHandler.sendException(e);
 		}
 
 		Log.d(SessionQuery.TAG, "User: "

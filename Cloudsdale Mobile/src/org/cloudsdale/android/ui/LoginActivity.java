@@ -58,9 +58,6 @@ public class LoginActivity extends SherlockActivity {
 
 	@Override
 	protected void onCreate(Bundle icicle) {
-		// Setup BugSense
-		BugSenseHandler.setup(this, "2bccbeb2");
-
 		// Hide the Cloudsdale text and icon in the ActionBar
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setDisplayShowHomeEnabled(false);

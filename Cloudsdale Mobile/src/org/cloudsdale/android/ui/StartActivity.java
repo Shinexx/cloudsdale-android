@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.bugsense.trace.BugSenseHandler;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
@@ -20,6 +21,8 @@ public class StartActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		getSupportActionBar().hide();
 		setContentView(R.layout.activity_start);
+		// Setup BugSense
+		BugSenseHandler.initAndStartSession(this, "2bccbeb2");
 	}
 
 	@Override
@@ -42,11 +45,11 @@ public class StartActivity extends SherlockActivity {
 			startActivity(intent);
 		}
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
 		finish();
 	}
-		
+
 }

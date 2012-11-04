@@ -90,12 +90,6 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		sFayeConnected = false;
 	}
 
-	@Override
-	public void onCreate() {
-		bindFaye();
-		super.onCreate();
-	}
-
 	public static boolean isFayeConnected() {
 		return sFayeConnected;
 	}
@@ -160,7 +154,9 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		sSlideMenuContextTemp = context;
 		
 		// View settings
+		slidingMenu.showAbove();
 		slidingMenu.setFadeEnabled(true);
+//		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
 
 		// Get all the layout items
 		LayoutInflater inflater = (LayoutInflater) context
@@ -242,12 +238,20 @@ public class Cloudsdale extends Application implements ServiceConnection,
 	}
 
 	private static void subscribeToClouds() {
-		final User me = UserManager.getLoggedInUser();
 		if (Cloudsdale.DEBUG) {
 			Log.d(TAG, "Starting cloud subscriptions");
 		}
 		new Thread() {
 			public void run() {
+				User me = null;
+				while(me == null) {
+					try {
+						Thread.sleep(100);
+						me = UserManager.getLoggedInUser();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 				for (Cloud c : me.getClouds()) {
 					sFayeBinder.getFayeClient().subscribe(
 							"/clouds/" + c.getId() + "/chat/messages");

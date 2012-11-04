@@ -29,6 +29,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.app.NotificationCompat.Builder;
 import android.widget.Toast;
 
 import com.b3rwynmobile.fayeclient.FayeService;
@@ -46,9 +48,11 @@ import org.cloudsdale.android.ui.HomeActivity;
 public class CloudsdaleFayeService extends FayeService implements IFayeCallback {
 
 	// Data objects
-	protected CloudsdaleFayeClient	mFaye;
-	protected CloudsdaleFayeBinder	mFayeBinder;
-	protected PendingIntent			mPendingIntent;
+	protected CloudsdaleFayeClient			mFaye;
+	protected CloudsdaleFayeBinder			mFayeBinder;
+	protected PendingIntent					mPendingIntent;
+	protected NotificationManager			mNotificationManager;
+	protected NotificationCompat.Builder	mNotificationBuilder;
 
 	/**
 	 * Default constructor
@@ -118,39 +122,37 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 
 	@Override
 	public void connected() {
-		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification note = makeNotification("Cloudsdale is connected",
-				"Cloudsdale is now connected to the chat server");
-		manager.notify(1337, note);
+		mNotificationBuilder = new Builder(this).setContentTitle(
+				"Cloudsdale is connected").setSmallIcon(R.drawable.color_icon);
+		Intent resultIntent = new Intent(this, HomeActivity.class);
+		mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent, 0);
+		mNotificationBuilder.setContentIntent(mPendingIntent);
+		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.notify(1337,
+				mNotificationBuilder.getNotification());
 	}
 
 	@Override
 	public void disconnected() {
-		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification note = makeNotification("Cloudsdale has disconnected",
-				"Cloudsdale has disconnected from the chat server");
-		manager.notify(1337, note);
+		mNotificationBuilder = new Builder(this).setContentTitle(
+				"Cloudsdale is disconnected").setSmallIcon(
+				R.drawable.color_icon);
+		Intent resultIntent = new Intent(this, HomeActivity.class);
+		mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent, 0);
+		mNotificationBuilder.setContentIntent(mPendingIntent);
+		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.notify(1337,
+				mNotificationBuilder.getNotification());
 	}
 
 	@Override
 	public void connecting() {
-		Notification note = makeNotification("Cloudsdale is connecting",
-				"Cloudsale is currently connecting to the chat server");
-		startForeground(1337, note);
-	}
+		mNotificationBuilder = new Builder(this).setContentTitle(
+				"Cloudsdale is connecting").setSmallIcon(R.drawable.color_icon);
+		Intent resultIntent = new Intent(this, HomeActivity.class);
+		mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent, 0);
+		mNotificationBuilder.setContentIntent(mPendingIntent);
 
-	private Notification makeNotification(String title, String content) {
-		Bitmap icon = BitmapFactory.decodeResource(getApplicationContext()
-				.getResources(), R.drawable.color_icon);
-		Notification note = new NotificationCompat.Builder(
-				getApplicationContext()).setContentTitle(title)
-				.setContentText(content).setSmallIcon(R.drawable.color_icon)
-				.setLargeIcon(icon).getNotification();
-		Intent i = new Intent(this, HomeActivity.class);
-		mPendingIntent = PendingIntent.getActivity(this, 0, i, 0);
-		note.flags |= Notification.FLAG_NO_CLEAR;
-		return note;
+		startForeground(1337, mNotificationBuilder.getNotification());
 	}
-	
-	
 }

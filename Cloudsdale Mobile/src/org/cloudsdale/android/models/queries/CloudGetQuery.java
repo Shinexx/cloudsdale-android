@@ -66,9 +66,9 @@ public class CloudGetQuery extends GetQuery {
                 }
             }
         } catch (ClientProtocolException e) {
-            BugSenseHandler.log(TAG, e);
+            BugSenseHandler.sendException(e);
         } catch (IOException e) {
-            BugSenseHandler.log(TAG, e);
+            BugSenseHandler.sendException(e);
         }
 
         return mResults;
@@ -105,9 +105,9 @@ public class CloudGetQuery extends GetQuery {
                 }
             }
         } catch (ClientProtocolException e) {
-            BugSenseHandler.log(TAG, e);
+            BugSenseHandler.sendException(e);
         } catch (IOException e) {
-            BugSenseHandler.log(TAG, e);
+            BugSenseHandler.sendException(e);
         }
 
         return mResult;
