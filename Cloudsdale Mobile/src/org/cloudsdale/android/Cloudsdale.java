@@ -1,8 +1,7 @@
 package org.cloudsdale.android;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
 import android.content.ComponentName;
@@ -10,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Resources;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.TypedValue;
@@ -33,7 +34,6 @@ import org.cloudsdale.android.faye.CloudsdaleFayeClient;
 import org.cloudsdale.android.faye.CloudsdaleFayeListener;
 import org.cloudsdale.android.faye.CloudsdaleFayeService;
 import org.cloudsdale.android.faye.FayeMessageHandler;
-import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api.Cloud;
@@ -75,6 +75,9 @@ public class Cloudsdale extends Application implements ServiceConnection,
 	// Public data objects
 	private static String							sCloudShowing;
 
+	// Temp objects for slide menu inflation
+	private static Activity							sSlideMenuContextTemp;
+
 	/**
 	 * Dummy constructor to handle creating static classes and fetch the global
 	 * app context
@@ -105,8 +108,7 @@ public class Cloudsdale extends Application implements ServiceConnection,
 	public static Gson getJsonDeserializer() {
 		if (sJsonDeserializer == null) {
 			GsonBuilder builder = new GsonBuilder();
-			sJsonDeserializer = builder.excludeFieldsWithoutExposeAnnotation()
-					.create();
+			sJsonDeserializer = builder.create();
 		}
 		return sJsonDeserializer;
 	}
@@ -148,6 +150,8 @@ public class Cloudsdale extends Application implements ServiceConnection,
 	@SuppressLint("NewApi")
 	public static void prepareSlideMenu(SlidingMenu slidingMenu,
 			Activity context) {
+		sSlideMenuContextTemp = context;
+
 		// View settings
 		slidingMenu.showAbove();
 		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
@@ -159,10 +163,7 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		ListView itemOptions = (ListView) slidingMenu
 				.findViewById(android.R.id.list);
 
-		User me = UserManager.getLoggedInUser();
-		setSlideMenuHeader(head, itemOptions, me);
-		addStaticSlideMenuViews(itemOptions, inflater);
-		itemOptions.setAdapter(new CloudsAdapter(context, me.getClouds()));
+		new SlideMenuFillTask().execute(new View[] { head, itemOptions });
 	}
 
 	private static void setSlideMenuHeader(View head, ListView itemOptions,
@@ -317,5 +318,29 @@ public class Cloudsdale extends Application implements ServiceConnection,
 	@Override
 	public void messageReceived(FayeClient faye, FayeMessage message) {
 		// STUB because we're using the child class in this case
+	}
+
+	static class SlideMenuFillTask extends AsyncTask<View, Void, User> {
+		View		head;
+		ListView	itemOptions;
+
+		@Override
+		protected User doInBackground(View... params) {
+			head = params[0];
+			itemOptions = (ListView) params[1];
+			return UserManager.getLoggedInUser();
+		}
+
+		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+		@Override
+		protected void onPostExecute(User result) {
+			setSlideMenuHeader(head, itemOptions, result);
+			addStaticSlideMenuViews(itemOptions,
+					sSlideMenuContextTemp.getLayoutInflater());
+			itemOptions.setAdapter(new CloudsAdapter(sSlideMenuContextTemp,
+					result.getClouds()));
+
+			super.onPostExecute(result);
+		}
 	}
 }

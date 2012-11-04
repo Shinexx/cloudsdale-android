@@ -1,6 +1,6 @@
 package org.cloudsdale.android.models;
 
-import com.google.gson.annotations.Expose;
+
 
 /**
  * Model class to pass on identity properties to child models
@@ -8,16 +8,15 @@ import com.google.gson.annotations.Expose;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 public class IdentityModel extends Model {
-	
-	@Expose
-	protected String	mId;
+
+	protected String	id;
 
 	public String getId() {
-		return this.mId;
+		return this.id;
 	}
 
 	public void setId(String id) {
-		this.mId = id;
+		this.id = id;
 	}
 
 }

@@ -21,24 +21,26 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.faye.FayeMessageHandler;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
-import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.Role;
-import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
-import org.cloudsdale.android.models.exceptions.QueryException;
-import org.cloudsdale.android.models.queries.CloudGetQuery;
-import org.cloudsdale.android.models.queries.UserGetQuery;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
+/**
+ * Activity loaded on the "home" view.
+ * Copyright (c) 2012 Cloudsdale.org
+ * 
+ * @author Jamison Greeley (atomicrat2552@gmail.com)
+ * 
+ */
 public class HomeActivity extends SlidingActivity implements FayeMessageHandler {
 
 	private static final String		TAG	= "Home Activity";
 
+	private View					mLoadingView;
+	private View					mContentView;
 	private ImageView				mAvatarView;
 	private TextView				mUsernameView;
 	private TextView				mAccountLevelView;
@@ -46,13 +48,11 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 	private TextView				mCloudCountView;
 	private SlidingMenu				mSlidingMenu;
 	private static ProgressDialog	sProgressDialog;
-	private static boolean			sShowDialog;
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		sShowDialog = true;
 
 		// Set the layouts
 		setContentView(R.layout.activity_home);
@@ -85,29 +85,10 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 				});
 	}
 
-	private void showProgressDialog() {
-		sProgressDialog = new ProgressDialog(this);
-		sProgressDialog.setIndeterminate(true);
-		sProgressDialog.setTitle("Cloudsdale is connecting");
-		sProgressDialog.setMessage("Please wait...");
-		sProgressDialog.setCancelable(false);
-		sProgressDialog.show();
-	}
-
-	private void hideProgressDialog() {
-		if (sProgressDialog != null && sProgressDialog.isShowing()) {
-			sProgressDialog.cancel();
-			sShowDialog = false;
-		}
-		sProgressDialog = null;
-	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();
 
-		updateMe();
-		getViews();
 		setViewContent();
 
 		// if (!Cloudsdale.isFayeConnected()) {
@@ -142,53 +123,34 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		return super.onOptionsItemSelected(item);
 	}
 
+	/**
+	 * Fetches and programmatically binds all the different view objects we care
+	 * about
+	 */
 	private void getViews() {
-		if (mAvatarView == null) {
-			mAvatarView = (ImageView) findViewById(R.id.home_user_avatar);
-		}
-
-		if (mUsernameView == null) {
-			mUsernameView = (TextView) findViewById(R.id.home_username_label);
-		}
-
-		if (mAccountLevelView == null) {
-			mAccountLevelView = (TextView) findViewById(R.id.home_account_level_label);
-		}
-
-		if (mDateRegisteredView == null) {
-			mDateRegisteredView = (TextView) findViewById(R.id.home_register_date_label);
-		}
-
-		if (mCloudCountView == null) {
-			mCloudCountView = (TextView) findViewById(R.id.home_cloud_count_label);
-		}
+		mLoadingView = findViewById(R.id.loading_frame);
+		mContentView = findViewById(R.id.main_content);
+		mAvatarView = (ImageView) findViewById(R.id.home_user_avatar);
+		mUsernameView = (TextView) findViewById(R.id.home_username_label);
+		mAccountLevelView = (TextView) findViewById(R.id.home_account_level_label);
+		mDateRegisteredView = (TextView) findViewById(R.id.home_register_date_label);
+		mCloudCountView = (TextView) findViewById(R.id.home_cloud_count_label);
 	}
 
+	/**
+	 * Starts an async task to load our view content without blocking the UI
+	 */
 	private void setViewContent() {
-		User me = UserManager.getLoggedInUser();
-
-		// Set the user's avatar in the view
-		UrlImageViewHelper.setUrlDrawable(mAvatarView, me.getAvatar()
-				.getNormal(), R.drawable.unknown_user);
-
-		// Set the user's username in the view
-		mUsernameView.setText(me.getName());
-
-		// Set the user's other properties in the main view
-		mAccountLevelView.setText(createAccountLevelText(me.getRole()));
-
-		// Format and set the user's join date
-		Date date = me.getMemberSince().getTime();
-		SimpleDateFormat df = new SimpleDateFormat("dd MM, yyyy");
-		mDateRegisteredView.setText(MessageFormat.format(
-				"You registered on {0}", df.format(date)));
-
-		// Set the user's cloud count
-		mCloudCountView.setText("You are a member of "
-				+ String.valueOf(me.getClouds().size()) + " clouds");
-
+		new UserViewFillTask().execute();
 	}
 
+	/**
+	 * Creates the appropriate text for the home tile based on the user's role
+	 * 
+	 * @param role
+	 *            The user's role
+	 * @return The text string that should be presented in the home tile
+	 */
 	private String createAccountLevelText(Role role) {
 		String text = "";
 
@@ -217,6 +179,9 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		return text;
 	}
 
+	/**
+	 * Handles Cloudsdale messages directed at this activity
+	 */
 	@Override
 	public void handleMessage(CloudsdaleFayeMessage message) {
 		String channel = message.getChannel().substring(1);
@@ -234,74 +199,54 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		super.onConfigurationChanged(newConfig);
 	}
 
-	private void updateMe() {
-		new UserUpdateTask().execute();
-		new CloudUpdateTask().execute();
-	}
-
-	private void handleCloudsdaleError(QueryException exception) {
-		if (Cloudsdale.DEBUG) {
-			Log.d(TAG, exception.getErrorCode() + ":" + exception.getMessage());
-		}
-	}
-
-	private class UserUpdateTask extends AsyncTask<Void, Void, User> {
-
+	/**
+	 * An async task to grab the user from the manager and then to populate the
+	 * home tile based on their information.
+	 * Copyright (c) 2012 Cloudsdale.org
+	 * 
+	 * @author Jamison Greeley (atomicrat2552@gmail.com)
+	 * 
+	 */
+	class UserViewFillTask extends AsyncTask<Void, Void, User> {
 		@Override
 		protected User doInBackground(Void... params) {
-			QueryData data = new QueryData();
-			UserGetQuery query = new UserGetQuery(
-					getString(R.string.cloudsdale_api_base)
-							+ getString(R.string.cloudsdale_user_endpoint,
-									UserManager.getLoggedInUser().getId()));
-			query.addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser()
-					.getAuthToken());
-			try {
-				return query.execute(data, HomeActivity.this);
-			} catch (QueryException e) {
-				HomeActivity.this.handleCloudsdaleError(e);
-				return null;
+			if (Cloudsdale.DEBUG) {
+				Log.d(TAG, "Executing the UserViewFillTask");
 			}
+			return UserManager.getLoggedInUser();
 		}
 
 		@Override
 		protected void onPostExecute(User result) {
-			UserManager.storeUser(result);
-			setViewContent();
-			super.onPostExecute(result);
-		}
-
-	}
-
-	private class CloudUpdateTask extends AsyncTask<Void, Void, Cloud[]> {
-
-		@Override
-		protected Cloud[] doInBackground(Void... params) {
-			QueryData data = new QueryData();
-			User me = UserManager.getLoggedInUser();
-			CloudGetQuery query = new CloudGetQuery(
-					getString(R.string.cloudsdale_api_base)
-							+ getString(
-									R.string.cloudsdale_user_clouds_endpoint,
-									me.getId()));
-			query.addHeader("X-AUTH-TOKEN", me.getAuthToken());
-			try {
-				return query.executeForCollection(data, HomeActivity.this);
-			} catch (QueryException e) {
-				HomeActivity.this.handleCloudsdaleError(e);
-				return null;
+			if (Cloudsdale.DEBUG) {
+				Log.d(TAG, "UserViewFillTask is now filling in the home view");
 			}
-		}
 
-		@Override
-		protected void onPostExecute(Cloud[] result) {
-			User me = UserManager.getLoggedInUser();
-			ArrayList<Cloud> clouds = new ArrayList<Cloud>(
-					Arrays.asList(result));
-			me.setClouds(clouds);
-			UserManager.storeUser(me);
+			// Switch the visible layout
+			mLoadingView.setVisibility(View.INVISIBLE);
+			mContentView.setVisibility(View.VISIBLE);
+
+			// Set the user's avatar in the view
+			UrlImageViewHelper.setUrlDrawable(mAvatarView, result.getAvatar()
+					.getNormal(), R.drawable.unknown_user);
+
+			// Set the user's username in the view
+			mUsernameView.setText(result.getName());
+
+			// Set the user's other properties in the main view
+			mAccountLevelView.setText(createAccountLevelText(result.getRole()));
+
+			// Format and set the user's join date
+			Date date = result.getMemberSince().getTime();
+			SimpleDateFormat df = new SimpleDateFormat("dd MM, yyyy");
+			mDateRegisteredView.setText(MessageFormat.format(
+					"You registered on {0}", df.format(date)));
+
+			// Set the user's cloud count
+			mCloudCountView.setText("You are a member of "
+					+ String.valueOf(result.getClouds().size()) + " clouds");
+
 			super.onPostExecute(result);
 		}
-
 	}
 }

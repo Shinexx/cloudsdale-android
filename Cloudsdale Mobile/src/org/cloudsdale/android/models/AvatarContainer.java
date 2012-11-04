@@ -1,9 +1,5 @@
 package org.cloudsdale.android.models;
 
-import android.content.Context;
-
-import org.cloudsdale.android.Cloudsdale;
-
 import java.io.Serializable;
 
 public class AvatarContainer implements Serializable {
