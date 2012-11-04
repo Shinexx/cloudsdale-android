@@ -12,8 +12,10 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +24,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.b3rwynmobile.fayeclient.FayeClient;
-import com.b3rwynmobile.fayeclient.models.FayeMessage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
@@ -158,9 +158,8 @@ public class Cloudsdale extends Application implements ServiceConnection,
 	public static void prepareSlideMenu(SlidingMenu slidingMenu,
 			Activity context) {
 		sSlideMenuContextTemp = context;
-
+		
 		// View settings
-		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
 		slidingMenu.setFadeEnabled(true);
 
 		// Get all the layout items

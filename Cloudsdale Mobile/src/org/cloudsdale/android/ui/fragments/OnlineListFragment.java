@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.WazaBe.HoloEverywhere.LinearLayout;
+import com.WazaBe.HoloEverywhere.widget.LinearLayout;
 import com.actionbarsherlock.app.SherlockFragment;
 
 public class OnlineListFragment extends SherlockFragment {
