@@ -50,32 +50,37 @@ public class UserManager {
 	 */
 	public static User getUserById(String id) {
 		if (mStoredUsers != null && !mStoredUsers.isEmpty()) {
-			UserLoadTask task = new UserLoadTask();
-			task.execute(id);
-			try {
-				return task.get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				return null;
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-				return null;
+			ArrayList<User> users;
+			synchronized (mStoredUsers) {
+				if (mStoredUsers != null) {
+					users = new ArrayList<User>(mStoredUsers);
+				} else {
+					users = null;
+				}
 			}
+			if (users != null && !users.isEmpty()) {
+				for (User u : users) {
+					if (u.getId().equals(id)) { return u; }
+				}
+			}
+			return null;
 		} else {
-			UserFetchTask task = new UserFetchTask();
-			User fetchedUser = null;
-			task.execute(id);
+			// Get the strings we need
+			Context appContext = Cloudsdale.getContext();
+			String url = appContext.getString(R.string.cloudsdale_api_base)
+					+ appContext.getString(R.string.cloudsdale_user_endpoint,
+							id);
+			String authToken = appContext
+					.getString(R.string.cloudsdale_auth_token);
+
+			// Build and execute the query
+			UserGetQuery query = new UserGetQuery(url);
+			query.addHeader("X-AUTH-TOKEN", authToken);
 			try {
-				fetchedUser = task.get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+				return query.execute(null, null);
+			} catch (QueryException e) {
+				return null;
 			}
-			if (fetchedUser != null) {
-				storeUser(fetchedUser);
-			}
-			return fetchedUser;
 		}
 	}
 
@@ -90,63 +95,4 @@ public class UserManager {
 			mStoredUsers.add(user);
 		}
 	}
-
-	/**
-	 * AsyncTask designed to load users out of memory asynchronously.
-	 * Copyright (c) 2012 Cloudsdale.org
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com)
-	 * 
-	 */
-	static class UserLoadTask extends AsyncTask<String, Void, User> {
-		@Override
-		protected User doInBackground(String... params) {
-			ArrayList<User> users;
-			synchronized (mStoredUsers) {
-				if (mStoredUsers != null) {
-					users = new ArrayList<User>(mStoredUsers);
-				} else {
-					users = null;
-				}
-			}
-			if (users != null && !users.isEmpty()) {
-				for (User u : users) {
-					if (u.getId().equals(params[0])) { return u; }
-				}
-			}
-			return null;
-		}
-	}
-
-	/**
-	 * AsyncTask used to fetch a user from the Cloudsdale API.
-	 * Copyright (c) 2012 Cloudsdale.org
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com)
-	 * 
-	 */
-	static class UserFetchTask extends AsyncTask<String, Void, User> {
-
-		@Override
-		protected User doInBackground(String... params) {
-			// Get the strings we need
-			Context appContext = Cloudsdale.getContext();
-			String url = appContext.getString(R.string.cloudsdale_api_base)
-					+ appContext.getString(R.string.cloudsdale_user_endpoint,
-							params[0]);
-			String authToken = appContext
-					.getString(R.string.cloudsdale_auth_token);
-
-			// Build and execute the query
-			UserGetQuery query = new UserGetQuery(url);
-			query.addHeader("X-AUTH-TOKEN", authToken);
-			try {
-				return query.execute(null, null);
-			} catch (QueryException e) {
-				return null;
-			}
-		}
-
-	}
-
 }

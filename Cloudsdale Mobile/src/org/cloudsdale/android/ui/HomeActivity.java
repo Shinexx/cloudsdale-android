@@ -1,7 +1,5 @@
 package org.cloudsdale.android.ui;
 
-import android.app.ProgressDialog;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,17 +35,16 @@ import java.util.Date;
  */
 public class HomeActivity extends SlidingActivity implements FayeMessageHandler {
 
-	private static final String		TAG	= "Home Activity";
+	private static final String	TAG	= "Home Activity";
 
-	private View					mLoadingView;
-	private View					mContentView;
-	private ImageView				mAvatarView;
-	private TextView				mUsernameView;
-	private TextView				mAccountLevelView;
-	private TextView				mDateRegisteredView;
-	private TextView				mCloudCountView;
-	private SlidingMenu				mSlidingMenu;
-	private static ProgressDialog	sProgressDialog;
+	private View				mLoadingView;
+	private View				mContentView;
+	private ImageView			mAvatarView;
+	private TextView			mUsernameView;
+	private TextView			mAccountLevelView;
+	private TextView			mDateRegisteredView;
+	private TextView			mCloudCountView;
+	private SlidingMenu			mSlidingMenu;
 
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -61,7 +58,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		// Get the view objects
 		getViews();
 		mSlidingMenu = getSlidingMenu();
-		Cloudsdale.prepareSlideMenu(mSlidingMenu, this);
+//		Cloudsdale.prepareSlideMenu(mSlidingMenu, this);
 
 		// Customize actionbar
 		ActionBar actionbar = getSupportActionBar();
@@ -86,27 +83,10 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	protected void onStart() {
+		super.onStart();
 
-		setViewContent();
-
-		// if (!Cloudsdale.isFayeConnected()) {
-		// Cloudsdale.bindFaye();
-		// showProgressDialog();
-		// new Thread() {
-		// public void run() {
-		// while (!Cloudsdale.isFayeConnected()) {
-		// try {
-		// Thread.sleep(100);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// }
-		// hideProgressDialog();
-		// };
-		// }.start();
-		// }
+		new UserViewFillTask().execute();
 	}
 
 	@Override
@@ -119,8 +99,9 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 					mSlidingMenu.showBehind();
 				}
 				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	/**
@@ -135,13 +116,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		mAccountLevelView = (TextView) findViewById(R.id.home_account_level_label);
 		mDateRegisteredView = (TextView) findViewById(R.id.home_register_date_label);
 		mCloudCountView = (TextView) findViewById(R.id.home_cloud_count_label);
-	}
-
-	/**
-	 * Starts an async task to load our view content without blocking the UI
-	 */
-	private void setViewContent() {
-		new UserViewFillTask().execute();
 	}
 
 	/**
@@ -193,12 +167,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		// TODO Handle the unread message counts
 	}
 
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		sProgressDialog.cancel();
-		super.onConfigurationChanged(newConfig);
-	}
-
 	/**
 	 * An async task to grab the user from the manager and then to populate the
 	 * home tile based on their information.
@@ -208,6 +176,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 	 * 
 	 */
 	class UserViewFillTask extends AsyncTask<Void, Void, User> {
+
 		@Override
 		protected User doInBackground(Void... params) {
 			if (Cloudsdale.DEBUG) {
@@ -223,7 +192,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 			}
 
 			// Switch the visible layout
-			mLoadingView.setVisibility(View.INVISIBLE);
+			mLoadingView.setVisibility(View.GONE);
 			mContentView.setVisibility(View.VISIBLE);
 
 			// Set the user's avatar in the view

@@ -33,12 +33,10 @@ class AccountAuthenticator extends
 	        String[] requiredFeatures, Bundle options)
 	        throws NetworkErrorException {
 		Bundle reply = new Bundle();
-		
 		Intent i = new Intent(mContext, LoginActivity.class);
 		i.setAction("org.cloudsdale.android.account.LOGIN");
 		i.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
 		reply.putParcelable(AccountManager.KEY_INTENT, i);
-		
 		return reply;
 	}
 	

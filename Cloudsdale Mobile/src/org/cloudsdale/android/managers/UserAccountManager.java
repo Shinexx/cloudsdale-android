@@ -33,14 +33,14 @@ public class UserAccountManager {
 		Context appContext = Cloudsdale.getContext();
 		Account account = new Account(user.getName(),
 				appContext.getString(R.string.account_type));
-		Bundle extras = new Bundle();
+		final Bundle extras = new Bundle();
+		extras.putString(KEY_ID, user.getId());
 		AccountManager am = AccountManager.get(appContext);
 		boolean accountCreated = am.addAccountExplicitly(account,
 				user.getAuthToken(), extras);
 		if (accountCreated) {
 			sUserAccount = account;
 		}
-		am.setUserData(account, KEY_ID, user.getId());
 		return accountCreated;
 	}
 
@@ -67,7 +67,9 @@ public class UserAccountManager {
 			Account[] accounts = am.getAccountsByType(context
 					.getString(R.string.account_type));
 			if (accounts.length > 0) {
-				return accounts[0];
+				Account account = accounts[0];
+				cacheAccount(account);
+				return account;
 			} else {
 				return null;
 			}
