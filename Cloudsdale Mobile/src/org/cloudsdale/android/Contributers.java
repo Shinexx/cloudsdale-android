@@ -20,7 +20,7 @@ public enum Contributers {
 	NIFE("Nife", null, "Moderator"), 
 	BEAN("Green Bean", null, "Moderator"), 
 	WINTER("Winter Storm", null, "Moderator"),
-	SIX("Six", null, "Former Moderator"),
+	SIX("Six Reader", null, "Former Moderator"),
 	DUSK("Dawn Blush", null, "Former Moderator")
 	;	// @formatter:on
 

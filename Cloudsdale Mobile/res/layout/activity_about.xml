@@ -8,7 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
-
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/about_contributor_title"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <fragment
             android:id="@+id/about_contributor_fragment"
@@ -16,7 +23,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:layout="@layout/contributor_phone_layout" />
-
 
         <Button
             android:id="@+id/about_license_button"
