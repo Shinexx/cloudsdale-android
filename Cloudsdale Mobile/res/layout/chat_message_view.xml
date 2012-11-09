@@ -13,7 +13,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:contentDescription="@string/cloud_view_avatar_description"
-        android:src="@drawable/unknown_user" />
+        android:src="@drawable/ic_unknown_user" />
 
     <LinearLayout
         android:id="@+id/message_root"

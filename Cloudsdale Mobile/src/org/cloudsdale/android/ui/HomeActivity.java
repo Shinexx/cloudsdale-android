@@ -249,7 +249,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 
 			// Set the user's avatar in the view
 			UrlImageViewHelper.setUrlDrawable(mAvatarView, result.getAvatar()
-					.getNormal(), R.drawable.unknown_user);
+					.getNormal(), R.drawable.ic_unknown_user);
 
 			// Set the user's username in the view
 			mUsernameView.setText(result.getName());

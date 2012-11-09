@@ -83,7 +83,7 @@ public class CloudMessageAdapter extends BaseAdapter {
         User user = message.getAuthor();
 
         UrlImageViewHelper.setUrlDrawable(avatar, user.getAvatar().getNormal(),
-                R.drawable.unknown_user, AVATAR_REFRESH_INTERVAL);
+                R.drawable.ic_unknown_user, AVATAR_REFRESH_INTERVAL);
          nameText.setText(message.getAuthor().getName());
          tagText.setText(message.getAuthor().getRole().toString());
          messageBody.setText(message.getContent());

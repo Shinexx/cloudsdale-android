@@ -123,7 +123,7 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 	@Override
 	public void connected() {
 		mNotificationBuilder = new Builder(this).setContentTitle(
-				"Cloudsdale is connected").setSmallIcon(R.drawable.color_icon);
+				"Cloudsdale is connected").setSmallIcon(R.drawable.ic_color_icon);
 		Intent resultIntent = new Intent(this, HomeActivity.class);
 		mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent, 0);
 		mNotificationBuilder.setContentIntent(mPendingIntent);
@@ -136,7 +136,7 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 	public void disconnected() {
 		mNotificationBuilder = new Builder(this).setContentTitle(
 				"Cloudsdale is disconnected").setSmallIcon(
-				R.drawable.color_icon);
+				R.drawable.ic_color_icon);
 		Intent resultIntent = new Intent(this, HomeActivity.class);
 		mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent, 0);
 		mNotificationBuilder.setContentIntent(mPendingIntent);
@@ -148,7 +148,7 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 	@Override
 	public void connecting() {
 		mNotificationBuilder = new Builder(this).setContentTitle(
-				"Cloudsdale is connecting").setSmallIcon(R.drawable.color_icon);
+				"Cloudsdale is connecting").setSmallIcon(R.drawable.ic_color_icon);
 		Intent resultIntent = new Intent(this, HomeActivity.class);
 		mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent, 0);
 		mNotificationBuilder.setContentIntent(mPendingIntent);

@@ -80,9 +80,14 @@ public class CloudActivity extends SlidingFragmentActivity implements
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
-		// TODO Check for the frame, see if we're in tablet mode
+		// Check for the frame, see if we're in tablet mode
 		mFragmentFrame = (FrameLayout) findViewById(R.id.cloud_fragment_frame);
-		mDualView = (mFragmentFrame != null);
+		mDualView = mFragmentFrame != null
+				&& mFragmentFrame.getVisibility() == View.VISIBLE;
+
+		// Get the cloud that's showing and setup the fragments
+		GetShowingCloud();
+		setupFragments();
 
 		if (savedInstanceState != null) {
 			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
@@ -90,7 +95,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
 			if (!mDualView) {
 				mTabHost.setCurrentTabByTag("chat");
 			} else {
-				mTabHost.setCurrentTabByTag("online");
+				mTabHost.setCurrentTabByTag("drops");
 			}
 		}
 
@@ -150,8 +155,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
-		GetShowingCloud();
-		setupFragments();
 		if (!Cloudsdale.isFayeConnected()) {
 			showProgressDialog();
 			Cloudsdale.bindFaye();

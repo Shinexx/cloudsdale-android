@@ -1,14 +1,17 @@
-package org.cloudsdale.android.ui;
+package org.cloudsdale.android;
 
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.R.drawable;
 
 public enum StaticNavigation {
 
-	HOME("Home", R.drawable.ic_action_home, "Home"), SETTINGS("Settings",
-			R.drawable.ic_action_settings, "Settings"), EXPLORE("Explore",
-			R.drawable.ic_action_globe, "Explore"), LOGOUT("Sign out",
-			R.drawable.ic_action_exit, "Logout");
+	//@formatter:off
+	HOME("Home", R.drawable.ic_action_home, "Home"), 
+	SETTINGS("Settings", R.drawable.ic_action_settings, "Settings"), 
+	EXPLORE("Explore", R.drawable.ic_action_globe, "Explore"), 
+	LOGOUT("Sign out", R.drawable.ic_action_exit, "Logout"),
+	ABOUT("About Cloudsdale", R.drawable.ic_color_icon, "About")
+	;
+	//@formatter:on
 
 	private String	displayName;
 	private int		resId;

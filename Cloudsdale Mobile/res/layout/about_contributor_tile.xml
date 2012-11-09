@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.WazaBe.HoloEverywhere.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="96dp" >
+
+    <ImageView
+        android:id="@+id/contributor_icon"
+        android:layout_width="96dp"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_unknown_user" />
+
+    <com.WazaBe.HoloEverywhere.widget.LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <com.WazaBe.HoloEverywhere.widget.TextView
+            android:id="@+id/contributor_username_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="Berwyn Codeweaver"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <com.WazaBe.HoloEverywhere.widget.TextView
+            android:id="@+id/contributor_title_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="Android Developer"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </com.WazaBe.HoloEverywhere.widget.LinearLayout>
+
+</com.WazaBe.HoloEverywhere.widget.LinearLayout>

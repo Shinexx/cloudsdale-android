@@ -75,7 +75,7 @@ public class CloudsAdapter extends BaseAdapter {
 
         // Set view properties
         UrlImageViewHelper.setUrlDrawable(icon, cloud.getAvatar().getPreview(),
-                R.drawable.unknown_cloud, 60000 * 60);
+                R.drawable.ic_unknown_cloud, 60000 * 60);
         nameView.setText(cloud.getName());
         nameView.setSelected(true);
         unreadCount.setText("0");

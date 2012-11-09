@@ -77,7 +77,7 @@ public class CloudDropAdapter extends BaseAdapter {
         title.setText(drop.getTitle());
         title.setSelected(true);
         UrlImageViewHelper.setUrlDrawable(preview, drop.getPreview(),
-                R.drawable.unknown_drop, PREVIEW_REFRESH_INTERVAL);
+                R.drawable.ic_unknown_drop, PREVIEW_REFRESH_INTERVAL);
         
         return dropView;
     }

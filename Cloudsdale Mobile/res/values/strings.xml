@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="about_view_title">About Cloudsdale</string>
+    <string name="about_license_button_text">Open Source Licenses</string>
     <string name="account_type">org.cloudsdale.android.account</string>
     <string name="app_name">Cloudsdale Beta</string>
     <string name="auth_token_type">org.cloudsdale.android</string>
@@ -28,6 +30,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_home">Home</string>
-    <string name="menu_register_account"></string>
+    <string name="menu_register_account">Register</string>
 
 </resources>

@@ -12,10 +12,8 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,13 +32,15 @@ import org.cloudsdale.android.faye.CloudsdaleFayeClient;
 import org.cloudsdale.android.faye.CloudsdaleFayeListener;
 import org.cloudsdale.android.faye.CloudsdaleFayeService;
 import org.cloudsdale.android.faye.FayeMessageHandler;
+import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
+import org.cloudsdale.android.ui.AboutActivity;
 import org.cloudsdale.android.ui.CloudActivity;
 import org.cloudsdale.android.ui.HomeActivity;
-import org.cloudsdale.android.ui.StaticNavigation;
+import org.cloudsdale.android.ui.StartActivity;
 import org.cloudsdale.android.ui.adapters.CloudsAdapter;
 
 import java.util.ArrayList;
@@ -152,11 +152,11 @@ public class Cloudsdale extends Application implements ServiceConnection,
 	public static void prepareSlideMenu(SlidingMenu slidingMenu,
 			Activity context) {
 		sSlideMenuContextTemp = context;
-		
+
 		// View settings
 		slidingMenu.showAbove();
 		slidingMenu.setFadeEnabled(true);
-//		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
+		// slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
 
 		// Get all the layout items
 		LayoutInflater inflater = (LayoutInflater) context
@@ -179,7 +179,7 @@ public class Cloudsdale extends Application implements ServiceConnection,
 				.findViewById(R.id.slide_menu_username_label);
 
 		UrlImageViewHelper.setUrlDrawable(userIcon, me.getAvatar().getNormal(),
-				R.drawable.unknown_user, AVATAR_EXPIRATION);
+				R.drawable.ic_unknown_user, AVATAR_EXPIRATION);
 		userName.setText(me.getName());
 		head.setClickable(false);
 	}
@@ -218,6 +218,12 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		}
 	}
 
+	public static void unbindFaye() {
+		if (sFayeBinder != null) {
+			sFayeBinder.getFayeService().stopFaye();
+		}
+	}
+
 	@Override
 	public void onServiceConnected(ComponentName className, IBinder binder) {
 		if (DEBUG) {
@@ -244,7 +250,7 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		new Thread() {
 			public void run() {
 				User me = null;
-				while(me == null) {
+				while (me == null) {
 					try {
 						Thread.sleep(100);
 						me = UserManager.getLoggedInUser();
@@ -282,12 +288,13 @@ public class Cloudsdale extends Application implements ServiceConnection,
 			// TODO Start the settings view
 			intent.setClass(context, HomeActivity.class);
 		} else if (viewId.equals("Logout")) {
-			// TODO Logout the user
-			// TODO Start the login view
+			logoutUser();
 			intent.setClass(context, HomeActivity.class);
 		} else if (viewId.equals("Explore")) {
 			// TODO Start the explore view
 			intent.setClass(context, HomeActivity.class);
+		} else if (viewId.equals("About")) {
+			intent.setClass(context, AboutActivity.class);
 		} else {
 			intent.setClass(context, CloudActivity.class);
 			intent.putExtra("cloudId", viewId);
@@ -317,6 +324,10 @@ public class Cloudsdale extends Application implements ServiceConnection,
 				handler.handleMessage(msg);
 			}
 		}
+	}
+
+	private static void logoutUser() {
+		UserAccountManager.deleteAccount();
 	}
 
 	static class SlideMenuFillTask extends AsyncTask<View, Void, User> {

@@ -9,7 +9,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_margin="8dp"
-        android:src="@drawable/unknown_user" />
+        android:src="@drawable/ic_unknown_user" />
 
     <TextView
         android:id="@+id/slide_menu_username_label"

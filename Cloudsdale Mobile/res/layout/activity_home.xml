@@ -9,7 +9,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/background_clouds_medium" />
+        android:src="@drawable/home_background_clouds" />
 
     <include
         android:id="@+id/home_tile"

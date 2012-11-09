@@ -2,13 +2,19 @@ package org.cloudsdale.android.managers;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.ui.LoginActivity;
+import org.cloudsdale.android.ui.StartActivity;
 
 /**
  * Class to manage the user's account object
@@ -80,5 +86,27 @@ public class UserAccountManager {
 				return null;
 			}
 		}
+	}
+
+	public static void deleteAccount() {
+		if (sUserAccount != null) {
+			sUserAccount = null;
+		}
+		Editor edit = Cloudsdale.getContext()
+				.getSharedPreferences(PREFERENCES_NAME, 0).edit();
+		edit.remove(KEY_ID);
+		edit.commit();
+		AccountManager am = AccountManager.get(Cloudsdale.getContext());
+		am.removeAccount(sUserAccount, new AccountManagerCallback<Boolean>() {
+
+			@Override
+			public void run(AccountManagerFuture<Boolean> arg0) {
+				Intent intent = new Intent();
+				intent.setClass(Cloudsdale.getContext(), LoginActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				Cloudsdale.getContext().startActivity(intent);
+			}
+		}, null);
 	}
 }

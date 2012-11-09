@@ -10,7 +10,7 @@
         android:layout_height="48dp"
         android:layout_centerVertical="true"
         android:contentDescription="@string/cloud_list_item_icon_description"
-        android:src="@drawable/unknown_cloud" />
+        android:src="@drawable/ic_unknown_cloud" />
 
     <TextView
         android:id="@+id/cloud_name"

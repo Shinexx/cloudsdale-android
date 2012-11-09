@@ -1,6 +1,5 @@
 package org.cloudsdale.android.models.api;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.cloudsdale.android.models.AvatarContainer;
@@ -10,33 +9,22 @@ import java.util.Calendar;
 
 public class Cloud extends IdentityModel {
 
-    @Expose
     private String          name;
-    @Expose
     private String          description;
-    @Expose
     @SerializedName("created_at")
     private String          createdTemp;
     private Calendar        createdAt;
-    @Expose
     private String          rules;
-    @Expose
     private boolean         hidden;
-    @Expose
     private AvatarContainer avatar;
-    @Expose
     @SerializedName("is_transient")
     private boolean         isTransient;
-    @Expose
     @SerializedName("owner")
     private String          ownerId;
-    @Expose
     @SerializedName("user_ids")
     private String[]        userIds;
-    @Expose
     @SerializedName("moderator_ids")
     private String[]        moderators;
-    @Expose
     @SerializedName("topic")
     private Chat            chat;
 
