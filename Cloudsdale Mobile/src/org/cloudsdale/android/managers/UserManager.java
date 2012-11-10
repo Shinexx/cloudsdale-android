@@ -33,7 +33,7 @@ public class UserManager {
 	 * 
 	 * @return The user that's logged in
 	 */
-	public static User getLoggedInUser() {
+	public synchronized static User getLoggedInUser() {
 		String id = Cloudsdale
 				.getContext()
 				.getSharedPreferences(UserAccountManager.PREFERENCES_NAME,

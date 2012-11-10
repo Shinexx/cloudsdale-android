@@ -12,11 +12,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
@@ -64,11 +62,10 @@ public class CloudActivity extends SlidingFragmentActivity implements
 
 		// Setup the view
 		setContentView(R.layout.activity_cloud_view);
-		setBehindContentView(R.layout.menu);
+		setBehindContentView(R.layout.fragment_sliding_menu_host);
 
 		// Setup the sliding menu
 		mSlidingMenu = getSlidingMenu();
-		Cloudsdale.prepareSlideMenu(mSlidingMenu, this);
 
 		// Customize actionbar
 		ActionBar actionbar = getSupportActionBar();
@@ -98,24 +95,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
 				mTabHost.setCurrentTabByTag("drops");
 			}
 		}
-
-		setMenuListener();
-	}
-
-	private void setMenuListener() {
-		// Set the item listener for the menu
-		((AdapterView) mSlidingMenu.findViewById(android.R.id.list))
-				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-					@Override
-					public void onItemClick(AdapterView<?> parent, View view,
-							int position, long id) {
-						showAbove();
-						Cloudsdale.navigate(((TextView) view
-								.findViewById(R.id.cloud_hidden_id)).getText()
-								.toString(), CloudActivity.this);
-					}
-				});
 	}
 
 	private void setupFragments() {

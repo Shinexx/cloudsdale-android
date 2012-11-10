@@ -67,7 +67,7 @@ public class CloudDropAdapter extends BaseAdapter {
         View dropView = convertView;
 
         if (dropView == null) {
-            dropView = mInflater.inflate(R.layout.drop_layout, null);
+            dropView = mInflater.inflate(R.layout.object_drop, null);
         }
 
         ImageView preview = (ImageView) dropView

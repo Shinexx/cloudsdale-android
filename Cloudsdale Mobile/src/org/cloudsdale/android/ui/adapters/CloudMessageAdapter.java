@@ -68,7 +68,7 @@ public class CloudMessageAdapter extends BaseAdapter {
         View messageView = convertView;
 
         if (messageView == null) {
-            messageView = mInflater.inflate(R.layout.chat_message_view, null);
+            messageView = mInflater.inflate(R.layout.object_chat_message, null);
         }
 
         ImageView avatar = (ImageView) messageView

@@ -14,9 +14,7 @@ public class AboutActivity extends SlidingFragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_about);
-		setBehindContentView(R.layout.menu);
-
-
+		setBehindContentView(R.layout.fragment_sliding_menu_host);
 	}
 	
 	@Override

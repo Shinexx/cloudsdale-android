@@ -33,5 +33,10 @@
     <string name="menu_register_account">Register</string>
     <string name="about_contributor_title">Contributors</string>
     <string name="contributor_subheader">The staff of Cloudsdale would also like to thank:</string>
+    <string name="profile_loading_text">Loading your profile...</string>
+    <string name="sliding_menu_fragment_tag">sliding_menu_fragment</string>
+    <string name="sliding_menu_static_nav_header">Navigation</string>
+    <string name="sliding_menu_cloud_nav_header">Clouds</string>
+    <string name="cloud_list_fragment_tag">cloud_list_fragment</string>
 
 </resources>

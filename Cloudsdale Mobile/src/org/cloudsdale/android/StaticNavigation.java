@@ -9,7 +9,7 @@ public enum StaticNavigation {
 	SETTINGS("Settings", R.drawable.ic_action_settings, "Settings"), 
 	EXPLORE("Explore", R.drawable.ic_action_globe, "Explore"), 
 	LOGOUT("Sign out", R.drawable.ic_action_exit, "Logout"),
-	ABOUT("About Cloudsdale", R.drawable.ic_color_icon, "About")
+	ABOUT("About Cloudsdale", R.drawable.ic_action_info, "About")
 	;
 	//@formatter:on
 

@@ -1,47 +1,31 @@
 package org.cloudsdale.android;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Resources;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
-import com.slidingmenu.lib.SlidingMenu;
 
 import org.cloudsdale.android.faye.CloudsdaleFayeBinder;
 import org.cloudsdale.android.faye.CloudsdaleFayeClient;
 import org.cloudsdale.android.faye.CloudsdaleFayeListener;
 import org.cloudsdale.android.faye.CloudsdaleFayeService;
 import org.cloudsdale.android.faye.FayeMessageHandler;
-import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
-import org.cloudsdale.android.ui.AboutActivity;
-import org.cloudsdale.android.ui.CloudActivity;
-import org.cloudsdale.android.ui.HomeActivity;
-import org.cloudsdale.android.ui.StartActivity;
-import org.cloudsdale.android.ui.adapters.CloudsAdapter;
 
 import java.util.ArrayList;
 
@@ -54,30 +38,23 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		CloudsdaleFayeListener {
 
 	// Debug fields
-	public static final boolean						DEBUG					= true;
-	private static final String						TAG						= "Cloudsdale Mobile";
+	public static final boolean						DEBUG				= true;
+	private static final String						TAG					= "Cloudsdale Mobile";
 
-	private static final int						AVATAR_EXPIRATION		= 30 * 60 * 1000;
-
-	// Database global information
-	public static final int							DATABASE_VERSION		= 2;
-	public static final String						USER_DATABASE_NAME		= "users.db";
-	public static final String						CLOUD_DATABASE_NAME		= "clouds.db";
-	public static final String						USERCLOUD_DATABASE_NAME	= "userclouds.db";
+	// Thirty minutes
+	public static final int							AVATAR_EXPIRATION	= 30 * 60 * 1000;
+	public static final int							CLOUD_EXPIRATION	= 1000 * 60 * 60;
 
 	// Static objects
 	private static Cloudsdale						sAppObject;
 	private static CloudsdaleFayeBinder				sFayeBinder;
 	private static ArrayList<FayeMessageHandler>	sMessageHandlerList;
-	private static boolean							sFirstConnection		= true;
+	private static boolean							sFirstConnection	= true;
 	private static boolean							sFayeConnected;
 	private static Gson								sJsonDeserializer;
 
 	// Public data objects
 	private static String							sCloudShowing;
-
-	// Temp objects for slide menu inflation
-	private static Activity							sSlideMenuContextTemp;
 
 	/**
 	 * Dummy constructor to handle creating static classes and fetch the global
@@ -145,62 +122,6 @@ public class Cloudsdale extends Application implements ServiceConnection,
 					}
 				}
 			}
-		}
-	}
-
-	@SuppressLint("NewApi")
-	public static void prepareSlideMenu(SlidingMenu slidingMenu,
-			Activity context) {
-		sSlideMenuContextTemp = context;
-
-		// View settings
-		slidingMenu.showAbove();
-		slidingMenu.setFadeEnabled(true);
-		// slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
-
-		// Get all the layout items
-		LayoutInflater inflater = (LayoutInflater) context
-				.getSystemService(LAYOUT_INFLATER_SERVICE);
-		View head = inflater.inflate(R.layout.menu_header, null);
-		ListView itemOptions = (ListView) slidingMenu
-				.findViewById(android.R.id.list);
-
-		new SlideMenuFillTask().execute(new View[] { head, itemOptions });
-	}
-
-	private static void setSlideMenuHeader(View head, ListView itemOptions,
-			User me) {
-		itemOptions.addHeaderView(head, null, false);
-		itemOptions.setHeaderDividersEnabled(true);
-
-		ImageView userIcon = (ImageView) head
-				.findViewById(R.id.slide_menu_user_icon);
-		TextView userName = (TextView) head
-				.findViewById(R.id.slide_menu_username_label);
-
-		UrlImageViewHelper.setUrlDrawable(userIcon, me.getAvatar().getNormal(),
-				R.drawable.ic_unknown_user, AVATAR_EXPIRATION);
-		userName.setText(me.getName());
-		head.setClickable(false);
-	}
-
-	private static void addStaticSlideMenuViews(ListView list,
-			LayoutInflater inflater) {
-		for (StaticNavigation nav : StaticNavigation.values()) {
-			View navigationView = inflater.inflate(R.layout.cloud_list_item,
-					null);
-			ImageView navIcon = (ImageView) navigationView
-					.findViewById(R.id.cloud_icon);
-			TextView navLabel = (TextView) navigationView
-					.findViewById(R.id.cloud_name);
-			TextView navId = (TextView) navigationView
-					.findViewById(R.id.cloud_hidden_id);
-
-			navIcon.setImageResource(nav.getResId());
-			navLabel.setText(nav.getDisplayName());
-			navId.setText(nav.getTextId());
-
-			list.addHeaderView(navigationView);
 		}
 	}
 
@@ -280,28 +201,6 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		}
 	}
 
-	public static void navigate(String viewId, Activity context) {
-		Intent intent = new Intent();
-		if (viewId.equals("Home")) {
-			intent.setClass(context, HomeActivity.class);
-		} else if (viewId.equals("Settings")) {
-			// TODO Start the settings view
-			intent.setClass(context, HomeActivity.class);
-		} else if (viewId.equals("Logout")) {
-			logoutUser();
-			intent.setClass(context, HomeActivity.class);
-		} else if (viewId.equals("Explore")) {
-			// TODO Start the explore view
-			intent.setClass(context, HomeActivity.class);
-		} else if (viewId.equals("About")) {
-			intent.setClass(context, AboutActivity.class);
-		} else {
-			intent.setClass(context, CloudActivity.class);
-			intent.putExtra("cloudId", viewId);
-		}
-		context.startActivity(intent);
-	}
-
 	@Override
 	public void connectedToServer(CloudsdaleFayeClient faye) {
 		sFayeConnected = true;
@@ -323,34 +222,6 @@ public class Cloudsdale extends Application implements ServiceConnection,
 			for (FayeMessageHandler handler : sMessageHandlerList) {
 				handler.handleMessage(msg);
 			}
-		}
-	}
-
-	private static void logoutUser() {
-		UserAccountManager.deleteAccount();
-	}
-
-	static class SlideMenuFillTask extends AsyncTask<View, Void, User> {
-		View		head;
-		ListView	itemOptions;
-
-		@Override
-		protected User doInBackground(View... params) {
-			head = params[0];
-			itemOptions = (ListView) params[1];
-			return UserManager.getLoggedInUser();
-		}
-
-		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-		@Override
-		protected void onPostExecute(User result) {
-			setSlideMenuHeader(head, itemOptions, result);
-			addStaticSlideMenuViews(itemOptions,
-					sSlideMenuContextTemp.getLayoutInflater());
-			itemOptions.setAdapter(new CloudsAdapter(sSlideMenuContextTemp,
-					result.getClouds()));
-
-			super.onPostExecute(result);
 		}
 	}
 }

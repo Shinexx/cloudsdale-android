@@ -41,7 +41,7 @@ public class ChatFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		sChatView = inflater.inflate(R.layout.chat_view, null);
+		sChatView = inflater.inflate(R.layout.fragment_chat, null);
 		return sChatView;
 	}
 

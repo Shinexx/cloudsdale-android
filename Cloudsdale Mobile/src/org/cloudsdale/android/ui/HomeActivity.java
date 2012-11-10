@@ -3,22 +3,19 @@ package org.cloudsdale.android.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.slidingmenu.lib.SlidingMenu;
-import com.slidingmenu.lib.app.SlidingActivity;
+import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
@@ -39,7 +36,8 @@ import java.util.Date;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  * 
  */
-public class HomeActivity extends SlidingActivity implements FayeMessageHandler {
+public class HomeActivity extends SlidingFragmentActivity implements
+		FayeMessageHandler {
 
 	private static final String	TAG	= "Home Activity";
 
@@ -51,24 +49,19 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 	private TextView			mDateRegisteredView;
 	private TextView			mCloudCountView;
 	private SlidingMenu			mSlidingMenu;
-	private Activity			mActivityContext;
-	private boolean				mAccountLoaded;
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mActivityContext = this;
-		mAccountLoaded = false;
 
 		// Set the layouts
 		setContentView(R.layout.activity_home);
-		setBehindContentView(R.layout.menu);
+		setBehindContentView(R.layout.fragment_sliding_menu_host);
 
 		// Get the view objects
 		getViews();
 		mSlidingMenu = getSlidingMenu();
-		mSlidingMenu.setSlidingEnabled(false);
+		mSlidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
 
 		// Customize actionbar
 		ActionBar actionbar = getSupportActionBar();
@@ -77,20 +70,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 		// Bind the Faye service
 		Cloudsdale.bindFaye();
 		Cloudsdale.subscribeToMessages(this);
-
-		// Set the item listener for the menu
-		((AdapterView) mSlidingMenu.findViewById(android.R.id.list))
-				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-					@Override
-					public void onItemClick(AdapterView<?> parent, View view,
-							int position, long id) {
-						showAbove();
-						Cloudsdale.navigate(((TextView) view
-								.findViewById(R.id.cloud_hidden_id)).getText()
-								.toString(), HomeActivity.this);
-					}
-				});
 	}
 
 	@Override
@@ -107,14 +86,7 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 				if (mSlidingMenu.isBehindShowing()) {
 					mSlidingMenu.showAbove();
 				} else {
-					if (mAccountLoaded) {
-						mSlidingMenu.showBehind();
-					} else {
-						Toast.makeText(
-								this,
-								"Please wait for your account to finish loading",
-								Toast.LENGTH_LONG).show();
-					}
+					mSlidingMenu.showBehind();
 				}
 				return true;
 			default:
@@ -268,9 +240,6 @@ public class HomeActivity extends SlidingActivity implements FayeMessageHandler 
 					+ String.valueOf(result.getClouds().size()) + " clouds");
 
 			showProgress(false);
-			Cloudsdale.prepareSlideMenu(mSlidingMenu, mActivityContext);
-			mSlidingMenu.setSlidingEnabled(true);
-			mAccountLoaded = true;
 
 			super.onPostExecute(result);
 		}

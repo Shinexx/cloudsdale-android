@@ -62,7 +62,7 @@ public class CloudsAdapter extends BaseAdapter {
         View cloudView = convertView;
 
         if (convertView == null) {
-            cloudView = this.mInflater.inflate(R.layout.cloud_list_item, null);
+            cloudView = this.mInflater.inflate(R.layout.fragment_sliding_menu_entry, null);
         }
 
         // Get the view objects

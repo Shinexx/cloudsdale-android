@@ -22,7 +22,7 @@ public class ContributorPhoneFragment extends Fragment {
 			Bundle savedInstanceState) {
 
 		// Get the container views
-		View rootView = inflater.inflate(R.layout.contributor_phone_layout,
+		View rootView = inflater.inflate(R.layout.fragment_contributor_phone,
 				null);
 		LinearLayout list = (LinearLayout) rootView
 				.findViewById(android.R.id.content);

@@ -32,7 +32,7 @@ public class DropFragment extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        sDropView = inflater.inflate(R.layout.drop_list_layout, null);
+        sDropView = inflater.inflate(R.layout.fragment_drop_list, null);
         return sDropView;
     }
 

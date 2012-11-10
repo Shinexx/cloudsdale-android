@@ -19,7 +19,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="60dp"
-        layout="@layout/home_tile" />
+        layout="@layout/partial_home_tile" />
 
     <LinearLayout
         android:layout_width="fill_parent"

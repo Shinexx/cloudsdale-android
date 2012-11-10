@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sliding_menu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#333" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <!-- Header view -->
+
+        <LinearLayout
+            android:id="@+id/sliding_menu_header"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:orientation="vertical" >
+
+            <!-- Loading layout -->
+
+            <LinearLayout
+                android:id="@+id/sliding_menu_header_loading_view"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:orientation="horizontal" >
+
+                <ProgressBar
+                    android:layout_width="64dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:indeterminate="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/profile_loading_text"
+                    android:textColor="#FFF" />
+            </LinearLayout>
+
+            <!-- Content layout -->
+
+            <RelativeLayout
+                android:id="@+id/sliding_menu_header_content_view"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:visibility="gone" >
+
+                <ImageView
+                    android:id="@+id/sliding_menu_header_avatar"
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:src="@drawable/ic_unknown_user" />
+
+                <TextView
+                    android:id="@+id/sliding_menu_header_username_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="72dp"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="8dp"
+                    android:layout_toRightOf="@+id/sliding_menu_header_avatar"
+                    android:text="Berwyn Codeweaver"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="#FFFFFF" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!-- Static Nav stuff -->
+
+        <LinearLayout
+            android:id="@+id/sliding_menu_static_nav_root"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_margin="8dp"
+                android:text="@string/sliding_menu_static_nav_header"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#FFF" />
+        </LinearLayout>
+
+        <!-- Cloud stuff -->
+
+        <LinearLayout
+            android:id="@+id/sliding_menu_cloud_nav_root"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_margin="8dp"
+                android:text="@string/sliding_menu_cloud_nav_header"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#FFF" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>
