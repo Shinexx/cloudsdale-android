@@ -34,8 +34,7 @@ import java.util.ArrayList;
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
-public class Cloudsdale extends Application implements ServiceConnection,
-		CloudsdaleFayeListener {
+public class Cloudsdale extends Application {
 
 	// Debug fields
 	public static final boolean						DEBUG				= true;
@@ -47,10 +46,6 @@ public class Cloudsdale extends Application implements ServiceConnection,
 
 	// Static objects
 	private static Cloudsdale						sAppObject;
-	private static CloudsdaleFayeBinder				sFayeBinder;
-	private static ArrayList<FayeMessageHandler>	sMessageHandlerList;
-	private static boolean							sFirstConnection	= true;
-	private static boolean							sFayeConnected;
 	private static Gson								sJsonDeserializer;
 
 	// Public data objects
@@ -62,13 +57,7 @@ public class Cloudsdale extends Application implements ServiceConnection,
 	 */
 	public Cloudsdale() {
 		super();
-		sMessageHandlerList = new ArrayList<FayeMessageHandler>();
 		sAppObject = this;
-		sFayeConnected = false;
-	}
-
-	public static boolean isFayeConnected() {
-		return sFayeConnected;
 	}
 
 	public static void setShowingCloud(String cloudId) {
@@ -90,138 +79,5 @@ public class Cloudsdale extends Application implements ServiceConnection,
 		}
 		return sJsonDeserializer;
 	}
-
-	public static int dpToPx(int dp, Context ctx) {
-		Resources r = ctx.getResources();
-		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-				r.getDisplayMetrics());
-	}
-
-	// originally:
-	// http://stackoverflow.com/questions/5418510/disable-the-touch-events-for-all-the-views
-	// modified for the needs here
-	public static void enableDisableViewGroup(ViewGroup viewGroup,
-			boolean enabled) {
-		int childCount = viewGroup.getChildCount();
-		for (int i = 0; i < childCount; i++) {
-			View view = viewGroup.getChildAt(i);
-			if (view.isFocusable()) {
-				view.setEnabled(enabled);
-			}
-			if (view instanceof ViewGroup) {
-				Cloudsdale.enableDisableViewGroup((ViewGroup) view, enabled);
-			} else if (view instanceof ListView) {
-				if (view.isFocusable()) {
-					view.setEnabled(enabled);
-				}
-				ListView listView = (ListView) view;
-				int listChildCount = listView.getChildCount();
-				for (int j = 0; j < listChildCount; j++) {
-					if (view.isFocusable()) {
-						listView.getChildAt(j).setEnabled(false);
-					}
-				}
-			}
-		}
-	}
-
-	public static void bindFaye() {
-		if (sFayeBinder == null) {
-			Intent intent = new Intent();
-			intent.setClass(sAppObject.getApplicationContext(),
-					CloudsdaleFayeService.class);
-			sAppObject
-					.bindService(intent, sAppObject, Context.BIND_AUTO_CREATE);
-		} else {
-			if (!sFayeBinder.getFayeClient().isFayeConnected()) {
-				sFayeBinder.getFayeClient().connect();
-			}
-		}
-	}
-
-	public static void unbindFaye() {
-		if (sFayeBinder != null) {
-			sFayeBinder.getFayeService().stopFaye();
-		}
-	}
-
-	@Override
-	public void onServiceConnected(ComponentName className, IBinder binder) {
-		if (DEBUG) {
-			Toast.makeText(sAppObject, "Cloudsale Faye service bound",
-					Toast.LENGTH_LONG).show();
-			Log.d(TAG, "Faye service bound");
-		}
-		sFayeBinder = (CloudsdaleFayeBinder) binder;
-		sFayeBinder.getFayeClient().setFayeListener(this);
-		sFayeBinder.getFayeService().startFaye();
-	}
-
-	@Override
-	public void onServiceDisconnected(ComponentName className) {
-		sFayeConnected = false;
-		sFirstConnection = true;
-		sFayeBinder = null;
-	}
-
-	private static void subscribeToClouds() {
-		if (Cloudsdale.DEBUG) {
-			Log.d(TAG, "Starting cloud subscriptions");
-		}
-		new Thread() {
-			public void run() {
-				User me = null;
-				while (me == null) {
-					try {
-						Thread.sleep(100);
-						me = UserManager.getLoggedInUser();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				for (Cloud c : me.getClouds()) {
-					sFayeBinder.getFayeClient().subscribe(
-							"/clouds/" + c.getId() + "/chat/messages");
-				}
-			};
-		}.start();
-	}
-
-	public static void subscribeToMessages(FayeMessageHandler handler) {
-		synchronized (sMessageHandlerList) {
-			if (!sMessageHandlerList.contains(handler)) {
-				sMessageHandlerList.add(handler);
-			}
-		}
-	}
-
-	public static void unsubscribeToMessages(FayeMessageHandler handler) {
-		synchronized (sMessageHandlerList) {
-			sMessageHandlerList.remove(handler);
-		}
-	}
-
-	@Override
-	public void connectedToServer(CloudsdaleFayeClient faye) {
-		sFayeConnected = true;
-		if (sFirstConnection) {
-			subscribeToClouds();
-			sFirstConnection = false;
-		}
-	}
-
-	@Override
-	public void disconnectedFromServer(CloudsdaleFayeClient faye) {
-		sFayeConnected = false;
-	}
-
-	@Override
-	public void messageReceived(CloudsdaleFayeClient faye,
-			CloudsdaleFayeMessage msg) {
-		if (!sMessageHandlerList.isEmpty()) {
-			for (FayeMessageHandler handler : sMessageHandlerList) {
-				handler.handleMessage(msg);
-			}
-		}
-	}
 }
+

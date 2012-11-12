@@ -20,6 +20,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.faye.FayeMessageHandler;
+import org.cloudsdale.android.managers.FayeManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.Role;
@@ -68,8 +69,8 @@ public class HomeActivity extends SlidingFragmentActivity implements
 		actionbar.setDisplayHomeAsUpEnabled(true);
 
 		// Bind the Faye service
-		Cloudsdale.bindFaye();
-		Cloudsdale.subscribeToMessages(this);
+		FayeManager.bindFaye();
+		FayeManager.subscribeToMessages(this);
 	}
 
 	@Override

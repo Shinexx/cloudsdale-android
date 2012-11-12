@@ -148,22 +148,11 @@ public class ChatFragment extends SherlockFragment {
 			if (Cloudsdale.DEBUG) {
 				Log.d(TAG, "There are " + result.length + " messages");
 			}
-			if (result != null) {
+			if (result != null && result.length > 0) {
 				for (Message m : result) {
-					// Message previous = getPreviousMessage();
-					// if (previous != null
-					// && m.getAuthor().getName()
-					// .equals(previous.getAuthor().getName())) {
-					// LinearLayout layout = (LinearLayout) mMessageList
-					// .getChildAt(mMessageAdapter.getCount() - 1)
-					// .findViewById(R.id.message_root);
-					// TextView tv = new TextView(getActivity());
-					// tv.setText(m.getContent());
-					// layout.addView(tv);
-					// } else {
+					if(m == null) continue;
 					((CloudMessageAdapter) sMessageList.getAdapter())
 							.addMessage(m);
-					// }
 				}
 			}
 		}

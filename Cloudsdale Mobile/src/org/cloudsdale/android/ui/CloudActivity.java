@@ -24,6 +24,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.faye.FayeMessageHandler;
+import org.cloudsdale.android.managers.FayeManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api.Cloud;
@@ -134,12 +135,12 @@ public class CloudActivity extends SlidingFragmentActivity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (!Cloudsdale.isFayeConnected()) {
+		if (!FayeManager.isFayeConnected()) {
 			showProgressDialog();
-			Cloudsdale.bindFaye();
+			FayeManager.bindFaye();
 			new Thread() {
 				public void run() {
-					while (!Cloudsdale.isFayeConnected()) {
+					while (!FayeManager.isFayeConnected()) {
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
@@ -150,12 +151,12 @@ public class CloudActivity extends SlidingFragmentActivity implements
 				};
 			};
 		}
-		Cloudsdale.subscribeToMessages(this);
+		FayeManager.subscribeToMessages(this);
 	}
 
 	@Override
 	protected void onPause() {
-		Cloudsdale.unsubscribeToMessages(this);
+		FayeManager.unsubscribeToMessages(this);
 		super.onPause();
 	}
 

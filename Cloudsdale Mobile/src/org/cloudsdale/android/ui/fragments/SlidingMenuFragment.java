@@ -40,6 +40,7 @@ public class SlidingMenuFragment extends SherlockFragment {
 	private View			mHeaderContentView;
 	private ImageView		mHeaderAvatar;
 	private TextView		mHeaderUsername;
+	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

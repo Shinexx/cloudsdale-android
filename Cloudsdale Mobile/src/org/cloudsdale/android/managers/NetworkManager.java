@@ -1,5 +1,9 @@
 package org.cloudsdale.android.managers;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.LoggedUser;
@@ -10,10 +14,66 @@ import org.cloudsdale.android.models.queries.SessionQuery;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Manager class to report network state and manage network queries
+ * Copyright (c) 2012 Cloudsdale.org
+ * 
+ * @author Jamison Greeley atomicrat2552@gmail.com
+ * 
+ */
 public class NetworkManager {
 
-	private static LoggedUser		sLoggedUser;
-	private static QueryException	sExceptionThrown;
+	// Connectivity status objects
+	private static ConnectivityManager	sConnectivityManager;
+
+	private static LoggedUser			sLoggedUser;
+	private static QueryException		sExceptionThrown;
+
+	public static boolean isInternetConnected() {
+		if (sConnectivityManager == null) {
+			sConnectivityManager = (ConnectivityManager) Cloudsdale
+					.getContext()
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+		}
+
+		return sConnectivityManager.getActiveNetworkInfo().isConnected();
+	}
+
+	public static boolean isMobileNetConnected() {
+		if (sConnectivityManager == null) {
+			sConnectivityManager = (ConnectivityManager) Cloudsdale
+					.getContext()
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+		}
+		NetworkInfo info = sConnectivityManager.getActiveNetworkInfo();
+		if (info.getType() == ConnectivityManager.TYPE_MOBILE) {
+			return info.isConnected();
+		} else return false;
+	}
+
+	public static boolean isWimaxConnected() {
+		if (sConnectivityManager == null) {
+			sConnectivityManager = (ConnectivityManager) Cloudsdale
+					.getContext()
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+		}
+		NetworkInfo info = sConnectivityManager.getActiveNetworkInfo();
+		if (info.getType() == ConnectivityManager.TYPE_WIMAX) {
+			return info.isConnected();
+		} else return false;
+	}
+
+	public static boolean isWifiConnected() {
+		if (sConnectivityManager == null) {
+			sConnectivityManager = (ConnectivityManager) Cloudsdale
+					.getContext()
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+		}
+		NetworkInfo info = sConnectivityManager.getActiveNetworkInfo();
+		if (info.getType() == ConnectivityManager.TYPE_WIFI) {
+			return info.isConnected();
+		} else return false;
+	}
 
 	/*
 	 * Public method to authenticate users via Cloudsdale credentials
@@ -52,7 +112,7 @@ public class NetworkManager {
 				};
 			}.start();
 		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
+			// TODO Handle this shit gracefully
 			e1.printStackTrace();
 		}
 		if (sExceptionThrown != null) {
