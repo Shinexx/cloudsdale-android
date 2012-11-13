@@ -1,29 +1,30 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#C1D7E9"
     android:orientation="vertical" >
 
-    <ImageView
+    <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/home_background_clouds" />
+        android:background="@drawable/background_clouds_tile"
+        android:orientation="vertical" >
 
-    <include
-        android:id="@+id/home_tile"
-        android:layout_width="420dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|left"
-        android:layout_margin="8dp"
-        layout="@layout/partial_home_tile" />
+        <include
+            android:id="@+id/home_tile"
+            android:layout_width="420dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|left"
+            android:layout_margin="8dp"
+            layout="@layout/partial_home_tile" />
 
-    <ImageView
-        android:layout_width="144dp"
-        android:layout_height="fill_parent"
-        android:layout_gravity="right"
-        android:scaleType="centerInside"
-        android:src="@drawable/bg_pony_right" />
+        <ImageView
+            android:layout_width="144dp"
+            android:layout_height="fill_parent"
+            android:layout_gravity="right"
+            android:scaleType="centerInside"
+            android:src="@drawable/home_background_pony_right" />
+    </FrameLayout>
 
-</FrameLayout>
+</LinearLayout>

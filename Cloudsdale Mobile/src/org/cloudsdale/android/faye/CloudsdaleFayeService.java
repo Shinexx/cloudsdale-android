@@ -71,12 +71,6 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 		return this.mFayeBinder;
 	}
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		setup();
-	}
-
 	/**
 	 * Stops Faye when the Service is being destroyed by the OS
 	 */

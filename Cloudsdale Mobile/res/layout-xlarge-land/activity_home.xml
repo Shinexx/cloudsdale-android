@@ -2,45 +2,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/background_clouds_tile"
+    android:background="#C1D7E9"
     android:orientation="vertical" >
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:background="@drawable/background_clouds_tile"
         android:orientation="vertical" >
 
         <include
             android:id="@+id/home_tile"
-            android:layout_width="fill_parent"
+            android:layout_width="420dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|top"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="60dp"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
             layout="@layout/partial_home_tile" />
 
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="420dp"
             android:layout_height="200dp"
-            android:layout_gravity="bottom|center_horizontal"
+            android:layout_alignLeft="@+id/home_tile"
+            android:layout_below="@+id/home_tile"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
-            android:weightSum="1.0" >
+            android:weightSum="1.2" >
 
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
-                android:layout_weight="0.5"
+                android:layout_weight="0.4"
                 android:scaleType="centerInside"
                 android:src="@drawable/home_background_pony_left" />
 
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
-                android:layout_weight="0.5"
+                android:layout_weight="0.4"
                 android:scaleType="centerInside"
                 android:src="@drawable/home_background_pony_center" />
+
+            <ImageView
+                android:id="@+id/home_right_pony_view"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.4"
+                android:scaleType="centerInside"
+                android:src="@drawable/home_background_pony_right" />
         </LinearLayout>
-    </FrameLayout>
+
+    </RelativeLayout>
 
 </LinearLayout>

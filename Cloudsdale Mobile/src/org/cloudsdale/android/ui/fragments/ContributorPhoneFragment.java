@@ -69,7 +69,7 @@ public class ContributorPhoneFragment extends Fragment {
 					.findViewById(R.id.contributor_title_label);
 
 			// Remove the image view and center the text views
-			avatar.setVisibility(View.GONE);
+			avatar.setVisibility(View.INVISIBLE);
 			name.setGravity(Gravity.CENTER);
 			title.setGravity(Gravity.CENTER);
 

@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/background_clouds_tile"
         android:orientation="vertical" >
 
         <TextView
@@ -20,10 +21,10 @@
 
         <fragment
             android:id="@+id/about_contributor_fragment"
-            android:name="org.cloudsdale.android.ui.fragments.ContributorPhoneFragment"
+            android:name="org.cloudsdale.android.ui.fragments.ContributorTabletFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:layout="@layout/fragment_contributor_phone" />
+            tools:layout="@layout/fragment_contributor_tablet" />
 
         <Button
             android:id="@+id/about_license_button"

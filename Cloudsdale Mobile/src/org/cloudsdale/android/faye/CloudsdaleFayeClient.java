@@ -245,17 +245,17 @@ public class CloudsdaleFayeClient {
 				CloudsdaleFayeClient.this.mWebSocket = new WebSocketConnection();
 				connect();
 				break;
-			case WebSocketHandler.CLOSE_PROTOCOL_ERROR:
-			case WebSocketHandler.CLOSE_CANNOT_CONNECT:
 			case WebSocketHandler.CLOSE_CONNECTION_LOST:
 				while (!CloudsdaleFayeClient.this.mWebSocket.isConnected()) {
 					try {
 						connect();
-						Thread.sleep(1000);
+						Thread.sleep(5000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
+			case WebSocketHandler.CLOSE_PROTOCOL_ERROR:
+			case WebSocketHandler.CLOSE_CANNOT_CONNECT:
 			case WebSocketHandler.CLOSE_NORMAL:
 				break;
 		}

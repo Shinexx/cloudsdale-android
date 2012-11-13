@@ -156,6 +156,7 @@ public class CloudActivity extends SlidingFragmentActivity implements
 
 	@Override
 	protected void onPause() {
+		showAbove();
 		FayeManager.unsubscribeToMessages(this);
 		super.onPause();
 	}
