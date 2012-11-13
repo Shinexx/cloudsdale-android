@@ -73,12 +73,8 @@ public class HomeActivity extends SlidingFragmentActivity implements
 			FayeManager.bindFaye();
 		}
 		FayeManager.subscribeToMessages(this);
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-
+		
+		// Start the UI fill tasks
 		new UserViewFillTask().execute();
 		new ConnectionMonitorTask().execute();
 	}

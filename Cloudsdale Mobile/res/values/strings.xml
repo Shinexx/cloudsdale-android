@@ -39,5 +39,6 @@
     <string name="sliding_menu_cloud_nav_header">Clouds</string>
     <string name="cloud_list_fragment_tag">cloud_list_fragment</string>
     <string name="chat_connecting_text">Chat is connecting...</string>
+    <string name="chat_loading_message">Loading chat messages...</string>
 
 </resources>

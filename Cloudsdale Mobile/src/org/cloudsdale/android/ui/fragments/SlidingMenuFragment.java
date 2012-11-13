@@ -25,8 +25,8 @@ import org.cloudsdale.android.ui.CloudActivity;
 import org.cloudsdale.android.ui.HomeActivity;
 
 /**
- * View fragment to show the inner view of the sliding menu.
- * Copyright (c) 2012 Cloudsale.org
+ * View fragment to show the inner view of the sliding menu. Copyright (c) 2012
+ * Cloudsale.org
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  * 
@@ -40,12 +40,12 @@ public class SlidingMenuFragment extends SherlockFragment {
 	private View			mHeaderContentView;
 	private ImageView		mHeaderAvatar;
 	private TextView		mHeaderUsername;
-	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		mRootView = (ScrollView) inflater.inflate(R.layout.fragment_sliding_menu, null);
+		mRootView = (ScrollView) inflater.inflate(
+				R.layout.fragment_sliding_menu, null);
 		View headerView = mRootView.findViewById(R.id.sliding_menu_header);
 
 		// Get the header views
@@ -101,7 +101,7 @@ public class SlidingMenuFragment extends SherlockFragment {
 			intent.setClass(getActivity(), CloudActivity.class);
 			intent.putExtra("cloudId", viewId);
 		}
-		startActivity(intent);
+		getActivity().startActivity(intent);
 	}
 
 	/**
@@ -122,8 +122,8 @@ public class SlidingMenuFragment extends SherlockFragment {
 	private void setSlideMenuClouds(User me) {
 		for (Cloud c : me.getClouds()) {
 			LayoutInflater inflater = getLayoutInflater(getArguments());
-			View cloudView = inflater
-					.inflate(R.layout.fragment_sliding_menu_entry, null);
+			View cloudView = inflater.inflate(
+					R.layout.fragment_sliding_menu_entry, null);
 			ImageView icon = (ImageView) cloudView
 					.findViewById(R.id.cloud_icon);
 			TextView text = (TextView) cloudView.findViewById(R.id.cloud_name);
@@ -154,7 +154,8 @@ public class SlidingMenuFragment extends SherlockFragment {
 	private void setStaticNavigation() {
 		for (StaticNavigation nav : StaticNavigation.values()) {
 			LayoutInflater inflater = getLayoutInflater(getArguments());
-			View navView = inflater.inflate(R.layout.fragment_sliding_menu_entry, null);
+			View navView = inflater.inflate(
+					R.layout.fragment_sliding_menu_entry, null);
 			ImageView icon = (ImageView) navView.findViewById(R.id.cloud_icon);
 			TextView text = (TextView) navView.findViewById(R.id.cloud_name);
 			TextView hiddenId = (TextView) navView
@@ -179,8 +180,7 @@ public class SlidingMenuFragment extends SherlockFragment {
 
 	/**
 	 * An AsyncTask to fetch the logged in user and fill the UI views
-	 * asynchronously.
-	 * Copyright (c) 2012 Cloudsdale.org
+	 * asynchronously. Copyright (c) 2012 Cloudsdale.org
 	 * 
 	 * @author Jamison Greeley (atomicrat2552@gmail.com)
 	 * 

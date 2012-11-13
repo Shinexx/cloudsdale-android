@@ -12,20 +12,21 @@ import org.cloudsdale.android.models.queries.UserGetQuery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
- * Manager class designed to store and retrieve Cloudsdale users.
- * Copyright (c) 2012 Cloudsdale.org
+ * Manager class designed to store and retrieve Cloudsdale users. Copyright (c)
+ * 2012 Cloudsdale.org
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  * 
  */
 public class UserManager {
 
-	private static ArrayList<User>	mStoredUsers;
+	private static HashMap<String, User>	mStoredUsers;
 
 	static {
-		mStoredUsers = new ArrayList<User>();
+		mStoredUsers = new HashMap<String, User>();
 	}
 
 	/**
@@ -54,15 +55,8 @@ public class UserManager {
 	 * @return The user corresponding to the passed ID
 	 */
 	public static User getUserById(String id) {
-		if (mStoredUsers != null && !mStoredUsers.isEmpty()) {
-			ArrayList<User> users;
-			synchronized (mStoredUsers) {
-				users = new ArrayList<User>(mStoredUsers);
-			}
-			for (User u : users) {
-				if (u.getId().equals(id)) { return u; }
-			}
-			return null;
+		if (mStoredUsers.containsKey(id)) {
+			return mStoredUsers.get(id);
 		} else {
 			// Get the strings we need
 			Context appContext = Cloudsdale.getContext();
@@ -74,7 +68,7 @@ public class UserManager {
 			UserGetQuery query = new UserGetQuery(url);
 			try {
 				User user = query.execute(null, null);
-				mStoredUsers.add(user);
+				mStoredUsers.put(id, user);
 				return user;
 			} catch (QueryException e) {
 				return null;
@@ -113,10 +107,7 @@ public class UserManager {
 	 * @return The cloud if the user is a member of it, null otherwise
 	 */
 	public static Cloud getCloudFromUser(User user, String id) {
-		for (Cloud c : user.getClouds()) {
-			if (c.getId().equals(id)) { return c; }
-		}
-		return null;
+		return user.getCloud(id);
 	}
 
 	/**
@@ -127,7 +118,7 @@ public class UserManager {
 	 */
 	public static void storeUser(User user) {
 		synchronized (mStoredUsers) {
-			mStoredUsers.add(user);
+			mStoredUsers.put(user.getId(), user);
 		}
 	}
 }

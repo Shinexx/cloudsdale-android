@@ -1,20 +1,10 @@
 package org.cloudsdale.android.ui.fragments;
 
-import android.annotation.SuppressLint;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
-
-import com.actionbarsherlock.app.SherlockFragment;
+import java.util.ArrayList;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.managers.FayeManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Message;
@@ -25,7 +15,19 @@ import org.cloudsdale.android.ui.adapters.CloudMessageAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
 
 public class ChatFragment extends SherlockFragment {
 
@@ -37,6 +39,8 @@ public class ChatFragment extends SherlockFragment {
 	private static String				sCloudUrl;
 	private static EditText				sInputField;
 	private static ImageButton			sSendButton;
+	private static TextView				sFayeConnectedStatus;
+	private static View					sLoadingView;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,6 +59,7 @@ public class ChatFragment extends SherlockFragment {
 	private void attachViews() {
 		sMessageList = (ListView) sChatView
 				.findViewById(R.id.chat_message_list);
+		sLoadingView = sChatView.findViewById(R.id.chat_loading_view);
 		sMessageAdapter = new CloudMessageAdapter(getActivity(),
 				new ArrayList<Message>());
 		sMessageList.setAdapter(sMessageAdapter);
@@ -62,6 +67,14 @@ public class ChatFragment extends SherlockFragment {
 		sInputField = (EditText) sChatView.findViewById(R.id.chat_input_field);
 		sSendButton = (ImageButton) sChatView
 				.findViewById(R.id.chat_send_button);
+
+		sFayeConnectedStatus = (TextView) sChatView
+				.findViewById(R.id.home_connection_status);
+		if (FayeManager.isFayeConnected()) {
+			sFayeConnectedStatus.setVisibility(View.GONE);
+		} else {
+			new ConnectionMonitorTask().execute();
+		}
 
 		sSendButton.setClickable(true);
 		sSendButton.setOnClickListener(new View.OnClickListener() {
@@ -81,20 +94,9 @@ public class ChatFragment extends SherlockFragment {
 		super.onPause();
 	}
 
-	// @Override
-	// public void onStop() {
-	// detachViews();
-	// super.onStop();
-	// }
-
 	@SuppressLint("NewApi")
 	private void detachViews() {
 		sMessageList.setAdapter(null);
-		// sMessageList = null;
-		// sMessageAdapter.clearMessages();
-		// sMessageAdapter = null;
-		// sInputField = null;
-		// sSendButton = null;
 	}
 
 	public void populateChat() {
@@ -150,11 +152,13 @@ public class ChatFragment extends SherlockFragment {
 			}
 			if (result != null && result.length > 0) {
 				for (Message m : result) {
-					if(m == null) continue;
+					if (m == null) continue;
 					((CloudMessageAdapter) sMessageList.getAdapter())
 							.addMessage(m);
 				}
 			}
+			sLoadingView.setVisibility(View.GONE);
+			sMessageList.setVisibility(View.VISIBLE);
 		}
 
 		private Message getPreviousMessage() {
@@ -212,5 +216,27 @@ public class ChatFragment extends SherlockFragment {
 			}
 			super.onPostExecute(result);
 		}
+	}
+
+	class ConnectionMonitorTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			while (!FayeManager.isFayeConnected()) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			sFayeConnectedStatus.setVisibility(View.GONE);
+			super.onPostExecute(result);
+		}
+
 	}
 }

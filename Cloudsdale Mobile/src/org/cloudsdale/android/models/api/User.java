@@ -1,14 +1,15 @@
 package org.cloudsdale.android.models.api;
 
-import com.google.gson.annotations.SerializedName;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.AvatarContainer;
 import org.cloudsdale.android.models.IdentityModel;
 import org.cloudsdale.android.models.Role;
 
-import java.util.ArrayList;
-import java.util.Calendar;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * User model for Cloudsdale
@@ -67,7 +68,7 @@ public class User extends IdentityModel {
 	protected String					skypeName;
 
 	// Child objects from JSON
-	protected ArrayList<Cloud>			clouds;
+	protected HashMap<String, Cloud>	clouds;
 
 	public String getAuthToken() {
 		return this.authToken;
@@ -79,9 +80,9 @@ public class User extends IdentityModel {
 
 	public ArrayList<Cloud> getClouds() {
 		if (clouds == null) {
-			clouds = new ArrayList<Cloud>();
+			clouds = new HashMap<String, Cloud>();
 		}
-		return clouds;
+		return new ArrayList<Cloud>(clouds.values());
 	}
 
 	public String getEmail() {
@@ -223,9 +224,15 @@ public class User extends IdentityModel {
 	}
 
 	public void setClouds(final ArrayList<Cloud> clouds) {
-		this.clouds = clouds;
+		new Thread() {
+			public void run() {
+				for (Cloud c : clouds) {
+					User.this.clouds.put(c.getId(), c);
+				}
+			};
+		}.start();
 	}
-	
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -333,9 +340,13 @@ public class User extends IdentityModel {
 	public void setUserRole(Role userRole) {
 		this.userRole = userRole;
 	}
-	
+
 	public void addCloud(Cloud cloud) {
-		clouds.add(cloud);
+		clouds.put(cloud.getId(), cloud);
+	}
+
+	public Cloud getCloud(String id) {
+		return clouds.get(id);
 	}
 
 	/**

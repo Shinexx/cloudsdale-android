@@ -135,22 +135,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (!FayeManager.isFayeConnected()) {
-			showProgressDialog();
-			FayeManager.bindFaye();
-			new Thread() {
-				public void run() {
-					while (!FayeManager.isFayeConnected()) {
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-					hideProgressDialog();
-				};
-			};
-		}
 		FayeManager.subscribeToMessages(this);
 	}
 
@@ -159,22 +143,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
 		showAbove();
 		FayeManager.unsubscribeToMessages(this);
 		super.onPause();
-	}
-
-	private void showProgressDialog() {
-		sProgressDialog = new ProgressDialog(this);
-		sProgressDialog.setIndeterminate(true);
-		sProgressDialog.setTitle("Cloudsdale is connecting");
-		sProgressDialog.setMessage("Please wait...");
-		sProgressDialog.setCancelable(false);
-		sProgressDialog.show();
-	}
-
-	private void hideProgressDialog() {
-		if (sProgressDialog != null && sProgressDialog.isShowing()) {
-			sProgressDialog.cancel();
-		}
-		sProgressDialog = null;
 	}
 
 	private void GetShowingCloud() {

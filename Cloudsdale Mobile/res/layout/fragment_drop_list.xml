@@ -4,7 +4,8 @@
     android:id="@+id/drop_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/abs__background_holo_light"
     android:stackFromBottom="true"
-    tools:listitem="@layout/drop_layout" >
+    tools:listitem="@layout/object_drop" >
 
 </ListView>
