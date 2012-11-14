@@ -50,6 +50,10 @@ public class HomeActivity extends SlidingFragmentActivity implements
 	private TextView	        mCloudCountView;
 	private SlidingMenu	        mSlidingMenu;
 	private TextView	        mChatConnectionStatusView;
+	
+	public boolean isBehindViewShowing() {
+		return mSlidingMenu.isBehindShowing();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
