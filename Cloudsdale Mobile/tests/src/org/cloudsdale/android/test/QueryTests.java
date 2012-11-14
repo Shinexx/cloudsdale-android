@@ -10,6 +10,7 @@ import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.Drop;
 import org.cloudsdale.android.models.api.Message;
 import org.cloudsdale.android.models.api.User;
+import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.queries.ChatMessageGetQuery;
 import org.cloudsdale.android.models.queries.CloudGetQuery;
 import org.cloudsdale.android.models.queries.DropGetQuery;
@@ -18,6 +19,8 @@ import org.cloudsdale.android.models.queries.SessionQuery;
 import org.cloudsdale.android.models.queries.UserGetQuery;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.google.gson.JsonObject;
 
 import junit.framework.Assert;
 
@@ -50,7 +53,12 @@ public class QueryTests extends AndroidTestCase {
         // Act
         UserGetQuery query = new UserGetQuery(data.getUrl());
         query.addHeader("X-AUTH-TOKEN", session.getAuthToken());
-        User user = query.execute(data, null);
+        User user = null;
+        try {
+        	user = query.execute(data, null);
+        } catch(QueryException e) {
+        	Assert.fail(e.getMessage());
+        }
 
         // Assert
         Assert.assertNotNull(user);
@@ -65,7 +73,12 @@ public class QueryTests extends AndroidTestCase {
         // Act
         CloudGetQuery query = new CloudGetQuery(data.getUrl());
         query.addHeader("X-AUTH-TOKEN", session.getAuthToken());
-        Cloud cloud = query.execute(data, null);
+        Cloud cloud = null;
+		try {
+			cloud = query.execute(data, null);
+		} catch (QueryException e) {
+			Assert.fail(e.getMessage());
+		}
 
         // Assert
         Assert.assertNotNull(cloud);
@@ -81,7 +94,12 @@ public class QueryTests extends AndroidTestCase {
         // Act
         ChatMessageGetQuery query = new ChatMessageGetQuery(data.getUrl());
         query.addHeader("X-AUTH-TOKEN", session.getAuthToken());
-        Message[] messages = query.executeForCollection(data, null);
+        Message[] messages = null;
+		try {
+			messages = query.executeForCollection(data, null);
+		} catch (QueryException e) {
+			Assert.fail(e.getMessage());
+		}
 
         // Assert
         Assert.assertNotNull(messages);
@@ -110,7 +128,12 @@ public class QueryTests extends AndroidTestCase {
 
         data.setJson(message.toString());
         query.addHeader("X-AUTH-TOKEN", session.getAuthToken());
-        Message result = query.execute(data, null);
+        Message result = null;
+		try {
+			result = query.execute(data, null);
+		} catch (QueryException e) {
+			Assert.fail(e.getMessage());
+		}
 
         // Assert
         Log.d("Message Post Test", message.toString());
@@ -152,17 +175,23 @@ public class QueryTests extends AndroidTestCase {
     private QueryData setupQueryData_Username(String url) {
         QueryData data = setupQueryData(url);
         data.setUrl(Constants.SESSION_ENDPOINT);
-        ArrayList<BasicNameValuePair> headers = new ArrayList<BasicNameValuePair>();
-        headers.add(new BasicNameValuePair("email", Constants.DUMMY_EMAIL));
-        headers.add(new BasicNameValuePair("password", Constants.DUMMY_PASSWORD));
-        data.setHeaders(headers);
+        JsonObject json = new JsonObject();
+		json.addProperty("email", Constants.DUMMY_EMAIL);
+		json.addProperty("password", Constants.DUMMY_PASSWORD);
+		data.setJson(json.toString());
         return data;
     }
 
     private LoggedUser establishSession() {
         QueryData data = setupQueryData_Username(Constants.SESSION_ENDPOINT);
         SessionQuery sq = new SessionQuery(data.getUrl());
-        LoggedUser session = sq.execute(data, null);
+        LoggedUser session;
+		try {
+			session = sq.execute(data, null);
+		} catch (QueryException e) {
+			Assert.fail(e.getMessage());
+			return null;
+		}
         return session;
     }
 }
