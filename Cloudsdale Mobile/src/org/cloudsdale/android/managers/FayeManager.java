@@ -68,7 +68,9 @@ public class FayeManager extends ContextWrapper implements ServiceConnection,
 		new Thread() {
 			public void run() {
 				User me = UserManager.getLoggedInUser();
-				for (Cloud c : me.getClouds()) {
+				ArrayList<Cloud> clouds = new ArrayList<Cloud>(me.getClouds()
+						.values());
+				for (Cloud c : clouds) {
 					sFayeBinder.getFayeClient().subscribe(
 							"/clouds/" + c.getId() + "/chat/messages");
 				}
@@ -83,7 +85,7 @@ public class FayeManager extends ContextWrapper implements ServiceConnection,
 			}
 		}
 	}
-	
+
 	public static void unsubscribeToMessages(FayeMessageHandler handler) {
 		synchronized (sHandlerList) {
 			sHandlerList.remove(handler);

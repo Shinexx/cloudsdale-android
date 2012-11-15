@@ -91,7 +91,7 @@ public class UserManager {
 		try {
 			ArrayList<Cloud> clouds = new ArrayList<Cloud>(Arrays.asList(query
 					.executeForCollection(null, null)));
-			user.setClouds(clouds);
+			user.convertClouds(clouds);
 		} catch (QueryException e) {
 			e.printStackTrace();
 		}

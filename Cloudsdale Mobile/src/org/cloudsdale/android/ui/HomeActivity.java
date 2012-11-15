@@ -137,15 +137,17 @@ public class HomeActivity extends SlidingFragmentActivity implements
 			case DONOR:
 				text = "Thanks for donating!";
 				break;
-			case PLACEHOLDER:
-				text = "Now, either someone was expirementing on you, or you broke something";
+			case CONTRIBUTOR:
+				text = "Thanks for contributing!";
 				break;
 			case MODERATOR:
 				text = "Get to work moderation monkey!";
 				break;
 			case DEVELOPER:
-			case ADMIN:
 				text = "You have code to write! Get to it!";
+				break;
+			case ADMIN:
+				text = "You have things to administrate! NO BREAK FOR YOU!";
 				break;
 			case FOUNDER:
 				text = "Go back to iOS douchebag!";
@@ -238,10 +240,10 @@ public class HomeActivity extends SlidingFragmentActivity implements
 			mUsernameView.setText(result.getName());
 
 			// Set the user's other properties in the main view
-			mAccountLevelView.setText(createAccountLevelText(result.getRole()));
+			mAccountLevelView.setText(createAccountLevelText(result.getUserRole()));
 
 			// Format and set the user's join date
-			Date date = result.getMemberSince().getTime();
+			Date date = result.getMemberSince();
 			SimpleDateFormat df = new SimpleDateFormat("dd MMMM, yyyy");
 			mDateRegisteredView.setText(MessageFormat.format(
 			        "You registered on {0}", df.format(date)));

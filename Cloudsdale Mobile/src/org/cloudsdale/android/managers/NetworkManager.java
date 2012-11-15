@@ -5,10 +5,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.Provider;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.authentication.Provider;
 import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.queries.SessionQuery;
 import org.json.JSONException;

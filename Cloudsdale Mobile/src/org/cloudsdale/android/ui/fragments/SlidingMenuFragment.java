@@ -1,5 +1,7 @@
 package org.cloudsdale.android.ui.fragments;
 
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -120,7 +122,8 @@ public class SlidingMenuFragment extends SherlockFragment {
 	}
 
 	private void setSlideMenuClouds(User me) {
-		for (Cloud c : me.getClouds()) {
+		ArrayList<Cloud> clouds = new ArrayList<Cloud>(me.getClouds().values());
+		for (Cloud c : clouds) {
 			LayoutInflater inflater = getLayoutInflater(getArguments());
 			View cloudView = inflater.inflate(
 					R.layout.fragment_sliding_menu_entry, null);

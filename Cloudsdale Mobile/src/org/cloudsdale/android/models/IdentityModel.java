@@ -1,5 +1,8 @@
 package org.cloudsdale.android.models;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 
 
 /**
@@ -7,16 +10,10 @@ package org.cloudsdale.android.models;
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
+@Data
+@EqualsAndHashCode(callSuper=false)
 public class IdentityModel extends Model {
 
 	protected String	id;
-
-	public String getId() {
-		return this.id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 }

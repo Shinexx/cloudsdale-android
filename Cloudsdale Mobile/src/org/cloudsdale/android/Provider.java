@@ -1,7 +1,12 @@
-package org.cloudsdale.android.models.authentication;
+package org.cloudsdale.android;
 
 public enum Provider {
-	FACEBOOK("facebook"), TWITTER("twitter"), CLOUDSDALE("cloudsdale");
+	//@formatter:off
+	FACEBOOK("facebook"), 
+	TWITTER("twitter"), 
+	CLOUDSDALE("cloudsdale")
+	;
+	//@formatter:on
 
 	private String	displayName;
 

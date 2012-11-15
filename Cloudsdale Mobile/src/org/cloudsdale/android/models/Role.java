@@ -1,8 +1,16 @@
 package org.cloudsdale.android.models;
 
 public enum Role {
-	NORMAL(""), DONOR("donor"), MODERATOR(""), PLACEHOLDER(
-			""), ADMIN(""), DEVELOPER("[ dev ]"), FOUNDER("[ founder ]");
+	//@formatter:off
+	NORMAL(""),
+	DONOR("[ donor ]"),
+	MODERATOR(""),
+	CONTRIBUTOR(""),
+	ADMIN(""),
+	DEVELOPER("[ dev ]"),
+	FOUNDER("[ founder ]")
+	;
+	//@formatter:on
 
 	private String	prettyName;
 
