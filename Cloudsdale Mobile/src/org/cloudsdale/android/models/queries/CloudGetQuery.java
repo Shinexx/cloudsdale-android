@@ -1,17 +1,11 @@
 package org.cloudsdale.android.models.queries;
 
-import android.accounts.AccountManager;
-import android.content.Context;
-import android.util.Log;
-
-import com.bugsense.trace.BugSenseHandler;
-import com.google.gson.Gson;
+import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.managers.UserAccountManager;
-import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.exceptions.QueryException;
@@ -19,7 +13,12 @@ import org.cloudsdale.android.models.network.ApiCloudArrayResponse;
 import org.cloudsdale.android.models.network.ApiCloudResponse;
 import org.cloudsdale.android.models.network.ApiResponse;
 
-import java.io.IOException;
+import android.accounts.AccountManager;
+import android.content.Context;
+import android.util.Log;
+
+import com.bugsense.trace.BugSenseHandler;
+import com.google.gson.Gson;
 
 public class CloudGetQuery extends GetQuery {
 

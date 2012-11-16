@@ -22,8 +22,6 @@ import org.cloudsdale.android.ui.adapters.CloudDropAdapter;
 
 public class DropFragment extends SherlockFragment {
 
-    private static final String     TAG = "Drop Fragment";
-
     private static View             sDropView;
     private static ListView         sDropList;
     private static CloudDropAdapter sDropAdapter;
@@ -54,7 +52,7 @@ public class DropFragment extends SherlockFragment {
         sDropList.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView parent, View view,
+            public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
                 String url = ((Drop) sDropList.getItemAtPosition(position))
                         .getUrl();

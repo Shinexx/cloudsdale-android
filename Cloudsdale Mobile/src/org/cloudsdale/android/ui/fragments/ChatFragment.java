@@ -160,15 +160,6 @@ public class ChatFragment extends SherlockFragment {
 			sLoadingView.setVisibility(View.GONE);
 			sMessageList.setVisibility(View.VISIBLE);
 		}
-
-		private Message getPreviousMessage() {
-			if (sMessageAdapter.getCount() > 0) {
-				return (Message) sMessageAdapter.getItem(sMessageAdapter
-						.getCount() - 1);
-			} else {
-				return null;
-			}
-		}
 	}
 
 	class MessageAsyncSend extends AsyncTask<String, Void, Message> {

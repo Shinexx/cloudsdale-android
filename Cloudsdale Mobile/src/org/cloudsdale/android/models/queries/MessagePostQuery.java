@@ -1,24 +1,23 @@
 package org.cloudsdale.android.models.queries;
 
-import android.accounts.AccountManager;
-import android.content.Context;
-import android.util.Log;
-
-import com.google.gson.Gson;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.managers.UserAccountManager;
-import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Message;
 import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.network.ApiMessageResponse;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import android.accounts.AccountManager;
+import android.content.Context;
+import android.util.Log;
+
+import com.google.gson.Gson;
 
 public class MessagePostQuery extends PostQuery {
 

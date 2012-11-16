@@ -7,8 +7,6 @@ import lombok.EqualsAndHashCode;
 
 import org.cloudsdale.android.models.Model;
 
-import com.google.gson.annotations.Expose;
-
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class Chat extends Model {

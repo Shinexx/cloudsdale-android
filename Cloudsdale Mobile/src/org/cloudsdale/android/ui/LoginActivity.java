@@ -1,5 +1,14 @@
 package org.cloudsdale.android.ui;
 
+import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.R;
+import org.cloudsdale.android.managers.UserAccountManager;
+import org.cloudsdale.android.managers.UserManager;
+import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.models.QueryData;
+import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.queries.SessionQuery;
+
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.animation.Animator;
@@ -21,25 +30,13 @@ import android.widget.TextView;
 import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
-import com.bugsense.trace.BugSenseHandler;
 import com.google.gson.JsonObject;
-
-import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.R;
-import org.cloudsdale.android.managers.UserAccountManager;
-import org.cloudsdale.android.managers.UserManager;
-import org.cloudsdale.android.models.LoggedUser;
-import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.exceptions.QueryException;
-import org.cloudsdale.android.models.queries.SessionQuery;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * Controller for the login view
  * 
- * @author Jamison Greeley (atomicrat2552@gmail.com)
- *         Copyright (c) 2012 Cloudsdale.org
+ * @author Jamison Greeley (atomicrat2552@gmail.com) Copyright (c) 2012
+ *         Cloudsdale.org
  */
 public class LoginActivity extends SherlockActivity {
 
@@ -208,8 +205,8 @@ public class LoginActivity extends SherlockActivity {
 	 * Helper class to asynchronously log the user in using Cloudsdale
 	 * credentials
 	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com)
-	 *         Copyright (c) 2012 Cloudsdale.org
+	 * @author Jamison Greeley (atomicrat2552@gmail.com) Copyright (c) 2012
+	 *         Cloudsdale.org
 	 * 
 	 */
 	private class CloudsdaleAuthTask extends AsyncTask<Void, Void, LoggedUser> {
