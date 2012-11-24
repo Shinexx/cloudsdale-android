@@ -1,18 +1,3 @@
 [submodule "submodules/Faye-Android"]
 	path = submodules/Faye-Android
 	url = git@github.com:IOMUSE/Faye-Android.git
-[submodule "submodules/HoloEverywhere"]
-	path = submodules/HoloEverywhere
-	url = git@github.com:atomicrat2552/HoloEverywhere.git
-[submodule "submodules/SlidingMenu"]
-	path = submodules/SlidingMenu
-	url = git@github.com:atomicrat2552/SlidingMenu.git
-[submodule "submodules/ActionBarSherlock"]
-	path = submodules/ActionBarSherlock
-	url = git@github.com:atomicrat2552/ActionBarSherlock.git
-[submodule "submodules/facebook-android-sdk"]
-	path = submodules/facebook-android-sdk
-	url = git@github.com:atomicrat2552/facebook-android-sdk.git
-[submodule "submodules/UrlImageViewHelper"]
-	path = submodules/UrlImageViewHelper
-	url = git@github.com:atomicrat2552/UrlImageViewHelper.git
