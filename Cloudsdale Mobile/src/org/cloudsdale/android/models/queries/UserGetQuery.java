@@ -58,7 +58,7 @@ public class UserGetQuery extends GetQuery {
 			json = stripHtml(json);
 
 			// Deserialize
-			Gson gson = new Gson();
+			Gson gson = Cloudsdale.getJsonDeserializer();
 			if (json != null) {
 				Log.d(TAG, json);
 				response = gson.fromJson(json, ApiUserResponse.class);

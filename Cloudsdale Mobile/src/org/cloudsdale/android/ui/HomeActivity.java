@@ -131,17 +131,12 @@ public class HomeActivity extends SlidingFragmentActivity implements
 		String text = "";
 
 		switch (role) {
+			default:
 			case NORMAL:
 				text = "Welcome back!";
 				break;
 			case DONOR:
 				text = "Thanks for donating!";
-				break;
-			case CONTRIBUTOR:
-				text = "Thanks for contributing!";
-				break;
-			case MODERATOR:
-				text = "Get to work moderation monkey!";
 				break;
 			case DEVELOPER:
 				text = "You have code to write! Get to it!";

@@ -1,5 +1,8 @@
 package org.cloudsdale.android;
 
+import org.cloudsdale.android.models.Role;
+import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
+
 import android.app.Application;
 import android.content.Context;
 
@@ -52,6 +55,7 @@ public class Cloudsdale extends Application {
 		if (sJsonDeserializer == null) {
 			GsonBuilder builder = new GsonBuilder();
 			builder.setDateFormat("yyyy/MM/dd HH:mm:ss Z");
+			builder.registerTypeAdapter(Role.class, new GsonRoleAdapter());
 			sJsonDeserializer = builder.create();
 		}
 		return sJsonDeserializer;

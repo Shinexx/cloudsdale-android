@@ -4,8 +4,8 @@ public enum Role {
 	//@formatter:off
 	NORMAL(""),
 	DONOR("[ donor ]"),
-	MODERATOR(""),
-	CONTRIBUTOR(""),
+	LEGACY("[ legacy ]"),
+	ASSOCIATE("[ associate ]"),
 	ADMIN(""),
 	DEVELOPER("[ dev ]"),
 	FOUNDER("[ founder ]")

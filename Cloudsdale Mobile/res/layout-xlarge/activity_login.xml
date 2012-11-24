@@ -1,6 +1,6 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".NewLoginActivity" >
+    tools:context=".LoginActivity" >
 
     <!-- Login progress -->
 
@@ -33,9 +33,9 @@
 
     <ScrollView
         android:id="@+id/login_form"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
+        android:layout_width="600dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" >
         <LinearLayout
             style="@style/LoginFormContainer"
             android:orientation="vertical" >
@@ -63,13 +63,32 @@
 
             <Button
                 android:id="@+id/sign_in_button"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="16dp"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
-                android:text="@string/action_sign_in_register" />
+                android:text="@string/login_view_login_button_text" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <Button
+                    android:id="@+id/facebook_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:enabled="false"
+                    android:text="@string/login_view_facebook_button_text" />
+
+                <Button
+                    android:id="@+id/twitter_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:enabled="false"
+                    android:text="@string/login_view_twitter_button_text" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

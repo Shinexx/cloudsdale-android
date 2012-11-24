@@ -14,5 +14,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/Cloudsdale/contrib/robotium-solo-3.5.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="/Faye"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

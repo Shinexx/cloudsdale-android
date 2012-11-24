@@ -45,7 +45,7 @@ public class MessagePostQuery extends PostQuery {
                 Log.d("Message Post", mJsonString);
             }
             if (mJsonString != null) {
-                Gson gson = new Gson();
+                Gson gson = Cloudsdale.getJsonDeserializer();
                 ApiMessageResponse response = gson.fromJson(mJsonString,
                         ApiMessageResponse.class);
                 if (response.getStatus() != 200) {

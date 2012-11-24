@@ -122,7 +122,7 @@ public class SlidingMenuFragment extends SherlockFragment {
 	}
 
 	private void setSlideMenuClouds(User me) {
-		ArrayList<Cloud> clouds = new ArrayList<Cloud>(me.getClouds().values());
+		ArrayList<Cloud> clouds = new ArrayList<Cloud>(me.getClouds());
 		for (Cloud c : clouds) {
 			LayoutInflater inflater = getLayoutInflater(getArguments());
 			View cloudView = inflater.inflate(
