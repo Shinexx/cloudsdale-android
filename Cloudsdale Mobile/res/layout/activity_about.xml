@@ -18,13 +18,6 @@
             android:text="@string/about_contributor_title"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <fragment
-            android:id="@+id/about_contributor_fragment"
-            android:name="org.cloudsdale.android.ui.fragments.ContributorPhoneFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:layout="@layout/fragment_contributor_phone" />
-
         <Button
             android:id="@+id/about_license_button"
             android:layout_width="wrap_content"

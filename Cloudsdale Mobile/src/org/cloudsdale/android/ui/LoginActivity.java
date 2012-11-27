@@ -8,6 +8,10 @@ import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.queries.SessionQuery;
+import org.holoeverywhere.app.Activity;
+import org.holoeverywhere.widget.EditText;
+import org.holoeverywhere.widget.TextView;
+import org.holoeverywhere.widget.Toast;
 
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
@@ -24,11 +28,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import com.WazaBe.HoloEverywhere.widget.Toast;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.google.gson.JsonObject;
 
@@ -38,7 +38,7 @@ import com.google.gson.JsonObject;
  * @author Jamison Greeley (atomicrat2552@gmail.com) Copyright (c) 2012
  *         Cloudsdale.org
  */
-public class LoginActivity extends SherlockActivity {
+public class LoginActivity extends Activity {
 
 	public static final String	TAG	= "Cloudsdale LoginViewActivity";
 
@@ -75,7 +75,7 @@ public class LoginActivity extends SherlockActivity {
 		mPasswordView
 				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 					@Override
-					public boolean onEditorAction(TextView textView, int id,
+					public boolean onEditorAction(android.widget.TextView textView, int id,
 							KeyEvent keyEvent) {
 						if (id == R.id.login || id == EditorInfo.IME_NULL) {
 							startCloudsdaleAuthentication();

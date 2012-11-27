@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
@@ -25,6 +24,7 @@ import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.Role;
 import org.cloudsdale.android.models.api.User;
+import org.holoeverywhere.widget.TextView;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;

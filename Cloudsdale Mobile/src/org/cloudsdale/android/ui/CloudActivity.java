@@ -1,6 +1,5 @@
 package org.cloudsdale.android.ui;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -54,7 +53,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
 	private OnlineListFragment	mOnlineFrag;
 	private int					mDropFragIndex;
 	private int					mOnlineFragIndex;
-	private ProgressDialog		sProgressDialog;
 	private FrameLayout			mFragmentFrame;
 
 	@Override

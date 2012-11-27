@@ -8,7 +8,10 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.NonFinal;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.AvatarContainer;
@@ -27,6 +30,10 @@ import com.google.gson.annotations.SerializedName;
 public class User extends IdentityModel {
 
 	protected final String						TAG	= "Cloudsdale User";
+	
+	public User() {
+		mCloudLookupHash = new HashMap<String, Cloud>();
+	}
 
 	// protected attributes from JSON
 	protected String							name;
@@ -93,7 +100,7 @@ public class User extends IdentityModel {
 		} else {
 			Cloud output = null;
 			for (Cloud c : clouds) {
-				if (c.getId() == id) {
+				if (c.getId().equals(id)) {
 					mCloudLookupHash.put(id, c);
 					output = c;
 					break;

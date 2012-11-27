@@ -1,14 +1,17 @@
 package org.cloudsdale.android.ui.fragments;
 
+import org.holoeverywhere.app.Fragment;
+import org.holoeverywhere.widget.LinearLayout;
+import org.holoeverywhere.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
+
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.WazaBe.HoloEverywhere.widget.LinearLayout;
-import com.actionbarsherlock.app.SherlockFragment;
 
 public class OnlineListFragment extends SherlockFragment {
 

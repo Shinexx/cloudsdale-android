@@ -11,6 +11,7 @@
 
         <TabWidget
             android:id="@android:id/tabs"
+            style="@style/Widget.Sherlock.ActionBar.TabBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"

@@ -16,13 +16,13 @@
         android:gravity="center_horizontal"
         android:orientation="vertical" >
 
-        <ProgressBar
+        <org.holoeverywhere.widget.ProgressBar
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp" />
 
-        <TextView
+        <org.holoeverywhere.widget.TextView
             android:id="@+id/login_status_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
                 android:layout_margin="8dp"
                 android:src="@drawable/ic_unknown_user" />
 
-            <TextView
+            <org.holoeverywhere.widget.TextView
                 android:id="@+id/home_username_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -66,21 +66,21 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <TextView
+        <org.holoeverywhere.widget.TextView
             android:id="@+id/home_account_level_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="You&apos;re a developer" />
 
-        <TextView
+        <org.holoeverywhere.widget.TextView
             android:id="@+id/home_register_date_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="Your account was registered on February 2nd, 2012" />
 
-        <TextView
+        <org.holoeverywhere.widget.TextView
             android:id="@+id/home_cloud_count_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
 
     <!-- Faye connection status -->
 
-    <TextView
+    <org.holoeverywhere.widget.TextView
         android:id="@+id/home_connection_status"
         android:layout_width="match_parent"
         android:layout_height="24dp"

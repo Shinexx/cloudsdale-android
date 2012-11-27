@@ -13,3 +13,6 @@
 [submodule "submodules\\facebook-android-sdk"]
 	path = submodules\\facebook-android-sdk
 	url = git://github.com/facebook/facebook-android-sdk.git
+[submodule "submodules/Crouton"]
+	path = submodules/Crouton
+	url = git://github.com/keyboardsurfer/Crouton.git
