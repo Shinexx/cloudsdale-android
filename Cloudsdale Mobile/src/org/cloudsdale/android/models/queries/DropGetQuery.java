@@ -46,7 +46,7 @@ public class DropGetQuery extends GetQuery {
             if (mHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) { return null; }
 
             mJsonString = EntityUtils.toString(mHttpResponse.getEntity());
-            if (Cloudsdale.DEBUG) {
+            if (Cloudsdale.isDebuggable()) {
                 Log.d("DropFetchQuery", mJsonString);
             }
 

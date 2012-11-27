@@ -41,7 +41,7 @@ public class MessagePostQuery extends PostQuery {
             mHttpResponse = mhttpClient.execute(mHttpPost);
 
             mJsonString = EntityUtils.toString(mHttpResponse.getEntity());
-            if (Cloudsdale.DEBUG) {
+            if (Cloudsdale.isDebuggable()) {
                 Log.d("Message Post", mJsonString);
             }
             if (mJsonString != null) {
@@ -49,7 +49,7 @@ public class MessagePostQuery extends PostQuery {
                 ApiMessageResponse response = gson.fromJson(mJsonString,
                         ApiMessageResponse.class);
                 if (response.getStatus() != 200) {
-                    if (Cloudsdale.DEBUG) {
+                    if (Cloudsdale.isDebuggable()) {
                         Log.d("Message Post",
                                 response.getErrors()[0].getMessage());
                     }

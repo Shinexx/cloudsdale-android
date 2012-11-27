@@ -31,10 +31,11 @@ import org.cloudsdale.android.models.api.Drop;
 import org.cloudsdale.android.ui.fragments.ChatFragment;
 import org.cloudsdale.android.ui.fragments.DropFragment;
 import org.cloudsdale.android.ui.fragments.OnlineListFragment;
+import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
 
 import java.util.ArrayList;
 
-public class CloudActivity extends SlidingFragmentActivity implements
+public class CloudActivity extends ActivityBase implements
 		FayeMessageHandler {
 
 	private static final int	ONLINE_INDEX	= 0;
@@ -46,7 +47,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
 	private TabHost				mTabHost;
 	private ViewPager			mViewPager;
 	private TabsAdapter			mTabsAdapter;
-	private SlidingMenu			mSlidingMenu;
 	private boolean				mDualView;
 	private ChatFragment		mChatFrag;
 	private DropFragment		mDropFrag;
@@ -62,13 +62,6 @@ public class CloudActivity extends SlidingFragmentActivity implements
 		// Setup the view
 		setContentView(R.layout.activity_cloud_view);
 		setBehindContentView(R.layout.fragment_sliding_menu_host);
-
-		// Setup the sliding menu
-		mSlidingMenu = getSlidingMenu();
-
-		// Customize actionbar
-		ActionBar actionbar = getSupportActionBar();
-		actionbar.setDisplayHomeAsUpEnabled(true);
 
 		// Get the tab host
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);

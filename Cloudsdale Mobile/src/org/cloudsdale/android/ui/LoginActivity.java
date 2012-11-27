@@ -223,7 +223,7 @@ public class LoginActivity extends Activity {
 			json.addProperty("password", mPassword);
 			data.setJson(json.toString());
 
-			if (Cloudsdale.DEBUG) {
+			if (Cloudsdale.isDebuggable()) {
 				Log.d(TAG, "Json: " + json);
 			}
 

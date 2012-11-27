@@ -130,7 +130,7 @@ public class ChatFragment extends SherlockFragment {
 		protected Message[] doInBackground(Void... params) {
 			QueryData data = new QueryData();
 			String url = sCloudUrl;
-			if (Cloudsdale.DEBUG) {
+			if (Cloudsdale.isDebuggable()) {
 				Log.d("Cloudsdale Chat Fragment", "Message url: " + url);
 			}
 			data.setUrl(url);
@@ -147,7 +147,7 @@ public class ChatFragment extends SherlockFragment {
 		@Override
 		protected void onPostExecute(Message[] result) {
 			super.onPostExecute(result);
-			if (Cloudsdale.DEBUG) {
+			if (Cloudsdale.isDebuggable()) {
 				Log.d(TAG, "There are " + result.length + " messages");
 			}
 			if (result != null && result.length > 0) {
@@ -177,7 +177,7 @@ public class ChatFragment extends SherlockFragment {
 				e.printStackTrace();
 			}
 
-			if (Cloudsdale.DEBUG) {
+			if (Cloudsdale.isDebuggable()) {
 				Log.d("Chat Send Message", "Attempting to send message");
 				Log.d("Chat Send Message", message.toString());
 			}
@@ -197,7 +197,7 @@ public class ChatFragment extends SherlockFragment {
 
 		@Override
 		protected void onPostExecute(Message result) {
-			if (Cloudsdale.DEBUG) {
+			if (Cloudsdale.isDebuggable()) {
 				Log.d("Chat Send Message", "Results received");
 			}
 			sInputField.setText("");

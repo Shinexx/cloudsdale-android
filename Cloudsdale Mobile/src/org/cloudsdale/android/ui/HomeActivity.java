@@ -6,6 +6,8 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,6 +26,8 @@ import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.Role;
 import org.cloudsdale.android.models.api.User;
+import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
+import org.holoeverywhere.widget.FrameLayout;
 import org.holoeverywhere.widget.TextView;
 
 import java.text.MessageFormat;
@@ -36,21 +40,19 @@ import java.util.Date;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  * 
  */
-public class HomeActivity extends SlidingFragmentActivity implements
-        FayeMessageHandler {
+public class HomeActivity extends ActivityBase {
 
 	private static final String	TAG	= "Home Activity";
 
-	private View	            mLoadingView;
-	private View	            mContentView;
-	private ImageView	        mAvatarView;
-	private TextView	        mUsernameView;
-	private TextView	        mAccountLevelView;
-	private TextView	        mDateRegisteredView;
-	private TextView	        mCloudCountView;
-	private SlidingMenu	        mSlidingMenu;
-	private TextView	        mChatConnectionStatusView;
-	
+	private View				mLoadingView;
+	private View				mContentView;
+	private ImageView			mAvatarView;
+	private TextView			mUsernameView;
+	private TextView			mAccountLevelView;
+	private TextView			mDateRegisteredView;
+	private TextView			mCloudCountView;
+	private TextView			mChatConnectionStatusView;
+
 	public boolean isBehindViewShowing() {
 		return mSlidingMenu.isBehindShowing();
 	}
@@ -65,19 +67,12 @@ public class HomeActivity extends SlidingFragmentActivity implements
 
 		// Get the view objects
 		getViews();
-		mSlidingMenu = getSlidingMenu();
-		mSlidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
-
-		// Customize actionbar
-		ActionBar actionbar = getSupportActionBar();
-		actionbar.setDisplayHomeAsUpEnabled(true);
 
 		// Bind the Faye service
 		if (!FayeManager.isFayeConnected()) {
 			FayeManager.bindFaye();
 		}
-		FayeManager.subscribeToMessages(this);
-		
+
 		// Start the UI fill tasks
 		new UserViewFillTask().execute();
 		new ConnectionMonitorTask().execute();
@@ -117,7 +112,7 @@ public class HomeActivity extends SlidingFragmentActivity implements
 		mDateRegisteredView = (TextView) findViewById(R.id.home_register_date_label);
 		mCloudCountView = (TextView) findViewById(R.id.home_cloud_count_label);
 		mChatConnectionStatusView = (TextView) findViewById(R.id.home_tile)
-		        .findViewById(R.id.home_connection_status);
+				.findViewById(R.id.home_connection_status);
 	}
 
 	/**
@@ -159,49 +154,35 @@ public class HomeActivity extends SlidingFragmentActivity implements
 		// the progress spinner.
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
 			int shortAnimTime = getResources().getInteger(
-			        android.R.integer.config_shortAnimTime);
+					android.R.integer.config_shortAnimTime);
 
 			mLoadingView.setVisibility(View.VISIBLE);
 			mLoadingView.animate().setDuration(shortAnimTime)
-			        .alpha(show ? 1 : 0)
-			        .setListener(new AnimatorListenerAdapter() {
-				        @Override
-				        public void onAnimationEnd(Animator animation) {
-					        mLoadingView.setVisibility(show ? View.VISIBLE
-					                : View.GONE);
-				        }
-			        });
+					.alpha(show ? 1 : 0)
+					.setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+							mLoadingView.setVisibility(show ? View.VISIBLE
+									: View.GONE);
+						}
+					});
 
 			mContentView.setVisibility(View.VISIBLE);
 			mContentView.animate().setDuration(shortAnimTime)
-			        .alpha(show ? 0 : 1)
-			        .setListener(new AnimatorListenerAdapter() {
-				        @Override
-				        public void onAnimationEnd(Animator animation) {
-					        mContentView.setVisibility(show ? View.GONE
-					                : View.VISIBLE);
-				        }
-			        });
+					.alpha(show ? 0 : 1)
+					.setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+							mContentView.setVisibility(show ? View.GONE
+									: View.VISIBLE);
+						}
+					});
 		} else {
 			// The ViewPropertyAnimator APIs are not available, so simply show
 			// and hide the relevant UI components.
 			mLoadingView.setVisibility(show ? View.VISIBLE : View.GONE);
 			mContentView.setVisibility(show ? View.GONE : View.VISIBLE);
 		}
-	}
-
-	/**
-	 * Handles Cloudsdale messages directed at this activity
-	 */
-	@Override
-	public void handleMessage(CloudsdaleFayeMessage message) {
-		String channel = message.getChannel().substring(1);
-		String cloudId = channel.split("/")[1];
-		if (Cloudsdale.DEBUG) {
-			Log.d(TAG, "Handling message for channel " + channel
-			        + " which generated a cloud id of " + cloudId);
-		}
-		// TODO Handle the unread message counts
 	}
 
 	/**
@@ -215,7 +196,7 @@ public class HomeActivity extends SlidingFragmentActivity implements
 
 		@Override
 		protected User doInBackground(Void... params) {
-			if (Cloudsdale.DEBUG) {
+			if (Cloudsdale.isDebuggable()) {
 				Log.d(TAG, "Executing the UserViewFillTask");
 			}
 			return UserManager.getLoggedInUser();
@@ -223,55 +204,56 @@ public class HomeActivity extends SlidingFragmentActivity implements
 
 		@Override
 		protected void onPostExecute(User result) {
-			if (Cloudsdale.DEBUG) {
+			if (Cloudsdale.isDebuggable()) {
 				Log.d(TAG, "UserViewFillTask is now filling in the home view");
 			}
 
 			// Set the user's avatar in the view
 			UrlImageViewHelper.setUrlDrawable(mAvatarView, result.getAvatar()
-			        .getNormal(), R.drawable.ic_unknown_user);
+					.getNormal(), R.drawable.ic_unknown_user);
 
 			// Set the user's username in the view
 			mUsernameView.setText(result.getName());
 
 			// Set the user's other properties in the main view
-			mAccountLevelView.setText(createAccountLevelText(result.getUserRole()));
+			mAccountLevelView.setText(createAccountLevelText(result
+					.getUserRole()));
 
 			// Format and set the user's join date
 			Date date = result.getMemberSince();
 			SimpleDateFormat df = new SimpleDateFormat("dd MMMM, yyyy");
 			mDateRegisteredView.setText(MessageFormat.format(
-			        "You registered on {0}", df.format(date)));
+					"You registered on {0}", df.format(date)));
 
 			// Set the user's cloud count
 			mCloudCountView.setText("You are a member of "
-			        + String.valueOf(result.getClouds().size()) + " clouds");
+					+ String.valueOf(result.getClouds().size()) + " clouds");
 
 			showProgress(false);
 
 			super.onPostExecute(result);
 		}
 	}
-	
+
 	class ConnectionMonitorTask extends AsyncTask<Void, Void, Void> {
 
 		@Override
-        protected Void doInBackground(Void... arg0) {
+		protected Void doInBackground(Void... arg0) {
 			while (!FayeManager.isFayeConnected()) {
-	            try {
-	                Thread.sleep(1000);
-                } catch (InterruptedException e) {
-	                e.printStackTrace();
-                }
-            }
-	        return null;
-        }
-		
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			return null;
+		}
+
 		@Override
 		protected void onPostExecute(Void result) {
 			mChatConnectionStatusView.setVisibility(View.GONE);
-		    super.onPostExecute(result);
+			super.onPostExecute(result);
 		}
-		
+
 	}
 }

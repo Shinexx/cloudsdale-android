@@ -35,13 +35,22 @@ import org.cloudsdale.android.ui.HomeActivity;
  */
 public class SlidingMenuFragment extends SherlockFragment {
 
-	private ScrollView		mRootView;
-	private LinearLayout	mStaticNavRoot;
-	private LinearLayout	mCloudNavRoot;
-	private View			mHeaderLoadingView;
-	private View			mHeaderContentView;
-	private ImageView		mHeaderAvatar;
-	private TextView		mHeaderUsername;
+	private static SlidingMenuFragment	sInstance;
+
+	private ScrollView					mRootView;
+	private LinearLayout				mStaticNavRoot;
+	private LinearLayout				mCloudNavRoot;
+	private View						mHeaderLoadingView;
+	private View						mHeaderContentView;
+	private ImageView					mHeaderAvatar;
+	private TextView					mHeaderUsername;
+
+	public static SlidingMenuFragment getInstance() {
+		if (sInstance == null) {
+			sInstance = new SlidingMenuFragment();
+		}
+		return sInstance;
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

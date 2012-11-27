@@ -83,7 +83,7 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 	@Override
 	protected void setup() {
 		// Debug toast
-		if (Cloudsdale.DEBUG) {
+		if (Cloudsdale.isDebuggable()) {
 			Toast.makeText(getApplicationContext(), "Faye Service created",
 					Toast.LENGTH_SHORT).show();
 		}

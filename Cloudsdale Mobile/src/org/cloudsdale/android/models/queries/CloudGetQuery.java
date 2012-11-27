@@ -49,7 +49,7 @@ public class CloudGetQuery extends GetQuery {
             // Deserialize
             Gson gson = Cloudsdale.getJsonDeserializer();
             if (mJsonString != null) {
-                if (Cloudsdale.DEBUG) {
+                if (Cloudsdale.isDebuggable()) {
                     Log.d(TAG, mJsonString);
                 }
                 if (mHttpResponse.getStatusLine().getStatusCode() == 200) {

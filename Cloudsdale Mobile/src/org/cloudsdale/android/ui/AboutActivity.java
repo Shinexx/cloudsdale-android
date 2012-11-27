@@ -1,16 +1,15 @@
 package org.cloudsdale.android.ui;
 
-import org.cloudsdale.android.R;
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.slidingmenu.lib.SlidingMenu;
-import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
-public class AboutActivity extends SlidingFragmentActivity {
+import org.cloudsdale.android.R;
+
+public class AboutActivity extends ActivityBase {
 	
 	private SlidingMenu mSlidingMenu;
 

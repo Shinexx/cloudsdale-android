@@ -66,7 +66,7 @@ public class SessionQuery extends PostQuery {
 			mJsonString = EntityUtils.toString(mHttpResponse.getEntity());
 
 			// [DEBUG] Logcat the json response
-			if (Cloudsdale.DEBUG) {
+			if (Cloudsdale.isDebuggable()) {
 				Log.d(SessionQuery.TAG, "Session API response: " + mJsonString);
 			}
 

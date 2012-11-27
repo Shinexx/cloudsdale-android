@@ -43,7 +43,7 @@ public class ChatMessageGetQuery extends GetQuery {
 
             mJsonString = EntityUtils.toString(mHttpResponse.getEntity());
             // mJsonString = stripHtml(mJsonString);
-            if (Cloudsdale.DEBUG) {
+            if (Cloudsdale.isDebuggable()) {
                 Log.d("ChatMessageGetQuery", mJsonString);
             }
 
