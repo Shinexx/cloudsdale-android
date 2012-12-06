@@ -1,14 +1,19 @@
 package org.cloudsdale.android;
 
-import org.cloudsdale.android.models.Role;
-import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
-
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import org.cloudsdale.android.managers.CloudManager;
+import org.cloudsdale.android.managers.FayeManager;
+import org.cloudsdale.android.managers.NetworkManager;
+import org.cloudsdale.android.managers.UserAccountManager;
+import org.cloudsdale.android.managers.UserManager;
+import org.cloudsdale.android.models.Role;
+import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
 
 /**
  * Global application class
@@ -18,23 +23,32 @@ import com.google.gson.GsonBuilder;
 public class Cloudsdale extends Application {
 
 	// Thirty minutes
-	public static final int		AVATAR_EXPIRATION	= 30 * 60 * 1000;
-	public static final int		CLOUD_EXPIRATION	= 1000 * 60 * 60;
+	public static final int				AVATAR_EXPIRATION	= 30 * 60 * 1000;
+	public static final int				CLOUD_EXPIRATION	= 1000 * 60 * 60;
 
 	// Static objects
-	private static Cloudsdale	sAppObject;
-	private static Gson			sJsonDeserializer;
+	private static Cloudsdale			sAppObject;
+	private static Gson					sJsonDeserializer;
 
 	// Public data objects
-	private static String		sCloudShowing;
+	private static String				sCloudShowing;
 
-	/**
-	 * Dummy constructor to handle creating static classes and fetch the global
-	 * app context
-	 */
-	public Cloudsdale() {
-		super();
+	// Managers
+	private static UserAccountManager	sUserAccountManager;
+	private static UserManager			sUserManager;
+	private static FayeManager			sFayeManager;
+	private static NetworkManager		sNetManager;
+	private static CloudManager			sCloudManager;
+
+	@Override
+	public void onCreate() {
 		sAppObject = this;
+		sUserAccountManager = new UserAccountManager();
+		sUserManager = new UserManager();
+		sFayeManager = new FayeManager(this);
+		sNetManager = new NetworkManager();
+
+		super.onCreate();
 	}
 
 	public static boolean isDebuggable() {
@@ -61,5 +75,35 @@ public class Cloudsdale extends Application {
 			sJsonDeserializer = builder.create();
 		}
 		return sJsonDeserializer;
+	}
+
+	public static UserAccountManager getUserAccountManager() {
+		if (sUserAccountManager == null)
+			sUserAccountManager = new UserAccountManager();
+		return sUserAccountManager;
+	}
+
+	public static UserManager getUserManager() {
+		if (sUserManager == null) 
+			sUserManager = new UserManager();
+		return sUserManager;
+	}
+	
+	public static FayeManager getFayeManager() {
+		if(sFayeManager == null) 
+			sFayeManager = new FayeManager(sAppObject);
+		return sFayeManager;
+	}
+	
+	public static NetworkManager getNetworkManager() {
+		if(sNetManager == null)
+			sNetManager = new NetworkManager();
+		return sNetManager;
+	}
+	
+	public static CloudManager getNearestPegasus() {
+		if(sCloudManager == null)
+			sCloudManager = new CloudManager();
+		return sCloudManager;
 	}
 }

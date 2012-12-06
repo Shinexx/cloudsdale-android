@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import lombok.val;
+
 /**
  * Manager class designed to store and retrieve Cloudsdale users. Copyright (c)
  * 2012 Cloudsdale.org
@@ -23,9 +25,9 @@ import java.util.HashMap;
  */
 public class UserManager {
 
-	private static HashMap<String, User>	mStoredUsers;
+	private HashMap<String, User>	mStoredUsers;
 
-	static {
+	public UserManager() {
 		mStoredUsers = new HashMap<String, User>();
 	}
 
@@ -33,13 +35,14 @@ public class UserManager {
 	 * Gets the user that has logged into the application
 	 * 
 	 * @return The user that's logged in
+	 * @throws QueryException
+	 *             When the query cannot be completed
 	 */
-	public synchronized static User getLoggedInUser() {
-		String id = Cloudsdale
-				.getContext()
-				.getSharedPreferences(UserAccountManager.PREFERENCES_NAME,
-						Context.MODE_PRIVATE)
-				.getString(UserAccountManager.KEY_ID, "");
+	public synchronized User getLoggedInUser() throws QueryException {
+		val accountManager = Cloudsdale.getUserAccountManager();
+		val am = accountManager.getAccountManager();
+		val userAccount = accountManager.getAccount();
+		val id = am.getUserData(userAccount, UserAccountManager.KEY_ID);
 		User user = getUserById(id);
 		if (user.getClouds() == null || user.getClouds().isEmpty()) {
 			getCloudsForUser(user);
@@ -53,10 +56,15 @@ public class UserManager {
 	 * @param id
 	 *            The ID of the user to load
 	 * @return The user corresponding to the passed ID
+	 * @throws QueryException
+	 *             When the query cannot be completed
 	 */
-	public static User getUserById(String id) {
-		if (mStoredUsers.containsKey(id)) {
-			return mStoredUsers.get(id);
+	public synchronized User getUserById(final String id) throws QueryException {
+		val userIsStored = mStoredUsers.containsKey(id);
+		if (userIsStored) {
+			synchronized (mStoredUsers) {
+				return mStoredUsers.get(id);
+			}
 		} else {
 			// Get the strings we need
 			Context appContext = Cloudsdale.getContext();
@@ -66,13 +74,11 @@ public class UserManager {
 
 			// Build and execute the query
 			UserGetQuery query = new UserGetQuery(url);
-			try {
-				User user = query.execute(null, null);
-				mStoredUsers.put(id, user);
-				return user;
-			} catch (QueryException e) {
-				return null;
+			User result = query.execute(null, null);
+			if (result != null) {
+				storeUser(result);
 			}
+			return result;
 		}
 	}
 
@@ -81,33 +87,18 @@ public class UserManager {
 	 * 
 	 * @param user
 	 *            The user to fetch clouds for
+	 * @throws QueryException
+	 *             When the query can't be completed
 	 */
-	public static void getCloudsForUser(User user) {
+	private void getCloudsForUser(User user) throws QueryException {
 		Context appContext = Cloudsdale.getContext();
 		String url = appContext.getString(R.string.cloudsdale_api_base)
 				+ appContext.getString(
 						R.string.cloudsdale_user_clouds_endpoint, user.getId());
 		CloudGetQuery query = new CloudGetQuery(url);
-		try {
-			ArrayList<Cloud> clouds = new ArrayList<Cloud>(Arrays.asList(query
-					.executeForCollection(null, null)));
-			user.setClouds(clouds);
-		} catch (QueryException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Get a cloud from a user by ID
-	 * 
-	 * @param user
-	 *            The user to get the cloud from
-	 * @param id
-	 *            The ID of the cloud to get
-	 * @return The cloud if the user is a member of it, null otherwise
-	 */
-	public static Cloud getCloudFromUser(User user, String id) {
-		return user.getCloud(id);
+		ArrayList<Cloud> clouds = new ArrayList<Cloud>(Arrays.asList(query
+				.executeForCollection(null, null)));
+		user.setClouds(clouds);
 	}
 
 	/**
@@ -116,7 +107,7 @@ public class UserManager {
 	 * @param user
 	 *            The user to store
 	 */
-	public static void storeUser(User user) {
+	public void storeUser(User user) {
 		synchronized (mStoredUsers) {
 			mStoredUsers.put(user.getId(), user);
 		}

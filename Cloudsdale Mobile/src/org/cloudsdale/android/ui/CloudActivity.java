@@ -15,28 +15,20 @@ import android.widget.FrameLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.MenuItem;
-import com.slidingmenu.lib.SlidingMenu;
-import com.slidingmenu.lib.app.SlidingFragmentActivity;
-
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.faye.FayeMessageHandler;
-import org.cloudsdale.android.managers.FayeManager;
-import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.Drop;
+import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.ui.fragments.ChatFragment;
 import org.cloudsdale.android.ui.fragments.DropFragment;
 import org.cloudsdale.android.ui.fragments.OnlineListFragment;
-import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
 
 import java.util.ArrayList;
 
-public class CloudActivity extends ActivityBase implements
-		FayeMessageHandler {
+public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 
 	private static final int	ONLINE_INDEX	= 0;
 	private static final int	DROP_INDEX		= 1;
@@ -61,7 +53,6 @@ public class CloudActivity extends ActivityBase implements
 
 		// Setup the view
 		setContentView(R.layout.activity_cloud_view);
-		setBehindContentView(R.layout.fragment_sliding_menu_host);
 
 		// Get the tab host
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
@@ -126,43 +117,38 @@ public class CloudActivity extends ActivityBase implements
 	@Override
 	protected void onResume() {
 		super.onResume();
-		FayeManager.subscribeToMessages(this);
+		Cloudsdale.getFayeManager().subscribeToMessages(this);
 	}
 
 	@Override
 	protected void onPause() {
 		showAbove();
-		FayeManager.unsubscribeToMessages(this);
+		Cloudsdale.getFayeManager().unsubscribeToMessages(this);
 		super.onPause();
 	}
 
 	private void GetShowingCloud() {
-		Intent intent = getIntent();
-		mCloudShowingId = intent.getExtras().getString("cloudId");
-		mCloudShowing = UserManager.getCloudFromUser(
-				UserManager.getLoggedInUser(), mCloudShowingId);
-		Cloudsdale.setShowingCloud(mCloudShowingId);
-		getSherlock().setTitle(mCloudShowing.getName());
+		try {
+			Intent intent = getIntent();
+			mCloudShowingId = intent.getExtras().getString("cloudId");
+			mCloudShowing = Cloudsdale.getNearestPegasus().getCloud(mCloudShowingId);
+			Cloudsdale.setShowingCloud(mCloudShowingId);
+
+			// Set the activity title, whether it's the compat or native
+			// actionbar
+			getSherlock().setTitle(mCloudShowing.getName());
+			getSupportActionBar().setTitle(mCloudShowing.getName());
+		} catch (QueryException e) {
+			// TODO Auto-generated catch block
+			// TODO Show error view
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putString("tab", mTabHost.getCurrentTabTag());
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				if (mSlidingMenu.isBehindShowing()) {
-					mSlidingMenu.showAbove();
-				} else {
-					mSlidingMenu.showBehind();
-				}
-				return true;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

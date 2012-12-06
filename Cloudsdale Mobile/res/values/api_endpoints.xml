@@ -9,5 +9,6 @@
     <string name="twitter_user_info_api_path">http://api.twitter.com/version/users/show.json</string>
     <string name="cloudsdale_cloud_chat_messages_endpoint">clouds/%1$s/chat/messages.json</string>
     <string name="cloudsdale_cloud_drop_endpoint">clouds/%1$s/drops.json</string>
+    <string name="cloudsdale_cloud_endpoint">clouds/%1$s.json</string>
 
 </resources>

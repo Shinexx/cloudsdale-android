@@ -1,90 +1,73 @@
 package org.cloudsdale.android.models.api;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.NonFinal;
+import com.google.gson.annotations.SerializedName;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.AvatarContainer;
 import org.cloudsdale.android.models.IdentityModel;
 import org.cloudsdale.android.models.Role;
 
-import com.google.gson.annotations.SerializedName;
+import java.util.ArrayList;
+import java.util.Date;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * User model for Cloudsdale
  * 
- * @author Jamison Greeley (Berwyn@cloudsdale.org)
+ * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class User extends IdentityModel {
 
-	protected final String						TAG	= "Cloudsdale User";
-	
-	public User() {
-		mCloudLookupHash = new HashMap<String, Cloud>();
-	}
+	protected final String	TAG	= "Cloudsdale User";
 
 	// protected attributes from JSON
-	protected String							name;
-	protected String							email;
+	protected String			name;
+	protected String			email;
 	@SerializedName("skype_name")
-	protected String							skypeName;
-	protected boolean							invisible;
+	protected String			skypeName;
+	protected boolean			invisible;
 	@SerializedName("time_zone")
-	protected String							timeZone;
+	protected String			timeZone;
 	@SerializedName("member_since")
-	protected Date								memberSince;
+	protected Date				memberSince;
 	@SerializedName("suspended_until")
-	protected Date								suspendedUntil;
+	protected Date				suspendedUntil;
 	@SerializedName("reason_for_suspension")
-	protected String							reasonForSuspension;
-	protected AvatarContainer					avatar;
+	protected String			reasonForSuspension;
+	protected AvatarContainer	avatar;
 	@SerializedName("is_registered")
-	protected boolean							isRegistered;
+	protected boolean			isRegistered;
 	@SerializedName("is_transient")
-	protected boolean							transientStatus;
+	protected boolean			transientStatus;
 	@SerializedName("is_banned")
-	protected boolean							banStatus;
+	protected boolean			banStatus;
 	@SerializedName("is_member_of_a_cloud")
-	protected boolean							memberOfACloud;
+	protected boolean			memberOfACloud;
 	@SerializedName("has_an_avatar")
-	protected boolean							hasAvatar;
+	protected boolean			hasAvatar;
 	@SerializedName("has_read_tnc")
-	protected boolean							hasReadTnC;
+	protected boolean			hasReadTnC;
 	@SerializedName("role")
-	protected Role								userRole;
-	protected Prosecution[]						prosecutions;
+	protected Role				userRole;
+	protected Prosecution[]		prosecutions;
 	@SerializedName("auth_token")
-	protected String							authToken;
+	protected String			authToken;
 	@SerializedName("needs_to_confirm_registration")
-	protected boolean							needsToConfirmRegistration;
+	protected boolean			needsToConfirmRegistration;
 	@SerializedName("needs_password_change")
-	protected boolean							needsToChangePassword;
+	protected boolean			needsToChangePassword;
 	@SerializedName("needs_name_change")
-	protected boolean							needsToChangeName;
+	protected boolean			needsToChangeName;
 	@SerializedName("confirmed_registration_at")
-	protected Date								confirmedRegistrationAt;
+	protected Date				confirmedRegistrationAt;
 	@SerializedName("tnc_last_accepted")
-	protected Date								tncLastAccepted;
-	protected ArrayList<Cloud>					clouds;
-	protected Ban[]								bans;
-
-	// Convenience objects
-	@Getter(AccessLevel.PROTECTED)
-	@Setter(AccessLevel.PROTECTED)
-	protected transient HashMap<String, Cloud>	mCloudLookupHash;
-	
+	protected Date				tncLastAccepted;
+	protected ArrayList<Cloud>	clouds;
+	protected Ban[]				bans;
 
 	public void setUserRole(Role role) {
 		this.userRole = role;
@@ -94,20 +77,11 @@ public class User extends IdentityModel {
 		clouds.add(cloud);
 	}
 
-	public Cloud getCloud(String id) {
-		if (mCloudLookupHash.containsKey(id)) {
-			return mCloudLookupHash.get(id);
-		} else {
-			Cloud output = null;
-			for (Cloud c : clouds) {
-				if (c.getId().equals(id)) {
-					mCloudLookupHash.put(id, c);
-					output = c;
-					break;
-				}
-			}
-			return output;
+	public void setClouds(ArrayList<Cloud> clouds) {
+		for (Cloud c : clouds) {
+			Cloudsdale.getNearestPegasus().storeCloud(c);
 		}
+		this.clouds = clouds;
 	}
 
 	/**

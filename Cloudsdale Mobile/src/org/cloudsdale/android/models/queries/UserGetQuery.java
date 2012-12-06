@@ -1,23 +1,21 @@
 package org.cloudsdale.android.models.queries;
 
-import java.io.IOException;
+import android.accounts.AccountManager;
+import android.content.Context;
+import android.util.Log;
+
+import com.google.gson.Gson;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.models.Model;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.network.ApiUserResponse;
 
-import android.accounts.AccountManager;
-import android.content.Context;
-import android.util.Log;
-
-import com.bugsense.trace.BugSenseHandler;
-import com.google.gson.Gson;
+import java.io.IOException;
 
 public class UserGetQuery extends GetQuery {
 
@@ -46,7 +44,7 @@ public class UserGetQuery extends GetQuery {
 			throws QueryException {
 		AccountManager am = AccountManager.get(Cloudsdale.getContext());
 		addHeader("X-AUTH-TOKEN",
-				am.getPassword(UserAccountManager.getAccount()));
+				am.getPassword(Cloudsdale.getUserAccountManager().getAccount()));
 
 		// Query the API
 		try {
@@ -71,9 +69,9 @@ public class UserGetQuery extends GetQuery {
 				}
 			}
 		} catch (ClientProtocolException e) {
-			BugSenseHandler.sendException(e);
+			throw new QueryException("Couldn't connect to Cloudsdale", 404);
 		} catch (IOException e) {
-			BugSenseHandler.sendException(e);
+			throw new QueryException("Couldn't connect to Cloudsdale", 404);
 		}
 
 		return u;

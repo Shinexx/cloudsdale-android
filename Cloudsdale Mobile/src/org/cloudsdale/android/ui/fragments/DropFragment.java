@@ -17,6 +17,7 @@ import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.QueryData;
 import org.cloudsdale.android.models.api.Drop;
+import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.models.queries.DropGetQuery;
 import org.cloudsdale.android.ui.adapters.CloudDropAdapter;
 
@@ -78,7 +79,13 @@ public class DropFragment extends SherlockFragment {
             data.setUrl(sCloudUrl);
 
             DropGetQuery query = new DropGetQuery(sCloudUrl);
-            return query.executeForCollection(data, getActivity());
+            try {
+				return query.executeForCollection(data, getActivity());
+			} catch (QueryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
         }
 
         @Override

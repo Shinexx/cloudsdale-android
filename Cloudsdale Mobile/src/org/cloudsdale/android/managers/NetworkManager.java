@@ -29,7 +29,7 @@ public class NetworkManager {
 	private static LoggedUser			sLoggedUser;
 	private static QueryException		sExceptionThrown;
 
-	public static boolean isInternetConnected() {
+	public boolean isInternetConnected() {
 		if (sConnectivityManager == null) {
 			sConnectivityManager = (ConnectivityManager) Cloudsdale
 					.getContext()
@@ -39,7 +39,7 @@ public class NetworkManager {
 		return sConnectivityManager.getActiveNetworkInfo().isConnected();
 	}
 
-	public static boolean isMobileNetConnected() {
+	public boolean isMobileNetConnected() {
 		if (sConnectivityManager == null) {
 			sConnectivityManager = (ConnectivityManager) Cloudsdale
 					.getContext()
@@ -51,7 +51,7 @@ public class NetworkManager {
 		} else return false;
 	}
 
-	public static boolean isWimaxConnected() {
+	public boolean isWimaxConnected() {
 		if (sConnectivityManager == null) {
 			sConnectivityManager = (ConnectivityManager) Cloudsdale
 					.getContext()
@@ -63,7 +63,7 @@ public class NetworkManager {
 		} else return false;
 	}
 
-	public static boolean isWifiConnected() {
+	public boolean isWifiConnected() {
 		if (sConnectivityManager == null) {
 			sConnectivityManager = (ConnectivityManager) Cloudsdale
 					.getContext()
@@ -78,7 +78,7 @@ public class NetworkManager {
 	/*
 	 * Public method to authenticate users via Cloudsdale credentials
 	 */
-	public static LoggedUser authenticate(String email, String password)
+	public LoggedUser authenticate(String email, String password)
 			throws QueryException {
 		// Reset the exception
 		sExceptionThrown = null;
@@ -126,7 +126,7 @@ public class NetworkManager {
 	 * Public method to authenticate users via oAuth credentials (e.g. Twitter,
 	 * Facebook)
 	 */
-	public static LoggedUser authenticate(String oAuthId, Provider oAuthProvider) {
+	public LoggedUser authenticate(String oAuthId, Provider oAuthProvider) {
 		// TODO authenticate using oAuth credentials
 		return null;
 	}

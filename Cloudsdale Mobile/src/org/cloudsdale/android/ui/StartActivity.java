@@ -11,7 +11,6 @@ import com.bugsense.trace.BugSenseHandler;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.managers.UserAccountManager;
 
 public class StartActivity extends SherlockActivity {
 
@@ -35,7 +34,7 @@ public class StartActivity extends SherlockActivity {
 				.getString(R.string.account_type));
 
 		if (accounts.length > 0) {
-			UserAccountManager.cacheAccount(accounts[0]);
+			Cloudsdale.getUserAccountManager().cacheAccount(accounts[0]);
 			Intent intent = new Intent();
 			intent.setClass(this, HomeActivity.class);
 			startActivity(intent);

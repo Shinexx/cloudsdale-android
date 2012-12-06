@@ -6,7 +6,6 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 
@@ -14,22 +13,29 @@ import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.LoggedUser;
 import org.cloudsdale.android.ui.LoginActivity;
-import org.cloudsdale.android.ui.StartActivity;
 
 /**
  * Class to manage the user's account object
  * 
- * @author Jamison Greeley (atomicrat2552@gmail.com)
- *         Copyright (c) 2012 Cloudsdale.org
+ * @author Jamison Greeley (atomicrat2552@gmail.com) Copyright (c) 2012
+ *         Cloudsdale.org
  * 
  */
 public class UserAccountManager {
 
-	public static final String	KEY_ID				= "id";
-	public static final String	PREFERENCES_NAME	= "LoggedUserPrefs";
+	public static final String		KEY_ID				= "id";
+	public static final String		PREFERENCES_NAME	= "LoggedUserPrefs";
 
-	private static Account		sUserAccount;
-
+	private Account			mUserAccount;
+	private AccountManager	mAccountManager;
+	
+	public AccountManager getAccountManager() {
+		if(mAccountManager == null) {
+			mAccountManager = AccountManager.get(Cloudsdale.getContext());
+		}
+		return mAccountManager;
+	}
+	
 	/**
 	 * Store the user's account in the system AccountManager
 	 * 
@@ -37,21 +43,17 @@ public class UserAccountManager {
 	 *            The user to store
 	 * @return Whether the user account was stored or not
 	 */
-	public static boolean storeAccount(LoggedUser user) {
+	public boolean storeAccount(LoggedUser user) {
 		Context appContext = Cloudsdale.getContext();
 		Account account = new Account(user.getName(),
 				appContext.getString(R.string.account_type));
 		final Bundle extras = new Bundle();
-		AccountManager am = AccountManager.get(appContext);
+		extras.putString(KEY_ID, user.getId());
+		AccountManager am = getAccountManager();
 		boolean accountCreated = am.addAccountExplicitly(account,
 				user.getAuthToken(), extras);
 		if (accountCreated) {
-			sUserAccount = account;
-			SharedPreferences prefs = appContext.getSharedPreferences(
-					PREFERENCES_NAME, Context.MODE_PRIVATE);
-			SharedPreferences.Editor prefsEdit = prefs.edit();
-			prefsEdit.putString(KEY_ID, user.getId());
-			prefsEdit.commit();
+			mUserAccount = account;
 		}
 		return accountCreated;
 	}
@@ -61,8 +63,8 @@ public class UserAccountManager {
 	 * 
 	 * @param account
 	 */
-	public static void cacheAccount(Account account) {
-		sUserAccount = account;
+	public void cacheAccount(Account account) {
+		mUserAccount = account;
 	}
 
 	/**
@@ -70,12 +72,12 @@ public class UserAccountManager {
 	 * 
 	 * @return The stored user account or
 	 */
-	public static Account getAccount() {
-		if (sUserAccount != null) {
-			return sUserAccount;
+	public Account getAccount() {
+		if (mUserAccount != null) {
+			return mUserAccount;
 		} else {
 			Context context = Cloudsdale.getContext();
-			AccountManager am = AccountManager.get(context);
+			AccountManager am = getAccountManager();
 			Account[] accounts = am.getAccountsByType(context
 					.getString(R.string.account_type));
 			if (accounts.length > 0) {
@@ -88,16 +90,16 @@ public class UserAccountManager {
 		}
 	}
 
-	public static void deleteAccount() {
-		if (sUserAccount != null) {
-			sUserAccount = null;
+	public void deleteAccount() {
+		if (mUserAccount != null) {
+			mUserAccount = null;
 		}
 		Editor edit = Cloudsdale.getContext()
 				.getSharedPreferences(PREFERENCES_NAME, 0).edit();
 		edit.remove(KEY_ID);
 		edit.commit();
-		AccountManager am = AccountManager.get(Cloudsdale.getContext());
-		am.removeAccount(sUserAccount, new AccountManagerCallback<Boolean>() {
+		AccountManager am = getAccountManager();
+		am.removeAccount(mUserAccount, new AccountManagerCallback<Boolean>() {
 
 			@Override
 			public void run(AccountManagerFuture<Boolean> arg0) {

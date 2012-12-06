@@ -1,20 +1,5 @@
 package org.cloudsdale.android.ui.fragments;
 
-import java.util.ArrayList;
-
-import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.R;
-import org.cloudsdale.android.managers.FayeManager;
-import org.cloudsdale.android.managers.UserManager;
-import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.api.Message;
-import org.cloudsdale.android.models.exceptions.QueryException;
-import org.cloudsdale.android.models.queries.ChatMessageGetQuery;
-import org.cloudsdale.android.models.queries.MessagePostQuery;
-import org.cloudsdale.android.ui.adapters.CloudMessageAdapter;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,6 +13,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+
+import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.R;
+import org.cloudsdale.android.managers.FayeManager;
+import org.cloudsdale.android.models.QueryData;
+import org.cloudsdale.android.models.api.Message;
+import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.queries.ChatMessageGetQuery;
+import org.cloudsdale.android.models.queries.MessagePostQuery;
+import org.cloudsdale.android.ui.adapters.CloudMessageAdapter;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class ChatFragment extends SherlockFragment {
 
@@ -108,10 +107,15 @@ public class ChatFragment extends SherlockFragment {
 	}
 
 	public void addMessage(Message message) {
-		if (!message.getAuthorId()
-				.equals(UserManager.getLoggedInUser().getId())
-				|| !message.getDevice().equals("mobile")) {
-			sMessageAdapter.addMessage(message);
+		try {
+			if (!message.getAuthorId().equals(
+					Cloudsdale.getUserManager().getLoggedInUser().getId())
+					|| !message.getDevice().equals("mobile")) {
+				sMessageAdapter.addMessage(message);
+			}
+		} catch (QueryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -166,33 +170,35 @@ public class ChatFragment extends SherlockFragment {
 
 		@Override
 		protected Message doInBackground(String... params) {
-			JSONObject body = new JSONObject();
-			JSONObject message = new JSONObject();
 			try {
+				JSONObject body = new JSONObject();
+				JSONObject message = new JSONObject();
 				body.put("device", "mobile");
 				body.put("content", sInputField.getText().toString());
-				body.put("client_id", UserManager.getLoggedInUser().getId());
+				body.put("client_id", Cloudsdale.getUserManager()
+						.getLoggedInUser().getId());
 				message.put("message", body);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
 
-			if (Cloudsdale.isDebuggable()) {
-				Log.d("Chat Send Message", "Attempting to send message");
-				Log.d("Chat Send Message", message.toString());
-			}
+				if (Cloudsdale.isDebuggable()) {
+					Log.d("Chat Send Message", "Attempting to send message");
+					Log.d("Chat Send Message", message.toString());
+				}
 
-			QueryData qd = new QueryData();
-			qd.setJson(message.toString());
-			MessagePostQuery q = new MessagePostQuery(sCloudUrl);
-			q.addHeader("X-AUTH-TOKEN", UserManager.getLoggedInUser()
-					.getAuthToken());
-			try {
+				QueryData qd = new QueryData();
+				qd.setJson(message.toString());
+				MessagePostQuery q = new MessagePostQuery(sCloudUrl);
+				q.addHeader("X-AUTH-TOKEN", Cloudsdale.getUserManager()
+						.getLoggedInUser().getAuthToken());
 				return q.execute(qd, getActivity());
 			} catch (QueryException e) {
 				// TODO error handling
 				return null;
+			} catch (JSONException e) {
+				// TODO error handling
+				e.printStackTrace();
 			}
+
+			return null;
 		}
 
 		@Override

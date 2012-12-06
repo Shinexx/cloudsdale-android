@@ -1,22 +1,25 @@
 package org.cloudsdale.android.models.parsers;
 
-import org.cloudsdale.android.managers.UserManager;
+import com.google.gson.JsonObject;
+
+import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.models.exceptions.QueryException;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class PostMessageBuilder {
 
-	private JSONObject	message;
+	private JsonObject	message;
 
-	public PostMessageBuilder(String message) {
-		JSONObject body = new JSONObject();
-		this.message = new JSONObject();
+	public PostMessageBuilder(String message) throws JSONException {
+		JsonObject body = new JsonObject();
+		this.message = new JsonObject();
 		try {
-			body.put("device", "mobile");
-			body.put("content", message);
-			body.put("client_id", UserManager.getLoggedInUser().getId());
-			this.message.put("message", body.toString());
-		} catch (JSONException e) {
+			body.addProperty("device", "mobile");
+			body.addProperty("content", message);
+			body.addProperty("client_id", Cloudsdale.getUserManager().getLoggedInUser().getId());
+			this.message.addProperty("message", body.toString());
+		} catch (QueryException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

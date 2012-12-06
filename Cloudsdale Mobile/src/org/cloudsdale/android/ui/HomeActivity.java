@@ -6,30 +6,21 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.MenuItem;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
-import com.slidingmenu.lib.SlidingMenu;
-import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.faye.FayeMessageHandler;
 import org.cloudsdale.android.managers.FayeManager;
-import org.cloudsdale.android.managers.UserManager;
-import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 import org.cloudsdale.android.models.Role;
 import org.cloudsdale.android.models.api.User;
-import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
-import org.holoeverywhere.widget.FrameLayout;
+import org.cloudsdale.android.models.exceptions.QueryException;
 import org.holoeverywhere.widget.TextView;
 
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,44 +44,29 @@ public class HomeActivity extends ActivityBase {
 	private TextView			mCloudCountView;
 	private TextView			mChatConnectionStatusView;
 
-	public boolean isBehindViewShowing() {
-		return mSlidingMenu.isBehindShowing();
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// Set the layouts
 		setContentView(R.layout.activity_home);
-		setBehindContentView(R.layout.fragment_sliding_menu_host);
 
 		// Get the view objects
 		getViews();
 
 		// Bind the Faye service
 		if (!FayeManager.isFayeConnected()) {
-			FayeManager.bindFaye();
+			Cloudsdale.getFayeManager().bindFaye();
 		}
 
-		// Start the UI fill tasks
-		new UserViewFillTask().execute();
-		new ConnectionMonitorTask().execute();
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				if (mSlidingMenu.isBehindShowing()) {
-					mSlidingMenu.showAbove();
-				} else {
-					mSlidingMenu.showBehind();
-				}
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
+	protected void onResume() {
+		// Start the UI fill tasks
+		new UserViewFillTask().execute();
+		// new ConnectionMonitorTask().execute();
+		super.onResume();
 	}
 
 	@Override
@@ -127,7 +103,6 @@ public class HomeActivity extends ActivityBase {
 
 		switch (role) {
 			default:
-			case NORMAL:
 				text = "Welcome back!";
 				break;
 			case DONOR:
@@ -199,7 +174,13 @@ public class HomeActivity extends ActivityBase {
 			if (Cloudsdale.isDebuggable()) {
 				Log.d(TAG, "Executing the UserViewFillTask");
 			}
-			return UserManager.getLoggedInUser();
+			try {
+				return Cloudsdale.getUserManager().getLoggedInUser();
+			} catch (QueryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
 		}
 
 		@Override
@@ -208,28 +189,32 @@ public class HomeActivity extends ActivityBase {
 				Log.d(TAG, "UserViewFillTask is now filling in the home view");
 			}
 
-			// Set the user's avatar in the view
-			UrlImageViewHelper.setUrlDrawable(mAvatarView, result.getAvatar()
-					.getNormal(), R.drawable.ic_unknown_user);
+			if (result != null) {
+				// Set the user's avatar in the view
+				UrlImageViewHelper.setUrlDrawable(mAvatarView, result
+						.getAvatar().getNormal(), R.drawable.ic_unknown_user);
 
-			// Set the user's username in the view
-			mUsernameView.setText(result.getName());
+				// Set the user's username in the view
+				mUsernameView.setText(result.getName());
 
-			// Set the user's other properties in the main view
-			mAccountLevelView.setText(createAccountLevelText(result
-					.getUserRole()));
+				// Set the user's other properties in the main view
+				mAccountLevelView.setText(createAccountLevelText(result
+						.getUserRole()));
 
-			// Format and set the user's join date
-			Date date = result.getMemberSince();
-			SimpleDateFormat df = new SimpleDateFormat("dd MMMM, yyyy");
-			mDateRegisteredView.setText(MessageFormat.format(
-					"You registered on {0}", df.format(date)));
+				// Format and set the user's join date
+				Date date = result.getMemberSince();
+				DateFormat df = SimpleDateFormat.getDateInstance();
+				mDateRegisteredView.setText(MessageFormat.format(
+						"You registered on {0}", df.format(date)));
 
-			// Set the user's cloud count
-			mCloudCountView.setText("You are a member of "
-					+ String.valueOf(result.getClouds().size()) + " clouds");
+				// Set the user's cloud count
+				mCloudCountView
+						.setText("You are a member of "
+								+ String.valueOf(result.getClouds().size())
+								+ " clouds");
 
-			showProgress(false);
+				showProgress(false);
+			}
 
 			super.onPostExecute(result);
 		}

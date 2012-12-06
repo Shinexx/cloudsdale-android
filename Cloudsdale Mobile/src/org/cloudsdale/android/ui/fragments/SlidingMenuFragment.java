@@ -2,9 +2,13 @@ package org.cloudsdale.android.ui.fragments;
 
 import java.util.ArrayList;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +20,16 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
+import de.neofonie.mobile.app.android.widget.crouton.Crouton;
+import de.neofonie.mobile.app.android.widget.crouton.Style;
+
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.StaticNavigation;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
+import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.ui.AboutActivity;
 import org.cloudsdale.android.ui.CloudActivity;
 import org.cloudsdale.android.ui.HomeActivity;
@@ -35,6 +43,8 @@ import org.cloudsdale.android.ui.HomeActivity;
  */
 public class SlidingMenuFragment extends SherlockFragment {
 
+	public static String				TAG	= "Sliding Menu Fragment";
+
 	private static SlidingMenuFragment	sInstance;
 
 	private ScrollView					mRootView;
@@ -45,6 +55,11 @@ public class SlidingMenuFragment extends SherlockFragment {
 	private ImageView					mHeaderAvatar;
 	private TextView					mHeaderUsername;
 
+	/**
+	 * Returns an instance of the fragment
+	 * 
+	 * @return The current instance of the fragment
+	 */
 	public static SlidingMenuFragment getInstance() {
 		if (sInstance == null) {
 			sInstance = new SlidingMenuFragment();
@@ -80,10 +95,15 @@ public class SlidingMenuFragment extends SherlockFragment {
 		// Fill the nav
 		setStaticNavigation();
 
+		return mRootView;
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
 		// Start the task
 		new ViewFillTask().execute();
-
-		return mRootView;
 	}
 
 	/**
@@ -94,8 +114,9 @@ public class SlidingMenuFragment extends SherlockFragment {
 	private void navigate(String viewId) {
 		Intent intent = new Intent();
 		if (viewId.equals("Home")) {
+			if (getActivity().getClass() == HomeActivity.class) return;
+
 			intent.setClass(getActivity(), HomeActivity.class);
-			// Clear all tasks when returning home
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		} else if (viewId.equals("Settings")) {
 			// TODO Start the settings view
@@ -107,12 +128,21 @@ public class SlidingMenuFragment extends SherlockFragment {
 			// TODO Start the explore view
 			intent.setClass(getActivity(), HomeActivity.class);
 		} else if (viewId.equals("About")) {
+			if (getActivity().getClass() == AboutActivity.class) return;
+
 			intent.setClass(getActivity(), AboutActivity.class);
 		} else {
 			intent.setClass(getActivity(), CloudActivity.class);
 			intent.putExtra("cloudId", viewId);
 		}
 		getActivity().startActivity(intent);
+	}
+
+	private void setErrorViews() {
+		mHeaderUsername.setText("Error loading profile");
+		mHeaderAvatar.setImageResource(R.drawable.ic_unknown_user);
+		mHeaderLoadingView.setVisibility(View.GONE);
+		mHeaderContentView.setVisibility(View.VISIBLE);
 	}
 
 	/**
@@ -130,6 +160,12 @@ public class SlidingMenuFragment extends SherlockFragment {
 		mHeaderContentView.setVisibility(View.VISIBLE);
 	}
 
+	/**
+	 * Create the pseudo ListView containing the user's clouds
+	 * 
+	 * @param me
+	 *            The logged in user
+	 */
 	private void setSlideMenuClouds(User me) {
 		ArrayList<Cloud> clouds = new ArrayList<Cloud>(me.getClouds());
 		for (Cloud c : clouds) {
@@ -201,13 +237,43 @@ public class SlidingMenuFragment extends SherlockFragment {
 
 		@Override
 		protected User doInBackground(Void... arg0) {
-			return UserManager.getLoggedInUser();
+			try {
+				return Cloudsdale.getUserManager().getLoggedInUser();
+			} catch (QueryException e) {
+				cancel(true);
+				return null;
+			}
+		}
+		
+		@Override
+		protected void onCancelled() {
+			Crouton.showText(getActivity(),
+					"Could not load your profile", Style.ALERT);
+			super.onCancelled();
+		}
+		
+		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+		@Override
+		protected void onCancelled(User result) {
+			Crouton.showText(getActivity(),
+					"Could not load your profile", Style.ALERT);
+			super.onCancelled(result);
 		}
 
 		@Override
 		protected void onPostExecute(User result) {
-			setSlideMenuHeader(result);
-			setSlideMenuClouds(result);
+			if (Cloudsdale.isDebuggable()) {
+				Log.d(TAG,
+						"Sliding menu is finishing task on" + result == null ? "null user"
+								: result.getName());
+			}
+
+			if (result != null) {
+				setSlideMenuHeader(result);
+				setSlideMenuClouds(result);
+			} else {
+				setErrorViews();
+			}
 			super.onPostExecute(result);
 		}
 

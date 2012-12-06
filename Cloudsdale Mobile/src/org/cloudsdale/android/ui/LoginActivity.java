@@ -2,6 +2,7 @@ package org.cloudsdale.android.ui;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.managers.NetworkManager;
 import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.LoggedUser;
@@ -23,6 +24,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -31,6 +33,9 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.actionbarsherlock.view.Menu;
 import com.google.gson.JsonObject;
+
+import de.neofonie.mobile.app.android.widget.crouton.Crouton;
+import de.neofonie.mobile.app.android.widget.crouton.Style;
 
 /**
  * Controller for the login view
@@ -75,7 +80,8 @@ public class LoginActivity extends Activity {
 		mPasswordView
 				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 					@Override
-					public boolean onEditorAction(android.widget.TextView textView, int id,
+					public boolean onEditorAction(
+							android.widget.TextView textView, int id,
 							KeyEvent keyEvent) {
 						if (id == R.id.login || id == EditorInfo.IME_NULL) {
 							startCloudsdaleAuthentication();
@@ -163,7 +169,8 @@ public class LoginActivity extends Activity {
 	 *            The user that has logged in
 	 */
 	private boolean storeAccount(LoggedUser user) {
-		boolean accountCreated = UserAccountManager.storeAccount(user);
+		boolean accountCreated = Cloudsdale.getUserAccountManager()
+				.storeAccount(user);
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			if (accountCreated) {
@@ -177,7 +184,7 @@ public class LoginActivity extends Activity {
 				response.onResult(result);
 			}
 		}
-		UserManager.storeUser(user);
+		Cloudsdale.getUserManager().storeUser(user);
 		return accountCreated;
 	}
 
@@ -185,6 +192,12 @@ public class LoginActivity extends Activity {
 	 * Sends Cloudsdale credentials to Cloudsdale
 	 */
 	private void startCloudsdaleAuthentication() {
+		// if(!NetworkManager.isInternetConnected()) {
+		// Crouton.showText(this, "There is no internet connection.",
+		// Style.ALERT);
+		// return;
+		// }
+
 		// Get inputted email and password
 		mEmail = this.mEmailView.getText().toString();
 		mPassword = this.mPasswordView.getText().toString();
@@ -213,6 +226,10 @@ public class LoginActivity extends Activity {
 
 		@Override
 		protected LoggedUser doInBackground(Void... params) {
+			if (Looper.myLooper() == null) {
+				Looper.prepare();
+			}
+
 			String sessionUrl = getString(R.string.cloudsdale_api_base)
 					+ getString(R.string.cloudsdale_sessions_endpoint);
 			QueryData data = new QueryData();
@@ -229,11 +246,29 @@ public class LoginActivity extends Activity {
 
 			try {
 				return query.execute(data, LoginActivity.this);
-			} catch (QueryException e) {
-				if (e.getErrorCode() == 500)
-					mEmailView.setError("Something went wrong during login");
-				else if (e.getErrorCode() == 404)
-					mEmailView.setError("Couldn't connect to Cloudsdale");
+			} catch (final QueryException e) {
+				runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						if (e.getErrorCode() == 500)
+							Crouton.showText(LoginActivity.this,
+									"Something went wrong during login",
+									Style.ALERT);
+						else if (e.getErrorCode() == 404)
+							Crouton.showText(LoginActivity.this,
+									"Couldn't connect to Cloudsdale",
+									Style.ALERT);
+						else if (e.getErrorCode() == 401)
+							Crouton.showText(LoginActivity.this,
+									"Invalid username/password combination",
+									Style.ALERT);
+						else
+							Crouton.showText(LoginActivity.this,
+									e.getMessage(), Style.ALERT);
+					}
+				});
+
 				return null;
 			}
 		}
@@ -247,19 +282,14 @@ public class LoginActivity extends Activity {
 		@Override
 		protected void onPostExecute(LoggedUser result) {
 			showProgress(false);
-			boolean success = storeAccount(result);
+			boolean success = result == null ? false : storeAccount(result);
 			if (success) {
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, HomeActivity.class);
 				startActivity(intent);
 				finish();
-			} else {
-				Toast.makeText(LoginActivity.this,
-						"There was an error logging in, please try again",
-						Toast.LENGTH_SHORT).show();
 			}
 			super.onPostExecute(result);
 		}
-
 	}
 }
