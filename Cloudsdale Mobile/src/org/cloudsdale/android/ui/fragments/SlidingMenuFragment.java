@@ -1,7 +1,5 @@
 package org.cloudsdale.android.ui.fragments;
 
-import java.util.ArrayList;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -26,13 +24,14 @@ import de.neofonie.mobile.app.android.widget.crouton.Style;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.StaticNavigation;
-import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.exceptions.QueryException;
 import org.cloudsdale.android.ui.AboutActivity;
 import org.cloudsdale.android.ui.CloudActivity;
 import org.cloudsdale.android.ui.HomeActivity;
+
+import java.util.ArrayList;
 
 /**
  * View fragment to show the inner view of the sliding menu. Copyright (c) 2012
@@ -45,8 +44,6 @@ public class SlidingMenuFragment extends SherlockFragment {
 
 	public static String				TAG	= "Sliding Menu Fragment";
 
-	private static SlidingMenuFragment	sInstance;
-
 	private ScrollView					mRootView;
 	private LinearLayout				mStaticNavRoot;
 	private LinearLayout				mCloudNavRoot;
@@ -54,18 +51,6 @@ public class SlidingMenuFragment extends SherlockFragment {
 	private View						mHeaderContentView;
 	private ImageView					mHeaderAvatar;
 	private TextView					mHeaderUsername;
-
-	/**
-	 * Returns an instance of the fragment
-	 * 
-	 * @return The current instance of the fragment
-	 */
-	public static SlidingMenuFragment getInstance() {
-		if (sInstance == null) {
-			sInstance = new SlidingMenuFragment();
-		}
-		return sInstance;
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

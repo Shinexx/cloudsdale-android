@@ -43,14 +43,14 @@ class AccountAuthenticator extends
 	@Override
 	public Bundle confirmCredentials(AccountAuthenticatorResponse response,
 	        Account account, Bundle options) throws NetworkErrorException {
-	    // TODO Auto-generated method stub
+	    // Fuck other apps
 	    return null;
 	}
 	
 	@Override
 	public Bundle editProperties(AccountAuthenticatorResponse response,
 	        String accountType) {
-	    // TODO Auto-generated method stub
+	    // No fucking editing
 	    return null;
 	}
 	
@@ -58,13 +58,13 @@ class AccountAuthenticator extends
 	public Bundle getAuthToken(AccountAuthenticatorResponse response,
 	        Account account, String authTokenType, Bundle options)
 	        throws NetworkErrorException {
-	    // TODO Auto-generated method stub
+	    // No one will be using the biult-in auth tokens
 	    return null;
 	}
 	
 	@Override
 	public String getAuthTokenLabel(String authTokenType) {
-	    // TODO Auto-generated method stub
+	    // See above
 	    return null;
 	}
 	
@@ -72,7 +72,7 @@ class AccountAuthenticator extends
 	public Bundle hasFeatures(AccountAuthenticatorResponse response,
 	        Account account, String[] features)
 	        throws NetworkErrorException {
-	    // TODO Auto-generated method stub
+	    // We don't do features in this house, bitch!
 	    return null;
 	}
 	
@@ -80,7 +80,7 @@ class AccountAuthenticator extends
 	public Bundle updateCredentials(AccountAuthenticatorResponse response,
 	        Account account, String authTokenType, Bundle options)
 	        throws NetworkErrorException {
-	    // TODO Auto-generated method stub
+	    // TODO, this we may want to do, however
 	    return null;
 	}
 }

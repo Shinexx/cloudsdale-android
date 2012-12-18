@@ -367,7 +367,8 @@ public class CloudsdaleFayeClient {
 			try {
 				mWebSocket.sendRawTextMessage(message.getBytes("UTF-8"));
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
+				// TODO I suppose I would want to catch exceptions in methods,
+				// even if they're unused
 				e.printStackTrace();
 			}
 		}

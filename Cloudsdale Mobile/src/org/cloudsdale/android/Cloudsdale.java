@@ -14,6 +14,7 @@ import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.Role;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
+import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
 
 /**
  * Global application class
@@ -30,15 +31,15 @@ public class Cloudsdale extends Application {
 	private static Cloudsdale			sAppObject;
 	private static Gson					sJsonDeserializer;
 
-	// Public data objects
-	private static String				sCloudShowing;
-
 	// Managers
 	private static UserAccountManager	sUserAccountManager;
 	private static UserManager			sUserManager;
 	private static FayeManager			sFayeManager;
 	private static NetworkManager		sNetManager;
 	private static CloudManager			sCloudManager;
+
+	// Our current
+	private static SlidingMenuFragment	sSlidingMenu;
 
 	@Override
 	public void onCreate() {
@@ -51,22 +52,30 @@ public class Cloudsdale extends Application {
 		super.onCreate();
 	}
 
+	/**
+	 * Determines if the application is currently debuggable.
+	 * 
+	 * @return A boolean representing the debug status of the app.
+	 */
 	public static boolean isDebuggable() {
 		return (0 != (sAppObject.getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE));
 	}
 
-	public static void setShowingCloud(String cloudId) {
-		sCloudShowing = cloudId;
-	}
-
-	public static String getShowingCloud() {
-		return sCloudShowing;
-	}
-
+	/**
+	 * Convenience method to retrieve the current application context
+	 * 
+	 * @return The application context
+	 */
 	public static Context getContext() {
 		return sAppObject;
 	}
 
+	/**
+	 * Convenience method to get a JSON deserializer configured to match
+	 * Cloudsdale's quirks
+	 * 
+	 * @return A JSON deserializer (GSON)
+	 */
 	public static Gson getJsonDeserializer() {
 		if (sJsonDeserializer == null) {
 			GsonBuilder builder = new GsonBuilder();
@@ -77,33 +86,64 @@ public class Cloudsdale extends Application {
 		return sJsonDeserializer;
 	}
 
+	/**
+	 * Gets the UserAccountManager instance for this application instance
+	 * 
+	 * @return The UserAccountManager attached to this application instance
+	 */
 	public static UserAccountManager getUserAccountManager() {
 		if (sUserAccountManager == null)
 			sUserAccountManager = new UserAccountManager();
 		return sUserAccountManager;
 	}
 
+	/**
+	 * Gets the UserManager attached to this application instance
+	 * 
+	 * @return The UserManager attached to this application instance
+	 */
 	public static UserManager getUserManager() {
-		if (sUserManager == null) 
-			sUserManager = new UserManager();
+		if (sUserManager == null) sUserManager = new UserManager();
 		return sUserManager;
 	}
-	
+
+	/**
+	 * Gets the FayeManager attached to this application instance
+	 * 
+	 * @return The FayeManager attached to this application instance
+	 */
 	public static FayeManager getFayeManager() {
-		if(sFayeManager == null) 
-			sFayeManager = new FayeManager(sAppObject);
+		if (sFayeManager == null) sFayeManager = new FayeManager(sAppObject);
 		return sFayeManager;
 	}
-	
+
+	/**
+	 * Gets the NetworkManager attached to this application instance
+	 * 
+	 * @return The NetworkManager attached to this application instance
+	 */
 	public static NetworkManager getNetworkManager() {
-		if(sNetManager == null)
-			sNetManager = new NetworkManager();
+		if (sNetManager == null) sNetManager = new NetworkManager();
 		return sNetManager;
 	}
-	
+
+	/**
+	 * Gets the CloudManager attached to this application instance
+	 * 
+	 * @return The CloudManager attached to this application instance
+	 */
 	public static CloudManager getNearestPegasus() {
-		if(sCloudManager == null)
-			sCloudManager = new CloudManager();
+		if (sCloudManager == null) sCloudManager = new CloudManager();
 		return sCloudManager;
+	}
+
+	/**
+	 * Gets the currently active SlidingMenu fragment we're using to navigate
+	 * 
+	 * @return The active SlidingMenu fragment
+	 */
+	public static SlidingMenuFragment getSlidingMenu() {
+		if (sSlidingMenu == null) sSlidingMenu = new SlidingMenuFragment();
+		return sSlidingMenu;
 	}
 }

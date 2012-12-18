@@ -28,14 +28,22 @@ import org.cloudsdale.android.ui.fragments.OnlineListFragment;
 
 import java.util.ArrayList;
 
+/**
+ * Activity to display a cloud
+ * 
+ * @author Jamison Greeley (atomicrat2552@gmail.com)
+ * 
+ */
 public class CloudActivity extends ActivityBase implements FayeMessageHandler {
+
+	public static final String	CLOUD_ID		= "cloudID";
 
 	private static final int	ONLINE_INDEX	= 0;
 	private static final int	DROP_INDEX		= 1;
 	private static final int	CHAT_INDEX		= 2;
 
-	private String				mCloudShowingId;
-	private Cloud				mCloudShowing;
+	private String				mCloudId;
+	private Cloud				mCloudObject;
 	private TabHost				mTabHost;
 	private ViewPager			mViewPager;
 	private TabsAdapter			mTabsAdapter;
@@ -46,6 +54,10 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 	private int					mDropFragIndex;
 	private int					mOnlineFragIndex;
 	private FrameLayout			mFragmentFrame;
+
+	public String getCloudId() {
+		return mCloudId;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -80,14 +92,20 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 		}
 	}
 
+	/**
+	 * Setup the fragments that make our view
+	 */
 	private void setupFragments() {
+		Bundle cloudArgs = new Bundle();
+		cloudArgs.putString(CLOUD_ID, mCloudId);
 
 		// Add the remaining fragments
 		mTabsAdapter.addTab(mTabHost.newTabSpec("online")
-				.setIndicator("Online"), OnlineListFragment.class, null);
+				.setIndicator("Online"), OnlineListFragment.class, cloudArgs);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("drops").setIndicator("Drops"),
-				DropFragment.class, null);
+				DropFragment.class, cloudArgs);
 
+		// Set active tab based on which view configuration we're using
 		if (!mDualView) {
 			mDropFragIndex = DROP_INDEX;
 			mOnlineFragIndex = ONLINE_INDEX;
@@ -127,19 +145,20 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 		super.onPause();
 	}
 
+	/**
+	 * Gets the cloud to show from the intent
+	 */
 	private void GetShowingCloud() {
 		try {
 			Intent intent = getIntent();
-			mCloudShowingId = intent.getExtras().getString("cloudId");
-			mCloudShowing = Cloudsdale.getNearestPegasus().getCloud(mCloudShowingId);
-			Cloudsdale.setShowingCloud(mCloudShowingId);
+			mCloudId = intent.getExtras().getString("cloudId");
+			mCloudObject = Cloudsdale.getNearestPegasus().getCloud(mCloudId);
 
 			// Set the activity title, whether it's the compat or native
 			// actionbar
-			getSherlock().setTitle(mCloudShowing.getName());
-			getSupportActionBar().setTitle(mCloudShowing.getName());
+			getSherlock().setTitle(mCloudObject.getName());
+			getSupportActionBar().setTitle(mCloudObject.getName());
 		} catch (QueryException e) {
-			// TODO Auto-generated catch block
 			// TODO Show error view
 			e.printStackTrace();
 		}
@@ -154,7 +173,7 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 	@Override
 	public void handleMessage(final CloudsdaleFayeMessage message) {
 		String channel = message.getChannel().substring(1).split("/")[1];
-		if (channel.equals(mCloudShowingId)) {
+		if (channel.equals(mCloudId)) {
 			runOnUiThread(new Runnable() {
 
 				@Override

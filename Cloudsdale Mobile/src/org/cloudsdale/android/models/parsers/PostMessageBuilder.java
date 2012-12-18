@@ -19,7 +19,7 @@ public class PostMessageBuilder {
 			body.addProperty("client_id", Cloudsdale.getUserManager().getLoggedInUser().getId());
 			this.message.addProperty("message", body.toString());
 		} catch (QueryException e) {
-			// TODO Auto-generated catch block
+			// TODO You dun goofed sending that shit, bitch
 			e.printStackTrace();
 		}
 	}

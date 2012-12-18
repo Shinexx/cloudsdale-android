@@ -9,9 +9,16 @@ import com.actionbarsherlock.view.MenuItem;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
+import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
 
+/**
+ * Base class for all Cloudsdale classes that use sliding menu navigation (e.g.
+ * most of them) Copyright (c) 2012 Cloudsdale.org
+ * 
+ * @author Jamison Greeley (atomicrat2552@gmail.com)
+ * 
+ */
 public class ActivityBase extends SlidingFragmentActivity {
 
 	protected SlidingMenu	mSlidingMenu;
@@ -49,7 +56,7 @@ public class ActivityBase extends SlidingFragmentActivity {
 		// Attach the sliding menu fragment
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
-		ft.add(R.id.sliding_menu_host_frame, SlidingMenuFragment.getInstance(),
+		ft.add(R.id.sliding_menu_host_frame, Cloudsdale.getSlidingMenu(),
 				getString(R.string.sliding_menu_fragment_tag));
 		ft.commit();
 
@@ -61,7 +68,7 @@ public class ActivityBase extends SlidingFragmentActivity {
 		// Remove the fragment so it can show up elsewhere
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
-		ft.remove(SlidingMenuFragment.getInstance());
+		ft.remove(Cloudsdale.getSlidingMenu());
 		ft.commit();
 
 		super.onPause();
