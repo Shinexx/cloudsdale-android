@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.AsyncTask.Status;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import org.cloudsdale.android.ui.CloudActivity;
 import org.cloudsdale.android.ui.HomeActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * View fragment to show the inner view of the sliding menu. Copyright (c) 2012
@@ -42,15 +44,23 @@ import java.util.ArrayList;
  */
 public class SlidingMenuFragment extends SherlockFragment {
 
-	public static String				TAG	= "Sliding Menu Fragment";
+	public static String		TAG	= "Sliding Menu Fragment";
 
-	private ScrollView					mRootView;
-	private LinearLayout				mStaticNavRoot;
-	private LinearLayout				mCloudNavRoot;
-	private View						mHeaderLoadingView;
-	private View						mHeaderContentView;
-	private ImageView					mHeaderAvatar;
-	private TextView					mHeaderUsername;
+	private ScrollView			mRootView;
+	private LinearLayout		mStaticNavRoot;
+	private LinearLayout		mCloudNavRoot;
+	private View				mHeaderLoadingView;
+	private View				mHeaderContentView;
+	private ImageView			mHeaderAvatar;
+	private TextView			mHeaderUsername;
+	private List<ViewFillTask>	mTaskList;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		mTaskList = new ArrayList<ViewFillTask>();
+
+		super.onCreate(savedInstanceState);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -84,11 +94,27 @@ public class SlidingMenuFragment extends SherlockFragment {
 	}
 
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
+	public void onDestroyView() {
+		for (ViewFillTask task : mTaskList) {
+			if (task.getStatus() == Status.PENDING
+					|| task.getStatus() == Status.RUNNING) {
+				task.cancel(true);
+			} else {
+				task = null;
+			}
+		}
 
+		super.onDestroyView();
+	}
+
+	@Override
+	public void onStart() {
 		// Start the task
-		new ViewFillTask().execute();
+		ViewFillTask task = new ViewFillTask();
+		mTaskList.add(task);
+		task.execute();
+
+		super.onStart();
 	}
 
 	/**
@@ -229,19 +255,23 @@ public class SlidingMenuFragment extends SherlockFragment {
 				return null;
 			}
 		}
-		
+
 		@Override
 		protected void onCancelled() {
-			Crouton.showText(getActivity(),
-					"Could not load your profile", Style.ALERT);
+			if (isVisible()) {
+				Crouton.showText(getActivity(), "Could not load your profile",
+						Style.ALERT);
+			}
 			super.onCancelled();
 		}
-		
+
 		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 		@Override
 		protected void onCancelled(User result) {
-			Crouton.showText(getActivity(),
-					"Could not load your profile", Style.ALERT);
+			if (isVisible()) {
+				Crouton.showText(getActivity(), "Could not load your profile",
+						Style.ALERT);
+			}
 			super.onCancelled(result);
 		}
 

@@ -26,8 +26,8 @@ public class DropFragment extends SherlockFragment {
 	private View				mDropView;
 	private ListView			mDropList;
 	private CloudDropAdapter	mDropAdapter;
-	private String				mCloudUrl;
 	private String				mCloudId;
+	private String				mCloudUrl;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,8 +67,11 @@ public class DropFragment extends SherlockFragment {
 	}
 
 	private void populateDrops() {
-		mCloudUrl = getString(R.string.cloudsdale_api_base)
-				+ getString(R.string.cloudsdale_cloud_drop_endpoint, mCloudId);
+		if (mCloudUrl == null) {
+			mCloudUrl = getString(R.string.cloudsdale_api_base)
+					+ getString(R.string.cloudsdale_cloud_drop_endpoint,
+							mCloudId);
+		}
 		DropAsyncQuery query = new DropAsyncQuery();
 		query.execute();
 	}
@@ -101,6 +104,12 @@ public class DropFragment extends SherlockFragment {
 				mDropList.smoothScrollToPosition(0);
 			}
 		}
+
+	}
+
+	public static interface DropFragmentCallbacks {
+
+		public long getCurruntCloudId();
 
 	}
 

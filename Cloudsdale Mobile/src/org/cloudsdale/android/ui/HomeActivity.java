@@ -16,6 +16,7 @@ import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.managers.FayeManager;
 import org.cloudsdale.android.models.Role;
+import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.exceptions.QueryException;
 import org.holoeverywhere.widget.TextView;
@@ -23,6 +24,7 @@ import org.holoeverywhere.widget.TextView;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -58,7 +60,6 @@ public class HomeActivity extends ActivityBase {
 		if (!FayeManager.isFayeConnected()) {
 			Cloudsdale.getFayeManager().bindFaye();
 		}
-
 	}
 
 	@Override
