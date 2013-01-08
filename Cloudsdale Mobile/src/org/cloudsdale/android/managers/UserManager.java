@@ -23,11 +23,12 @@ import lombok.val;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  * 
  */
-public class UserManager {
+public class UserManager extends ManagerBase {
 
 	private HashMap<String, User>	mStoredUsers;
 
 	public UserManager() {
+		super("UserManagerThread");
 		mStoredUsers = new HashMap<String, User>();
 	}
 
@@ -38,7 +39,7 @@ public class UserManager {
 	 * @throws QueryException
 	 *             When the query cannot be completed
 	 */
-	public synchronized User getLoggedInUser() throws QueryException {
+	public User getLoggedInUser() throws QueryException {
 		val accountManager = Cloudsdale.getUserAccountManager();
 		val am = accountManager.getAccountManager();
 		val userAccount = accountManager.getAccount();
@@ -59,26 +60,54 @@ public class UserManager {
 	 * @throws QueryException
 	 *             When the query cannot be completed
 	 */
-	public synchronized User getUserById(final String id) throws QueryException {
+	public User getUserById(final String id) throws QueryException {
 		val userIsStored = mStoredUsers.containsKey(id);
 		if (userIsStored) {
-			synchronized (mStoredUsers) {
-				return mStoredUsers.get(id);
-			}
+			mReadLock.lock();
+			val user =  mStoredUsers.get(id);
+			mReadLock.unlock();
+			return user;
 		} else {
 			// Get the strings we need
 			Context appContext = Cloudsdale.getContext();
-			String url = appContext.getString(R.string.cloudsdale_api_base)
+			final String url = appContext
+					.getString(R.string.cloudsdale_api_base)
 					+ appContext.getString(R.string.cloudsdale_user_endpoint,
 							id);
 
-			// Build and execute the query
-			UserGetQuery query = new UserGetQuery(url);
-			User result = query.execute(null, null);
-			if (result != null) {
-				storeUser(result);
+			mNetworkHandler.post(new Runnable() {
+
+				@Override
+				public void run() {
+					// Build and execute the query
+					UserGetQuery query = new UserGetQuery(url);
+					User result;
+					try {
+						result = query.execute(null, null);
+						if (result != null) {
+							storeUser(result);
+						}
+					} catch (QueryException e) {
+						// Don't worry here, the method body will catch it
+					}
+					synchronized (UserManager.this) {
+						UserManager.this.notify();
+					}
+				}
+			});
+
+			try {
+				synchronized (this) {
+					wait();
+				}
+				if (mStoredUsers.containsKey(id)) {
+					return mStoredUsers.get(id);
+				} else {
+					throw new QueryException("Thread failed", 418);
+				}
+			} catch (InterruptedException e) {
+				throw new QueryException("Thread was interrupted", 418);
 			}
-			return result;
 		}
 	}
 
@@ -96,9 +125,16 @@ public class UserManager {
 				+ appContext.getString(
 						R.string.cloudsdale_user_clouds_endpoint, user.getId());
 		CloudGetQuery query = new CloudGetQuery(url);
-		ArrayList<Cloud> clouds = new ArrayList<Cloud>(Arrays.asList(query
-				.executeForCollection(null, null)));
+		final ArrayList<Cloud> clouds = new ArrayList<Cloud>(
+				Arrays.asList(query.executeForCollection(null, null)));
 		user.setClouds(clouds);
+		new Thread() {
+			public void run() {
+				for (Cloud cloud : clouds) {
+					Cloudsdale.getNearestPegasus().storeCloud(cloud);
+				}
+			};
+		}.start();
 	}
 
 	/**
@@ -108,8 +144,8 @@ public class UserManager {
 	 *            The user to store
 	 */
 	public void storeUser(User user) {
-		synchronized (mStoredUsers) {
-			mStoredUsers.put(user.getId(), user);
-		}
+		mWriteLock.lock();
+		mStoredUsers.put(user.getId(), user);
+		mWriteLock.unlock();
 	}
 }

@@ -51,8 +51,6 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 	private ChatFragment		mChatFrag;
 	private DropFragment		mDropFrag;
 	private OnlineListFragment	mOnlineFrag;
-	private int					mDropFragIndex;
-	private int					mOnlineFragIndex;
 	private FrameLayout			mFragmentFrame;
 
 	public String getCloudId() {
@@ -105,17 +103,10 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 		mTabsAdapter.addTab(mTabHost.newTabSpec("drops").setIndicator("Drops"),
 				DropFragment.class, cloudArgs);
 
-		// Set active tab based on which view configuration we're using
-		if (!mDualView) {
-			mDropFragIndex = DROP_INDEX;
-			mOnlineFragIndex = ONLINE_INDEX;
-		} else {
-			mDropFragIndex = DROP_INDEX;
-			mOnlineFragIndex = ONLINE_INDEX;
-		}
-		mDropFrag = (DropFragment) mTabsAdapter.getItem(mDropFragIndex);
+		mDropFrag = (DropFragment) mTabsAdapter.getItem(DROP_INDEX);
 		mOnlineFrag = (OnlineListFragment) mTabsAdapter
-				.getItem(mOnlineFragIndex);
+				.getItem(ONLINE_INDEX);
+		
 
 		// If we're on a phone, add chat to the pager
 		// Else, put it in the dualView frame
@@ -130,6 +121,10 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 			ft.add(R.id.cloud_fragment_frame, mChatFrag);
 			ft.commit();
 		}
+		
+		mDropFrag.setArguments(cloudArgs);
+		mOnlineFrag.setArguments(cloudArgs);
+		mChatFrag.setArguments(cloudArgs);
 	}
 
 	@Override
@@ -188,6 +183,12 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 				}
 			});
 		}
+	}
+	
+	public interface Callbacks {
+		
+		public String getCurrentCloudId();
+		
 	}
 
 	/**
