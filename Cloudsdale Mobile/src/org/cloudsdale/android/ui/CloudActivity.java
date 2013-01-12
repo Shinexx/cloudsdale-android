@@ -119,7 +119,6 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 			ft.add(R.id.cloud_fragment_frame, mChatFrag);
 			ft.commit();
 		}
-
 		mDropFrag.setArguments(cloudArgs);
 		mOnlineFrag.setArguments(cloudArgs);
 		mChatFrag.setArguments(cloudArgs);
@@ -181,11 +180,11 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 			});
 		}
 	}
-
+	
 	public interface Callbacks {
-
+		
 		public String getCurrentCloudId();
-
+		
 	}
 
 	/**

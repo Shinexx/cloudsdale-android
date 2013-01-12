@@ -121,7 +121,7 @@ public class UserManager extends ManagerBase {
 	 *             When the query can't be completed
 	 */
 	private void getCloudsForUser(User user) throws QueryException {
-		ArrayList<Cloud> clouds = Cloudsdale.getNearestPegasus().getCloudsForUser(
+		final ArrayList<Cloud> clouds = Cloudsdale.getNearestPegasus().getCloudsForUser(
 				user.getId());
 		user.setClouds(clouds);
 	}
