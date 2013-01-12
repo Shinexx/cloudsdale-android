@@ -1,19 +1,5 @@
 package org.cloudsdale.android.ui;
 
-import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.R;
-import org.cloudsdale.android.managers.NetworkManager;
-import org.cloudsdale.android.managers.UserAccountManager;
-import org.cloudsdale.android.managers.UserManager;
-import org.cloudsdale.android.models.LoggedUser;
-import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.exceptions.QueryException;
-import org.cloudsdale.android.models.queries.SessionQuery;
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.widget.EditText;
-import org.holoeverywhere.widget.TextView;
-import org.holoeverywhere.widget.Toast;
-
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.animation.Animator;
@@ -34,8 +20,18 @@ import android.view.inputmethod.InputMethodManager;
 import com.actionbarsherlock.view.Menu;
 import com.google.gson.JsonObject;
 
-import de.neofonie.mobile.app.android.widget.crouton.Crouton;
-import de.neofonie.mobile.app.android.widget.crouton.Style;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
+
+import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.R;
+import org.cloudsdale.android.models.LoggedUser;
+import org.cloudsdale.android.models.QueryData;
+import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.queries.SessionQuery;
+import org.holoeverywhere.app.Activity;
+import org.holoeverywhere.widget.EditText;
+import org.holoeverywhere.widget.TextView;
 
 /**
  * Controller for the login view
@@ -63,7 +59,7 @@ public class LoginActivity extends Activity {
 		// Hide the Cloudsdale text and icon in the ActionBar
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
-
+		
 		// Make the super call
 		super.onCreate(icicle);
 

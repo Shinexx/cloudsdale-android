@@ -19,8 +19,8 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
-import de.neofonie.mobile.app.android.widget.crouton.Crouton;
-import de.neofonie.mobile.app.android.widget.crouton.Style;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;

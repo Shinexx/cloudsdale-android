@@ -104,9 +104,7 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 				DropFragment.class, cloudArgs);
 
 		mDropFrag = (DropFragment) mTabsAdapter.getItem(DROP_INDEX);
-		mOnlineFrag = (OnlineListFragment) mTabsAdapter
-				.getItem(ONLINE_INDEX);
-		
+		mOnlineFrag = (OnlineListFragment) mTabsAdapter.getItem(ONLINE_INDEX);
 
 		// If we're on a phone, add chat to the pager
 		// Else, put it in the dualView frame
@@ -121,7 +119,7 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 			ft.add(R.id.cloud_fragment_frame, mChatFrag);
 			ft.commit();
 		}
-		
+
 		mDropFrag.setArguments(cloudArgs);
 		mOnlineFrag.setArguments(cloudArgs);
 		mChatFrag.setArguments(cloudArgs);
@@ -135,7 +133,7 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 
 	@Override
 	protected void onPause() {
-		showAbove();
+		showContent();
 		Cloudsdale.getFayeManager().unsubscribeToMessages(this);
 		super.onPause();
 	}
@@ -151,8 +149,7 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 
 			// Set the activity title, whether it's the compat or native
 			// actionbar
-			getSherlock().setTitle(mCloudObject.getName());
-			getSupportActionBar().setTitle(mCloudObject.getName());
+			getSherlock().getActionBar().setTitle(mCloudObject.getName());
 		} catch (QueryException e) {
 			// TODO Show error view
 			e.printStackTrace();
@@ -184,11 +181,11 @@ public class CloudActivity extends ActivityBase implements FayeMessageHandler {
 			});
 		}
 	}
-	
+
 	public interface Callbacks {
-		
+
 		public String getCurrentCloudId();
-		
+
 	}
 
 	/**

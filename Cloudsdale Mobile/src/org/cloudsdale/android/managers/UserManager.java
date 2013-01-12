@@ -7,11 +7,9 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.exceptions.QueryException;
-import org.cloudsdale.android.models.queries.CloudGetQuery;
 import org.cloudsdale.android.models.queries.UserGetQuery;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import lombok.val;
@@ -64,7 +62,7 @@ public class UserManager extends ManagerBase {
 		val userIsStored = mStoredUsers.containsKey(id);
 		if (userIsStored) {
 			mReadLock.lock();
-			val user =  mStoredUsers.get(id);
+			val user = mStoredUsers.get(id);
 			mReadLock.unlock();
 			return user;
 		} else {
@@ -101,7 +99,10 @@ public class UserManager extends ManagerBase {
 					wait();
 				}
 				if (mStoredUsers.containsKey(id)) {
-					return mStoredUsers.get(id);
+					mReadLock.lock();
+					val user = mStoredUsers.get(id);
+					mReadLock.unlock();
+					return user;
 				} else {
 					throw new QueryException("Thread failed", 418);
 				}
@@ -120,21 +121,9 @@ public class UserManager extends ManagerBase {
 	 *             When the query can't be completed
 	 */
 	private void getCloudsForUser(User user) throws QueryException {
-		Context appContext = Cloudsdale.getContext();
-		String url = appContext.getString(R.string.cloudsdale_api_base)
-				+ appContext.getString(
-						R.string.cloudsdale_user_clouds_endpoint, user.getId());
-		CloudGetQuery query = new CloudGetQuery(url);
-		final ArrayList<Cloud> clouds = new ArrayList<Cloud>(
-				Arrays.asList(query.executeForCollection(null, null)));
+		ArrayList<Cloud> clouds = Cloudsdale.getNearestPegasus().getCloudsForUser(
+				user.getId());
 		user.setClouds(clouds);
-		new Thread() {
-			public void run() {
-				for (Cloud cloud : clouds) {
-					Cloudsdale.getNearestPegasus().storeCloud(cloud);
-				}
-			};
-		}.start();
 	}
 
 	/**

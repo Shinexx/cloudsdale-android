@@ -35,7 +35,7 @@ public class ActivityBase extends SlidingFragmentActivity {
 		mSlidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
 
 		// Customize actionbar
-		ActionBar actionbar = getSupportActionBar();
+		ActionBar actionbar = getSherlock().getActionBar();
 		actionbar.setHomeButtonEnabled(true);
 		actionbar.setDisplayHomeAsUpEnabled(true);
 	}

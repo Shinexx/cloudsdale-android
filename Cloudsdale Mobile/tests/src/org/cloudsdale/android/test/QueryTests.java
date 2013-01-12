@@ -146,21 +146,26 @@ public class QueryTests extends AndroidTestCase {
 		// Act
 		DropGetQuery query = new DropGetQuery(data.getUrl());
 		query.addHeader("X-AUTH-TOKEN", session.getAuthToken());
-		Drop[] result = query.executeForCollection(data, null);
-
-		// Assert
-		Assert.assertNotNull(result);
-		Assert.assertEquals(10, result.length);
-		for (Drop drop : result) {
-			Assert.assertNotNull(drop);
-			Assert.assertNotNull(drop.getId());
-			Assert.assertNotNull(drop.getPreview());
-			Assert.assertNotNull(drop.getTitle());
-			Assert.assertNotNull(drop.getUrl());
-			Assert.assertNotNull(drop.getStatus());
-			Assert.assertEquals("200", drop.getStatus()[0]);
-			Assert.assertEquals("OK", drop.getStatus()[1]);
+		Drop[] result;
+		try {
+			result = query.executeForCollection(data, null);
+			// Assert
+			Assert.assertNotNull(result);
+			Assert.assertEquals(10, result.length);
+			for (Drop drop : result) {
+				Assert.assertNotNull(drop);
+				Assert.assertNotNull(drop.getId());
+				Assert.assertNotNull(drop.getPreview());
+				Assert.assertNotNull(drop.getTitle());
+				Assert.assertNotNull(drop.getUrl());
+				Assert.assertNotNull(drop.getStatus());
+				Assert.assertEquals("200", drop.getStatus()[0]);
+				Assert.assertEquals("OK", drop.getStatus()[1]);
+			}
+		} catch (QueryException e) {
+			fail(e.getMessage());
 		}
+
 	}
 
 	private QueryData setupQueryData(String url) {
