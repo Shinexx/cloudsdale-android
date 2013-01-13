@@ -1,97 +1,93 @@
 package org.cloudsdale.android.ui;
 
-import android.accounts.AccountAuthenticatorResponse;
-import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.Intent;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 
-import com.actionbarsherlock.view.Menu;
-import com.google.gson.JsonObject;
-
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
-
-import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.LoggedUser;
-import org.cloudsdale.android.models.QueryData;
-import org.cloudsdale.android.models.exceptions.QueryException;
-import org.cloudsdale.android.models.queries.SessionQuery;
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.widget.EditText;
-import org.holoeverywhere.widget.TextView;
+import org.cloudsdale.android.R.id;
+import org.cloudsdale.android.R.layout;
+import org.cloudsdale.android.R.menu;
+import org.cloudsdale.android.R.string;
 
 /**
- * Controller for the login view
- * 
- * @author Jamison Greeley (atomicrat2552@gmail.com) Copyright (c) 2012
- *         Cloudsdale.org
+ * Activity which displays a login screen to the user, offering registration as
+ * well.
  */
 public class LoginActivity extends Activity {
+	/**
+	 * A dummy authentication store containing known user names and passwords.
+	 * TODO: remove after connecting to a real authentication system.
+	 */
+	private static final String[]	DUMMY_CREDENTIALS	= new String[] {
+			"foo@example.com:hello", "bar@example.com:world" };
 
-	public static final String	TAG	= "Cloudsdale LoginViewActivity";
+	/**
+	 * The default email to populate the email field with.
+	 */
+	public static final String		EXTRA_EMAIL			= "com.example.android.authenticatordemo.extra.EMAIL";
 
-	// Fields
-	private String				mEmail;
-	private String				mPassword;
+	/**
+	 * Keep track of the login task to ensure we can cancel it if requested.
+	 */
+	private UserLoginTask			mAuthTask			= null;
 
-	// UI references
-	private EditText			mEmailView;
-	private EditText			mPasswordView;
-	private View				mLoginFormView;
-	private View				mLoginStatusView;
-	private TextView			mLoginStatusMessageView;
+	// Values for email and password at the time of the login attempt.
+	private String					mEmail;
+	private String					mPassword;
+
+	// UI references.
+	private EditText				mEmailView;
+	private EditText				mPasswordView;
+	private View					mLoginFormView;
+	private View					mLoginStatusView;
+	private TextView				mLoginStatusMessageView;
 
 	@Override
-	protected void onCreate(Bundle icicle) {
-		// Hide the Cloudsdale text and icon in the ActionBar
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		
-		// Make the super call
-		super.onCreate(icicle);
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-		// Set the layout
 		setContentView(R.layout.activity_login);
 
-		// Setup the login form
+		// Set up the login form.
+		mEmail = getIntent().getStringExtra(EXTRA_EMAIL);
 		mEmailView = (EditText) findViewById(R.id.email);
-		mPasswordView = (EditText) findViewById(R.id.password);
-		mLoginFormView = findViewById(R.id.login_form);
-		mLoginStatusView = findViewById(R.id.login_status);
-		mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
+		mEmailView.setText(mEmail);
 
+		mPasswordView = (EditText) findViewById(R.id.password);
 		mPasswordView
 				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 					@Override
-					public boolean onEditorAction(
-							android.widget.TextView textView, int id,
+					public boolean onEditorAction(TextView textView, int id,
 							KeyEvent keyEvent) {
 						if (id == R.id.login || id == EditorInfo.IME_NULL) {
-							startCloudsdaleAuthentication();
+							attemptLogin();
 							return true;
 						}
 						return false;
 					}
 				});
 
+		mLoginFormView = findViewById(R.id.login_form);
+		mLoginStatusView = findViewById(R.id.login_status);
+		mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
+
 		findViewById(R.id.sign_in_button).setOnClickListener(
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
-						startCloudsdaleAuthentication();
+						attemptLogin();
 					}
 				});
 	}
@@ -99,8 +95,63 @@ public class LoginActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		getSupportMenuInflater().inflate(R.menu.activity_login, menu);
+		getMenuInflater().inflate(R.menu.activity_login, menu);
 		return true;
+	}
+
+	/**
+	 * Attempts to sign in or register the account specified by the login form.
+	 * If there are form errors (invalid email, missing fields, etc.), the
+	 * errors are presented and no actual login attempt is made.
+	 */
+	public void attemptLogin() {
+		if (mAuthTask != null) { return; }
+
+		// Reset errors.
+		mEmailView.setError(null);
+		mPasswordView.setError(null);
+
+		// Store values at the time of the login attempt.
+		mEmail = mEmailView.getText().toString();
+		mPassword = mPasswordView.getText().toString();
+
+		boolean cancel = false;
+		View focusView = null;
+
+		// Check for a valid password.
+		if (TextUtils.isEmpty(mPassword)) {
+			mPasswordView.setError(getString(R.string.error_field_required));
+			focusView = mPasswordView;
+			cancel = true;
+		} else if (mPassword.length() < 4) {
+			mPasswordView.setError(getString(R.string.error_invalid_password));
+			focusView = mPasswordView;
+			cancel = true;
+		}
+
+		// Check for a valid email address.
+		if (TextUtils.isEmpty(mEmail)) {
+			mEmailView.setError(getString(R.string.error_field_required));
+			focusView = mEmailView;
+			cancel = true;
+		} else if (!mEmail.contains("@")) {
+			mEmailView.setError(getString(R.string.error_invalid_email));
+			focusView = mEmailView;
+			cancel = true;
+		}
+
+		if (cancel) {
+			// There was an error; don't attempt login and focus the first
+			// form field with an error.
+			focusView.requestFocus();
+		} else {
+			// Show a progress spinner, and kick off a background task to
+			// perform the user login attempt.
+			mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
+			showProgress(true);
+			mAuthTask = new UserLoginTask();
+			mAuthTask.execute((Void) null);
+		}
 	}
 
 	/**
@@ -145,147 +196,51 @@ public class LoginActivity extends Activity {
 	}
 
 	/**
-	 * Hide the soft keyboard if it's showing
+	 * Represents an asynchronous login/registration task used to authenticate
+	 * the user.
 	 */
-	private void hideSoftKeyboard() {
-		if (mEmailView.hasFocus()) {
-			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(mEmailView.getWindowToken(), 0);
-		} else if (mPasswordView.hasFocus()) {
-			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(mPasswordView.getWindowToken(), 0);
-		}
-	}
-
-	/**
-	 * Stores the user account, both in the account manager and in the SQL
-	 * database
-	 * 
-	 * @param user
-	 *            The user that has logged in
-	 */
-	private boolean storeAccount(LoggedUser user) {
-		boolean accountCreated = Cloudsdale.getUserAccountManager()
-				.storeAccount(user);
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {
-			if (accountCreated) {
-				AccountAuthenticatorResponse response = extras
-						.getParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
-				Bundle result = new Bundle();
-				result.putString(AccountManager.KEY_ACCOUNT_NAME,
-						user.getName());
-				result.putString(AccountManager.KEY_ACCOUNT_TYPE,
-						getString(R.string.account_type));
-				response.onResult(result);
-			}
-		}
-		Cloudsdale.getUserManager().storeUser(user);
-		return accountCreated;
-	}
-
-	/**
-	 * Sends Cloudsdale credentials to Cloudsdale
-	 */
-	private void startCloudsdaleAuthentication() {
-		// if(!NetworkManager.isInternetConnected()) {
-		// Crouton.showText(this, "There is no internet connection.",
-		// Style.ALERT);
-		// return;
-		// }
-
-		// Get inputted email and password
-		mEmail = this.mEmailView.getText().toString();
-		mPassword = this.mPasswordView.getText().toString();
-
-		if (mEmail == null || mEmail.length() == 0) {
-			mEmailView.setError("Email can't be empty");
-		} else if (mPassword == null || mPassword.length() == 0) {
-			mPasswordView.setError("Password can't be empty");
-		} else {
-			hideSoftKeyboard();
-			showProgress(true);
-			CloudsdaleAuthTask auth = new CloudsdaleAuthTask();
-			auth.execute();
-		}
-	}
-
-	/**
-	 * Helper class to asynchronously log the user in using Cloudsdale
-	 * credentials
-	 * 
-	 * @author Jamison Greeley (atomicrat2552@gmail.com) Copyright (c) 2012
-	 *         Cloudsdale.org
-	 * 
-	 */
-	private class CloudsdaleAuthTask extends AsyncTask<Void, Void, LoggedUser> {
-
+	public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 		@Override
-		protected LoggedUser doInBackground(Void... params) {
-			if (Looper.myLooper() == null) {
-				Looper.prepare();
-			}
-
-			String sessionUrl = getString(R.string.cloudsdale_api_base)
-					+ getString(R.string.cloudsdale_sessions_endpoint);
-			QueryData data = new QueryData();
-			SessionQuery query = new SessionQuery(sessionUrl);
-
-			JsonObject json = new JsonObject();
-			json.addProperty("email", mEmail);
-			json.addProperty("password", mPassword);
-			data.setJson(json.toString());
-
-			if (Cloudsdale.isDebuggable()) {
-				Log.d(TAG, "Json: " + json);
-			}
+		protected Boolean doInBackground(Void... params) {
+			// TODO: attempt authentication against a network service.
 
 			try {
-				return query.execute(data, LoginActivity.this);
-			} catch (final QueryException e) {
-				runOnUiThread(new Runnable() {
+				// Simulate network access.
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				return false;
+			}
 
-					@Override
-					public void run() {
-						if (e.getErrorCode() == 500)
-							Crouton.showText(LoginActivity.this,
-									"Something went wrong during login",
-									Style.ALERT);
-						else if (e.getErrorCode() == 404)
-							Crouton.showText(LoginActivity.this,
-									"Couldn't connect to Cloudsdale",
-									Style.ALERT);
-						else if (e.getErrorCode() == 401)
-							Crouton.showText(LoginActivity.this,
-									"Invalid username/password combination",
-									Style.ALERT);
-						else
-							Crouton.showText(LoginActivity.this,
-									e.getMessage(), Style.ALERT);
-					}
-				});
+			for (String credential : DUMMY_CREDENTIALS) {
+				String[] pieces = credential.split(":");
+				if (pieces[0].equals(mEmail)) {
+					// Account exists, return true if the password matches.
+					return pieces[1].equals(mPassword);
+				}
+			}
 
-				return null;
+			// TODO: register the new account here.
+			return true;
+		}
+
+		@Override
+		protected void onPostExecute(final Boolean success) {
+			mAuthTask = null;
+			showProgress(false);
+
+			if (success) {
+				finish();
+			} else {
+				mPasswordView
+						.setError(getString(R.string.error_incorrect_password));
+				mPasswordView.requestFocus();
 			}
 		}
 
 		@Override
 		protected void onCancelled() {
+			mAuthTask = null;
 			showProgress(false);
-			super.onCancelled();
-		}
-
-		@Override
-		protected void onPostExecute(LoggedUser result) {
-			showProgress(false);
-			boolean success = result == null ? false : storeAccount(result);
-			if (success) {
-				Intent intent = new Intent();
-				intent.setClass(LoginActivity.this, HomeActivity.class);
-				startActivity(intent);
-				finish();
-			}
-			super.onPostExecute(result);
 		}
 	}
 }

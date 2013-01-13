@@ -1,17 +1,14 @@
 package org.cloudsdale.android.models.api;
 
+import com.google.gson.annotations.SerializedName;
+
+import org.cloudsdale.android.models.IdentityModel;
+
 import java.util.Date;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import org.cloudsdale.android.models.AvatarContainer;
-import org.cloudsdale.android.models.IdentityModel;
-
-import com.google.gson.annotations.SerializedName;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
 public class Cloud extends IdentityModel {
 
 	private String			name;
@@ -20,7 +17,7 @@ public class Cloud extends IdentityModel {
 	private Date			createdAt;
 	private String			rules;
 	private boolean			hidden;
-	private AvatarContainer	avatar;
+	private Avatar	avatar;
 	@SerializedName("is_transient")
 	private boolean			isTransient;
 	@SerializedName("owner")

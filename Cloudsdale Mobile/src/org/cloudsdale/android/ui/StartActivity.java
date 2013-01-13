@@ -34,14 +34,9 @@ public class StartActivity extends SherlockActivity {
 				.getString(R.string.account_type));
 
 		if (accounts.length > 0) {
-			Cloudsdale.getUserAccountManager().cacheAccount(accounts[0]);
-			Intent intent = new Intent();
-			intent.setClass(this, HomeActivity.class);
-			startActivity(intent);
+			// TODO Act when at least one user is signed in
 		} else {
-			Intent intent = new Intent();
-			intent.setClass(this, LoginActivity.class);
-			startActivity(intent);
+			// TODO Act when no users are signed in
 		}
 	}
 

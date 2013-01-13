@@ -7,7 +7,6 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.exceptions.QueryException;
-import org.cloudsdale.android.models.queries.UserGetQuery;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,11 +24,6 @@ public class UserManager extends ManagerBase {
 
 	private HashMap<String, User>	mStoredUsers;
 
-	public UserManager() {
-		super("UserManagerThread");
-		mStoredUsers = new HashMap<String, User>();
-	}
-
 	/**
 	 * Gets the user that has logged into the application
 	 * 
@@ -38,15 +32,8 @@ public class UserManager extends ManagerBase {
 	 *             When the query cannot be completed
 	 */
 	public User getLoggedInUser() throws QueryException {
-		val accountManager = Cloudsdale.getUserAccountManager();
-		val am = accountManager.getAccountManager();
-		val userAccount = accountManager.getAccount();
-		val id = am.getUserData(userAccount, UserAccountManager.KEY_ID);
-		User user = getUserById(id);
-		if (user.getClouds() == null || user.getClouds().isEmpty()) {
-			getCloudsForUser(user);
-		}
-		return user;
+		// TODO Re-implement using API client
+		return null;
 	}
 
 	/**
@@ -59,57 +46,8 @@ public class UserManager extends ManagerBase {
 	 *             When the query cannot be completed
 	 */
 	public User getUserById(final String id) throws QueryException {
-		val userIsStored = mStoredUsers.containsKey(id);
-		if (userIsStored) {
-			mReadLock.lock();
-			val user = mStoredUsers.get(id);
-			mReadLock.unlock();
-			return user;
-		} else {
-			// Get the strings we need
-			Context appContext = Cloudsdale.getContext();
-			final String url = appContext
-					.getString(R.string.cloudsdale_api_base)
-					+ appContext.getString(R.string.cloudsdale_user_endpoint,
-							id);
-
-			mNetworkHandler.post(new Runnable() {
-
-				@Override
-				public void run() {
-					// Build and execute the query
-					UserGetQuery query = new UserGetQuery(url);
-					User result;
-					try {
-						result = query.execute(null, null);
-						if (result != null) {
-							storeUser(result);
-						}
-					} catch (QueryException e) {
-						// Don't worry here, the method body will catch it
-					}
-					synchronized (UserManager.this) {
-						UserManager.this.notify();
-					}
-				}
-			});
-
-			try {
-				synchronized (this) {
-					wait();
-				}
-				if (mStoredUsers.containsKey(id)) {
-					mReadLock.lock();
-					val user = mStoredUsers.get(id);
-					mReadLock.unlock();
-					return user;
-				} else {
-					throw new QueryException("Thread failed", 418);
-				}
-			} catch (InterruptedException e) {
-				throw new QueryException("Thread was interrupted", 418);
-			}
-		}
+		// TODO Re-implement using API client
+		return null;
 	}
 
 	/**
@@ -121,9 +59,7 @@ public class UserManager extends ManagerBase {
 	 *             When the query can't be completed
 	 */
 	private void getCloudsForUser(User user) throws QueryException {
-		final ArrayList<Cloud> clouds = Cloudsdale.getNearestPegasus().getCloudsForUser(
-				user.getId());
-		user.setClouds(clouds);
+		// TODO Re-implement using API client
 	}
 
 	/**

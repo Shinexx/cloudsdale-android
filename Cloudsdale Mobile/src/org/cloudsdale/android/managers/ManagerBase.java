@@ -1,8 +1,5 @@
 package org.cloudsdale.android.managers;
 
-import android.os.Handler;
-import android.os.HandlerThread;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -16,13 +13,4 @@ public abstract class ManagerBase {
 	protected final Lock					mWriteLock		= mReadWriteLock
 																	.writeLock();
 
-	// Worker thead stuff
-	protected HandlerThread					mNetworkThread;
-	protected Handler						mNetworkHandler;
-
-	public ManagerBase(String name) {
-		mNetworkThread = new HandlerThread(name);
-		mNetworkThread.start();
-		mNetworkHandler = new Handler(mNetworkThread.getLooper());
-	}
 }

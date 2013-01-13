@@ -11,8 +11,8 @@ import android.os.Bundle;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.LoggedUser;
-import org.cloudsdale.android.ui.LoginActivity;
+import org.cloudsdale.android.models.api.Session;
+import org.cloudsdale.android.models.api.User;
 
 /**
  * Class to manage the user's account object
@@ -23,19 +23,19 @@ import org.cloudsdale.android.ui.LoginActivity;
  */
 public class UserAccountManager {
 
-	public static final String		KEY_ID				= "id";
-	public static final String		PREFERENCES_NAME	= "LoggedUserPrefs";
+	public static final String	KEY_ID				= "id";
+	public static final String	PREFERENCES_NAME	= "LoggedUserPrefs";
 
-	private Account			mUserAccount;
-	private AccountManager	mAccountManager;
-	
+	private Account				mUserAccount;
+	private AccountManager		mAccountManager;
+
 	public AccountManager getAccountManager() {
-		if(mAccountManager == null) {
+		if (mAccountManager == null) {
 			mAccountManager = AccountManager.get(Cloudsdale.getContext());
 		}
 		return mAccountManager;
 	}
-	
+
 	/**
 	 * Store the user's account in the system AccountManager
 	 * 
@@ -43,8 +43,9 @@ public class UserAccountManager {
 	 *            The user to store
 	 * @return Whether the user account was stored or not
 	 */
-	public boolean storeAccount(LoggedUser user) {
+	public boolean storeAccount(Session session) {
 		Context appContext = Cloudsdale.getContext();
+		User user = session.getUser();
 		Account account = new Account(user.getName(),
 				appContext.getString(R.string.account_type));
 		final Bundle extras = new Bundle();
@@ -104,7 +105,8 @@ public class UserAccountManager {
 			@Override
 			public void run(AccountManagerFuture<Boolean> arg0) {
 				Intent intent = new Intent();
-				intent.setClass(Cloudsdale.getContext(), LoginActivity.class);
+				// TODO Re-do this once the views are back in place
+//				intent.setClass(Cloudsdale.getContext(), LoginActivity.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				Cloudsdale.getContext().startActivity(intent);

@@ -20,16 +20,12 @@
 
 package org.cloudsdale.android.faye;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.widget.Toast;
 
@@ -37,7 +33,6 @@ import com.b3rwynmobile.fayeclient.FayeService;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
-import org.cloudsdale.android.ui.HomeActivity;
 
 /**
  * Service class to run Faye. Provides a singleton method to get the running
@@ -116,37 +111,45 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 
 	@Override
 	public void connected() {
-		mNotificationBuilder = new Builder(this).setContentTitle(
-				"Cloudsdale is connected").setSmallIcon(R.drawable.ic_color_icon);
-		Intent resultIntent = new Intent(this, HomeActivity.class);
-		mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent, 0);
-		mNotificationBuilder.setContentIntent(mPendingIntent);
-		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.notify(1337,
-				mNotificationBuilder.getNotification());
+		// TODO Re-implement when views are in place
+		// mNotificationBuilder = new Builder(this).setContentTitle(
+		// "Cloudsdale is connected").setSmallIcon(R.drawable.ic_color_icon);
+		// Intent resultIntent = new Intent(this, HomeActivity.class);
+		// mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent,
+		// 0);
+		// mNotificationBuilder.setContentIntent(mPendingIntent);
+		// mNotificationManager = (NotificationManager)
+		// getSystemService(Context.NOTIFICATION_SERVICE);
+		// mNotificationManager.notify(1337,
+		// mNotificationBuilder.getNotification());
 	}
 
 	@Override
 	public void disconnected() {
-		mNotificationBuilder = new Builder(this).setContentTitle(
-				"Cloudsdale is disconnected").setSmallIcon(
-				R.drawable.ic_color_icon);
-		Intent resultIntent = new Intent(this, HomeActivity.class);
-		mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent, 0);
-		mNotificationBuilder.setContentIntent(mPendingIntent);
-		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.notify(1337,
-				mNotificationBuilder.getNotification());
+		// TODO Re-implement when views are in place
+		// mNotificationBuilder = new Builder(this).setContentTitle(
+		// "Cloudsdale is disconnected").setSmallIcon(
+		// R.drawable.ic_color_icon);
+		// Intent resultIntent = new Intent(this, HomeActivity.class);
+		// mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent,
+		// 0);
+		// mNotificationBuilder.setContentIntent(mPendingIntent);
+		// mNotificationManager = (NotificationManager)
+		// getSystemService(Context.NOTIFICATION_SERVICE);
+		// mNotificationManager.notify(1337,
+		// mNotificationBuilder.getNotification());
 	}
 
 	@Override
 	public void connecting() {
-		mNotificationBuilder = new Builder(this).setContentTitle(
-				"Cloudsdale is connecting").setSmallIcon(R.drawable.ic_color_icon);
-		Intent resultIntent = new Intent(this, HomeActivity.class);
-		mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent, 0);
-		mNotificationBuilder.setContentIntent(mPendingIntent);
-
-		startForeground(1337, mNotificationBuilder.getNotification());
+		// TODO Re-implement when views are in place
+		// mNotificationBuilder = new Builder(this).setContentTitle(
+		// "Cloudsdale is connecting").setSmallIcon(R.drawable.ic_color_icon);
+		// Intent resultIntent = new Intent(this, HomeActivity.class);
+		// mPendingIntent = PendingIntent.getActivity(this, 1337, resultIntent,
+		// 0);
+		// mNotificationBuilder.setContentIntent(mPendingIntent);
+		//
+		// startForeground(1337, mNotificationBuilder.getNotification());
 	}
 }

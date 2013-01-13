@@ -3,15 +3,12 @@ package org.cloudsdale.android.models.api;
 import com.google.gson.annotations.SerializedName;
 
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.models.AvatarContainer;
 import org.cloudsdale.android.models.IdentityModel;
-import org.cloudsdale.android.models.Role;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * User model for Cloudsdale
@@ -19,10 +16,35 @@ import lombok.EqualsAndHashCode;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
 public class User extends IdentityModel {
 
-	protected final String	TAG	= "Cloudsdale User";
+	public static enum Role {
+
+		//@formatter:off
+		NORMAL(""),
+		DONOR("[ donor ]"),
+		LEGACY("[ legacy ]"),
+		ASSOCIATE("[ associate ]"),
+		ADMIN(""),
+		DEVELOPER("[ dev ]"),
+		FOUNDER("[ founder ]")
+		;
+		//@formatter:on
+
+		private String	prettyName;
+
+		Role(String prettyName) {
+			this.prettyName = prettyName;
+		}
+
+		@Override
+		public String toString() {
+			return this.prettyName;
+		}
+
+	}
+
+	protected final String		TAG	= "Cloudsdale User";
 
 	// protected attributes from JSON
 	protected String			name;
@@ -38,7 +60,7 @@ public class User extends IdentityModel {
 	protected Date				suspendedUntil;
 	@SerializedName("reason_for_suspension")
 	protected String			reasonForSuspension;
-	protected AvatarContainer	avatar;
+	protected Avatar			avatar;
 	@SerializedName("is_registered")
 	protected boolean			isRegistered;
 	@SerializedName("is_transient")

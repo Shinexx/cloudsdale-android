@@ -19,3 +19,6 @@
 [submodule "submodules/cwac-merge"]
 	path = submodules/cwac-merge
 	url = git@github.com:commonsguy/cwac-merge.git
+[submodule "submodules/androidquery"]
+	path = submodules/androidquery
+	url = git@github.com:androidquery/androidquery.git

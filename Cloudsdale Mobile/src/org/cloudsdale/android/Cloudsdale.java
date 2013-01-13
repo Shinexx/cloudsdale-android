@@ -12,9 +12,8 @@ import org.cloudsdale.android.managers.FayeManager;
 import org.cloudsdale.android.managers.NetworkManager;
 import org.cloudsdale.android.managers.UserAccountManager;
 import org.cloudsdale.android.managers.UserManager;
-import org.cloudsdale.android.models.Role;
+import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
-import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
 
 /**
  * Global application class
@@ -37,9 +36,6 @@ public class Cloudsdale extends Application {
 	private static FayeManager			sFayeManager;
 	private static NetworkManager		sNetManager;
 	private static CloudManager			sCloudManager;
-
-	// Our current
-	private static SlidingMenuFragment	sSlidingMenu;
 
 	@Override
 	public void onCreate() {
@@ -80,7 +76,7 @@ public class Cloudsdale extends Application {
 		if (sJsonDeserializer == null) {
 			GsonBuilder builder = new GsonBuilder();
 			builder.setDateFormat("yyyy/MM/dd HH:mm:ss Z");
-			builder.registerTypeAdapter(Role.class, new GsonRoleAdapter());
+			builder.registerTypeAdapter(User.Role.class, new GsonRoleAdapter());
 			sJsonDeserializer = builder.create();
 		}
 		return sJsonDeserializer;
@@ -135,15 +131,5 @@ public class Cloudsdale extends Application {
 	public static CloudManager getNearestPegasus() {
 		if (sCloudManager == null) sCloudManager = new CloudManager();
 		return sCloudManager;
-	}
-
-	/**
-	 * Gets the currently active SlidingMenu fragment we're using to navigate
-	 * 
-	 * @return The active SlidingMenu fragment
-	 */
-	public static SlidingMenuFragment getSlidingMenu() {
-		if (sSlidingMenu == null) sSlidingMenu = new SlidingMenuFragment();
-		return sSlidingMenu;
 	}
 }
