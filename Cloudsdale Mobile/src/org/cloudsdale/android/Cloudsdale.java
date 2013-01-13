@@ -142,8 +142,21 @@ public class Cloudsdale extends Application {
 	 * @return The Cloudsdale API client in use by the application
 	 */
 	public CloudsdaleApiClient callZephyr() {
-		if (mApiClient == null)
-			mApiClient = new CloudsdaleApiClient(this);
+		if (mApiClient == null) mApiClient = new CloudsdaleApiClient(this);
 		return mApiClient;
+	}
+
+	/**
+	 * Gets the appropriate Facebook application key depending on debuggable
+	 * mode (determined at runtime)
+	 * 
+	 * @return The Facebook application key
+	 */
+	public String getFacebookAppKey() {
+		if (isDebuggable()) {
+			return getString(R.string.facebook_app_key_debug);
+		} else {
+			return getString(R.string.facebook_app_key);
+		}
 	}
 }

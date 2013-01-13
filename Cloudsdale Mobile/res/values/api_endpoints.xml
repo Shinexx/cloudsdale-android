@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Base -->
     <string name="cloudsdale_api_base">http://www.cloudsdale.org/v1/</string>
+
+    <!-- Cloud resources -->
+    <string name="cloudsdale_cloud_endpoint">clouds/%1$s.json</string>
+    <string name="cloudsdale_cloud_bans_endpoint">clouds/%1$s/bans.json</string>
+    <string name="cloudsdale_cloud_chat_messages_endpoint">clouds/%1$s/chat/messages.json</string>
+    <string name="cloudsdale_cloud_drop_endpoint">clouds/%1$s/drops.json</string>
+    <string name="cloudsdale_cloud_popular_endpoint">clouds/popular.json</string>
+    <string name="cloudsdale_cloud_recent_endpoint">clouds/recent.json</string>
+    <string name="cloudsdale_cloud_search_endpoint">clous/search.json</string>
+
+    <!-- User resources -->
     <string name="cloudsdale_user_endpoint">users/%1$s.json</string>
     <string name="cloudsdale_user_clouds_endpoint">users/%1$s/clouds.json</string>
     <string name="cloudsdale_sessions_endpoint">sessions.json</string>
+
+    <!-- 3rd party APIs -->
     <string name="facebook_graph_api_base_path">http://graph.facebook.com/</string>
     <string name="twitter_user_info_api_path">http://api.twitter.com/version/users/show.json</string>
-    <string name="cloudsdale_cloud_chat_messages_endpoint">clouds/%1$s/chat/messages.json</string>
-    <string name="cloudsdale_cloud_drop_endpoint">clouds/%1$s/drops.json</string>
-    <string name="cloudsdale_cloud_endpoint">clouds/%1$s.json</string>
 
 </resources>

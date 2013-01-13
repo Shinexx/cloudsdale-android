@@ -19,6 +19,13 @@ public class CloudsdaleApiClient {
 	private String		mSessionEndpoint;
 	private String		mUserEndpoint;
 	private String		mUserCloudEndpoint;
+	private String		mCloudEndpoint;
+	private String		mCloudBansEndpoint;
+	private String		mCloudDropsEndpoint;
+	private String		mCloudMessagesEndpoint;
+	private String		mCloudPopularEndpoint;
+	private String		mCloudRecentEndpoint;
+	private String		mCloudSearchEndpoint;
 
 	public CloudsdaleApiClient(Cloudsdale cloudsdale) {
 		mAppInstance = cloudsdale;
@@ -29,6 +36,20 @@ public class CloudsdaleApiClient {
 				.getString(R.string.cloudsdale_user_endpoint);
 		mUserCloudEndpoint = mAppInstance
 				.getString(R.string.cloudsdale_user_clouds_endpoint);
+		mCloudEndpoint = mAppInstance
+				.getString(R.string.cloudsdale_cloud_endpoint);
+		mCloudBansEndpoint = mAppInstance
+				.getString(R.string.cloudsdale_cloud_bans_endpoint);
+		mCloudDropsEndpoint = mAppInstance
+				.getString(R.string.cloudsdale_cloud_drop_endpoint);
+		mCloudMessagesEndpoint = mAppInstance
+				.getString(R.string.cloudsdale_cloud_chat_messages_endpoint);
+		mCloudPopularEndpoint = mAppInstance
+				.getString(R.string.cloudsdale_cloud_popular_endpoint);
+		mCloudRecentEndpoint = mAppInstance
+				.getString(R.string.cloudsdale_cloud_recent_endpoint);
+		mCloudSearchEndpoint = mAppInstance
+				.getString(R.string.cloudsdale_cloud_search_endpoint);
 	}
 
 	private AsyncHttpClient getAsyncClient() {
@@ -37,6 +58,8 @@ public class CloudsdaleApiClient {
 		client.addHeader("Accept", "application/json");
 		client.addHeader("Content-Encoding", "utf-8");
 		client.addHeader("Content-Type", "application/json");
+		client.addHeader("X_AUTH_INTERNAL_TOKEN",
+				mAppInstance.getString(R.string.cloudsdale_auth_token));
 		return client;
 	}
 
@@ -61,6 +84,53 @@ public class CloudsdaleApiClient {
 		}
 	}
 
+	public void getCloud(String id, AsyncHttpResponseHandler handler) {
+		String relUrl = String.format(mCloudEndpoint, id);
+		get(relUrl, handler);
+	}
+	
+	public void getCloudBans(String id, AsyncHttpResponseHandler handler) {
+		String relUrl = String.format(mCloudBansEndpoint, id);
+		get(relUrl, handler);
+	}
+
+	public void getCloudDrops(String id, AsyncHttpResponseHandler handler) {
+		String relUrl = String.format(mCloudDropsEndpoint, id);
+		get(relUrl, handler);
+	}
+
+	public void getCloudMessages(String id, AsyncHttpResponseHandler handler) {
+		String relUrl = String.format(mCloudMessagesEndpoint, id);
+		get(relUrl, handler);
+	}
+
+	public void getCloudPopular(AsyncHttpResponseHandler handler) {
+		get(mCloudPopularEndpoint, handler);
+	}
+
+	public void getCloudRecents(AsyncHttpResponseHandler handler) {
+		get(mCloudRecentEndpoint, handler);
+	}
+
+	public void postCloudSearch(String query, AsyncHttpResponseHandler handler) {
+		try {
+			String json = new JSONObject().put("q", query).toString();
+			post(mCloudSearchEndpoint, json, handler);
+		} catch (JSONException e) {
+			// this won't happen
+		}
+	}
+
+	public void getUser(String id, AsyncHttpResponseHandler handler) {
+		String relUrl = String.format(mUserEndpoint, id);
+		get(relUrl, handler);
+	}
+
+	public void getUserClouds(String id, AsyncHttpResponseHandler handler) {
+		String relUrl = String.format(mUserCloudEndpoint, id);
+		get(relUrl, handler);
+	}
+
 	public void getSession(String email, String password,
 			AsyncHttpResponseHandler handler) {
 		try {
@@ -75,20 +145,6 @@ public class CloudsdaleApiClient {
 	public void getSession(String oAuthId, Provider oAuthProvider,
 			AsyncHttpResponseHandler handler) {
 		// TODO Implement oAuth login
-	}
-
-	public void getUser(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(mUserEndpoint, id);
-		get(relUrl, handler);
-	}
-
-	public void getUserClouds(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(mUserCloudEndpoint, id);
-		get(relUrl, handler);
-	}
-	
-	public void getCloud(String id, AsyncHttpResponseHandler handler) {
-		// TODO get the cloud from the api
 	}
 
 }
