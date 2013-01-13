@@ -10,9 +10,9 @@ import android.os.IBinder;
 import org.cloudsdale.android.faye.CloudsdaleFayeBinder;
 import org.cloudsdale.android.faye.CloudsdaleFayeClient;
 import org.cloudsdale.android.faye.CloudsdaleFayeListener;
+import org.cloudsdale.android.faye.CloudsdaleFayeMessage;
 import org.cloudsdale.android.faye.CloudsdaleFayeService;
 import org.cloudsdale.android.faye.FayeMessageHandler;
-import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 
 import java.util.ArrayList;
 

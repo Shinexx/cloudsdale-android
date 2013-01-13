@@ -1,4 +1,4 @@
-package org.cloudsdale.android.models;
+package org.cloudsdale.android.faye;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

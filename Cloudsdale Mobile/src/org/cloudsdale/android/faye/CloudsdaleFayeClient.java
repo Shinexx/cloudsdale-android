@@ -31,7 +31,6 @@ import de.tavendo.autobahn.WebSocketHandler;
 import de.tavendo.autobahn.WebSocketOptions;
 
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.models.CloudsdaleFayeMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;

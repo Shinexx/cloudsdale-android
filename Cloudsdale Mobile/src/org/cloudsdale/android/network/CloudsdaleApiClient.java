@@ -1,7 +1,5 @@
 package org.cloudsdale.android.network;
 
-import android.content.Context;
-
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -87,6 +85,10 @@ public class CloudsdaleApiClient {
 	public void getUserClouds(String id, AsyncHttpResponseHandler handler) {
 		String relUrl = String.format(mUserCloudEndpoint, id);
 		get(relUrl, handler);
+	}
+	
+	public void getCloud(String id, AsyncHttpResponseHandler handler) {
+		// TODO get the cloud from the api
 	}
 
 }
