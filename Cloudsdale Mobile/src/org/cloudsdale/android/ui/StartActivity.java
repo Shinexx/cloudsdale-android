@@ -3,13 +3,11 @@ package org.cloudsdale.android.ui;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bugsense.trace.BugSenseHandler;
 
-import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 
 public class StartActivity extends SherlockActivity {
@@ -28,7 +26,7 @@ public class StartActivity extends SherlockActivity {
 	protected void onStart() {
 		super.onStart();
 		// Get the account
-		Context context = Cloudsdale.getContext();
+		Context context = getApplicationContext();
 		AccountManager am = AccountManager.get(context);
 		Account[] accounts = am.getAccountsByType(context
 				.getString(R.string.account_type));

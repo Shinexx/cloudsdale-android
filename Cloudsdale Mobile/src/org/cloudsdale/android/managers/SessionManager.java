@@ -21,17 +21,22 @@ import org.cloudsdale.android.models.api.User;
  *         Cloudsdale.org
  * 
  */
-public class UserAccountManager {
+public class SessionManager {
 
 	public static final String	KEY_ID				= "id";
 	public static final String	PREFERENCES_NAME	= "LoggedUserPrefs";
 
+	private Cloudsdale			mAppInstance;
 	private Account				mUserAccount;
 	private AccountManager		mAccountManager;
 
+	public SessionManager(Cloudsdale cloudsdale) {
+		mAppInstance = cloudsdale;
+	}
+
 	public AccountManager getAccountManager() {
 		if (mAccountManager == null) {
-			mAccountManager = AccountManager.get(Cloudsdale.getContext());
+			mAccountManager = AccountManager.get(mAppInstance.getContext());
 		}
 		return mAccountManager;
 	}
@@ -44,7 +49,7 @@ public class UserAccountManager {
 	 * @return Whether the user account was stored or not
 	 */
 	public boolean storeAccount(Session session) {
-		Context appContext = Cloudsdale.getContext();
+		Context appContext = mAppInstance.getContext();
 		User user = session.getUser();
 		Account account = new Account(user.getName(),
 				appContext.getString(R.string.account_type));
@@ -77,7 +82,7 @@ public class UserAccountManager {
 		if (mUserAccount != null) {
 			return mUserAccount;
 		} else {
-			Context context = Cloudsdale.getContext();
+			Context context = mAppInstance.getContext();
 			AccountManager am = getAccountManager();
 			Account[] accounts = am.getAccountsByType(context
 					.getString(R.string.account_type));
@@ -95,7 +100,7 @@ public class UserAccountManager {
 		if (mUserAccount != null) {
 			mUserAccount = null;
 		}
-		Editor edit = Cloudsdale.getContext()
+		Editor edit = mAppInstance.getContext()
 				.getSharedPreferences(PREFERENCES_NAME, 0).edit();
 		edit.remove(KEY_ID);
 		edit.commit();
@@ -106,10 +111,11 @@ public class UserAccountManager {
 			public void run(AccountManagerFuture<Boolean> arg0) {
 				Intent intent = new Intent();
 				// TODO Re-do this once the views are back in place
-//				intent.setClass(Cloudsdale.getContext(), LoginActivity.class);
+				// intent.setClass(Cloudsdale.getContext(),
+				// LoginActivity.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				Cloudsdale.getContext().startActivity(intent);
+				mAppInstance.getContext().startActivity(intent);
 			}
 		}, null);
 	}

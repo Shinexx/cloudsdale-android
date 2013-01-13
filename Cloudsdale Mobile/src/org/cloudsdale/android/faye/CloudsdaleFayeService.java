@@ -20,6 +20,7 @@
 
 package org.cloudsdale.android.faye;
 
+import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -78,7 +79,7 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 	@Override
 	protected void setup() {
 		// Debug toast
-		if (Cloudsdale.isDebuggable()) {
+		if (getDebugStatus()) {
 			Toast.makeText(getApplicationContext(), "Faye Service created",
 					Toast.LENGTH_SHORT).show();
 		}
@@ -151,5 +152,15 @@ public class CloudsdaleFayeService extends FayeService implements IFayeCallback 
 		// mNotificationBuilder.setContentIntent(mPendingIntent);
 		//
 		// startForeground(1337, mNotificationBuilder.getNotification());
+	}
+	
+	@Override
+	public boolean getDebugStatus() {
+		return ((Cloudsdale) getApplication()).isDebuggable();
+	}
+	
+	@Override
+	public final Application getServiceApplication() {
+		return getApplication();
 	}
 }

@@ -166,7 +166,7 @@ public class CloudsdaleFayeClient {
 		String disconnectString = "{\"channel\":\""
 				+ CloudsdaleFayeClient.DISCONNECT_CHANNEL
 				+ "\",\"clientID\":\"" + this.mClientId + "\"}";
-		if (Cloudsdale.isDebuggable()) {
+		if (callback.getDebugStatus()) {
 			Log.d(CloudsdaleFayeClient.TAG, "Disconnect: " + disconnectString);
 		}
 		this.mWebSocket.sendTextMessage(disconnectString);
@@ -205,11 +205,12 @@ public class CloudsdaleFayeClient {
 				}
 
 				public void onTextMessage(String payload) {
-					if (Cloudsdale.isDebuggable()) {
+					if (callback.getDebugStatus()) {
 						Log.d(CloudsdaleFayeClient.TAG,
 								"Text message payload: " + payload);
 					}
-					Gson gson = Cloudsdale.getJsonDeserializer();
+					Gson gson = ((Cloudsdale) callback.getServiceApplication())
+							.getJsonDeserializer();
 					CloudsdaleFayeMessage[] messages = gson.fromJson(payload,
 							CloudsdaleFayeMessage[].class);
 					for (CloudsdaleFayeMessage message : messages) {
@@ -217,7 +218,7 @@ public class CloudsdaleFayeClient {
 					}
 				}
 			}, options);
-			if (Cloudsdale.isDebuggable()) {
+			if (callback.getDebugStatus()) {
 				Log.d(CloudsdaleFayeClient.TAG,
 						"Service is opening the web socket");
 			}
@@ -310,7 +311,7 @@ public class CloudsdaleFayeClient {
 				+ channel
 				+ "\",\"channel\":\"/meta/subscribe\",\"ext\":{\"authToken\":\""
 				+ this.mAuthToken + "\"}}";
-		if (Cloudsdale.isDebuggable()) {
+		if (callback.getDebugStatus()) {
 			Log.d(CloudsdaleFayeClient.TAG,
 					"Faye is attempting to subscribe to channel \"" + channel
 							+ "\"");
@@ -332,7 +333,7 @@ public class CloudsdaleFayeClient {
 		String unsubscribe = "{\"clientId\":\"" + this.mClientId
 				+ "\",\"subscription\":\"" + channel
 				+ "\",\"channel\":\"/meta/unsubscribe\"}";
-		if (Cloudsdale.isDebuggable()) {
+		if (callback.getDebugStatus()) {
 			Log.d(CloudsdaleFayeClient.TAG,
 					"Faye is attempting to unsubscribe from channel \""
 							+ channel + "\"");
@@ -398,7 +399,7 @@ public class CloudsdaleFayeClient {
 					mClientId = message.getClientId();
 					openFayeConnection();
 				} else {
-					if (Cloudsdale.isDebuggable()) {
+					if (callback.getDebugStatus()) {
 						Log.e(CloudsdaleFayeClient.TAG,
 								"Faye failed to handshake");
 					}
@@ -409,12 +410,12 @@ public class CloudsdaleFayeClient {
 					mFayeListener.connectedToServer(CloudsdaleFayeClient.this);
 					callback.connected();
 					scheduleHeartbeat(message.getAdvice().getInterval());
-					if (Cloudsdale.isDebuggable()) {
+					if (callback.getDebugStatus()) {
 						Log.d(TAG, "Faye connected");
 					}
 				} else {
 					mFayeConnected = false;
-					if (Cloudsdale.isDebuggable()) {
+					if (callback.getDebugStatus()) {
 						Log.e(CloudsdaleFayeClient.TAG,
 								"Faye failed to connect");
 					}
@@ -428,21 +429,21 @@ public class CloudsdaleFayeClient {
 					closeSocketConnection();
 				} else {
 					mFayeConnected = true;
-					if (Cloudsdale.isDebuggable()) {
+					if (callback.getDebugStatus()) {
 						Log.e(CloudsdaleFayeClient.TAG,
 								"Faye failed to disconnect");
 					}
 				}
 			} else if (channel.equals(CloudsdaleFayeClient.SUBSCRIBE_CHANNEL)) {
 				if (message.isSuccessful()) {
-					if (Cloudsdale.isDebuggable()) {
+					if (callback.getDebugStatus()) {
 						Log.i(CloudsdaleFayeClient.TAG,
 								"Faye subscribed to channel"
 										+ message.getSubscription());
 					}
 					mActiveSubchannels.add(message.getSubscription());
 				} else {
-					if (Cloudsdale.isDebuggable()) {
+					if (callback.getDebugStatus()) {
 						Log.e(CloudsdaleFayeClient.TAG,
 								MessageFormat
 										.format("Faye failed to connect to channel {0} with error {1}",
@@ -452,7 +453,7 @@ public class CloudsdaleFayeClient {
 					// TODO Handle failed subscribe
 				}
 			} else if (channel.equals(CloudsdaleFayeClient.UNSUBSCRIBE_CHANNEL)) {
-				if (Cloudsdale.isDebuggable()) {
+				if (callback.getDebugStatus()) {
 					Log.i(CloudsdaleFayeClient.TAG,
 							"Faye unsubscribed from channel "
 									+ message.getSubscription());
@@ -461,7 +462,7 @@ public class CloudsdaleFayeClient {
 				mFayeListener.messageReceived(CloudsdaleFayeClient.this,
 						message);
 			} else {
-				if (Cloudsdale.isDebuggable()) {
+				if (callback.getDebugStatus()) {
 					Log.e(CloudsdaleFayeClient.TAG,
 							"Faye recieved a message with no subscription for channel "
 									+ message.getSubscription());

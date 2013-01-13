@@ -2,7 +2,6 @@ package org.cloudsdale.android.models.api;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.models.IdentityModel;
 
 import java.util.ArrayList;
@@ -100,19 +99,7 @@ public class User extends IdentityModel {
 	}
 
 	public void setClouds(ArrayList<Cloud> clouds) {
-		for (Cloud c : clouds) {
-			Cloudsdale.getNearestPegasus().storeCloud(c);
-		}
 		this.clouds = clouds;
 	}
-
-	/**
-	 * Converts the user to a JSON string
-	 * 
-	 * @return json representation of the user
-	 */
-	public String toJson() {
-		return Cloudsdale.getJsonDeserializer().toJson(this, this.getClass());
-	}
-
+	
 }

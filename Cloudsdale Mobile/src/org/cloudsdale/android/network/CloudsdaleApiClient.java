@@ -16,23 +16,24 @@ import java.io.UnsupportedEncodingException;
 
 public class CloudsdaleApiClient {
 
-	private static String	BASE_URL;
-	private static String	SESSIONS_ENDPOINT;
-	private static String	USERS_ENDPOINT;
-	private static String	USERS_CLOUDS_ENDPOINT;
+	private Cloudsdale	mAppInstance;
+	private String		mBaseUrl;
+	private String		mSessionEndpoint;
+	private String		mUserEndpoint;
+	private String		mUserCloudEndpoint;
 
-	static {
-		Context appContext = Cloudsdale.getContext();
-		BASE_URL = appContext.getString(R.string.cloudsdale_api_base);
-		SESSIONS_ENDPOINT = appContext
+	public CloudsdaleApiClient(Cloudsdale cloudsdale) {
+		mAppInstance = cloudsdale;
+		mBaseUrl = mAppInstance.getString(R.string.cloudsdale_api_base);
+		mSessionEndpoint = mAppInstance
 				.getString(R.string.cloudsdale_sessions_endpoint);
-		USERS_ENDPOINT = appContext
+		mUserEndpoint = mAppInstance
 				.getString(R.string.cloudsdale_user_endpoint);
-		USERS_CLOUDS_ENDPOINT = appContext
+		mUserCloudEndpoint = mAppInstance
 				.getString(R.string.cloudsdale_user_clouds_endpoint);
 	}
 
-	private static AsyncHttpClient getAsyncClient() {
+	private AsyncHttpClient getAsyncClient() {
 		AsyncHttpClient client = new AsyncHttpClient();
 		client.setUserAgent("cloudsdale-android");
 		client.addHeader("Accept", "application/json");
@@ -41,19 +42,19 @@ public class CloudsdaleApiClient {
 		return client;
 	}
 
-	private static String getAbsoluteUrl(String relativeUrl) {
-		return BASE_URL + relativeUrl;
+	private String getAbsoluteUrl(String relativeUrl) {
+		return mBaseUrl + relativeUrl;
 	}
 
-	private static void get(String relativeUrl,
+	private void get(String relativeUrl,
 			AsyncHttpResponseHandler responseHandler) {
 		getAsyncClient().get(getAbsoluteUrl(relativeUrl), responseHandler);
 	}
 
-	private static void post(String relativeUrl, String json,
+	private void post(String relativeUrl, String json,
 			AsyncHttpResponseHandler responseHandler) {
 		try {
-			getAsyncClient().post(Cloudsdale.getContext(),
+			getAsyncClient().post(mAppInstance.getContext(),
 					getAbsoluteUrl(relativeUrl),
 					new StringEntity(json, "utf-8"), "application/json",
 					responseHandler);
@@ -62,29 +63,29 @@ public class CloudsdaleApiClient {
 		}
 	}
 
-	public static void getSession(String email, String password,
+	public void getSession(String email, String password,
 			AsyncHttpResponseHandler handler) {
 		try {
 			String json = new JSONObject().put("email", email)
 					.put("password", password).toString();
-			post(SESSIONS_ENDPOINT, json, handler);
+			post(mSessionEndpoint, json, handler);
 		} catch (JSONException e) {
 			// This also won't happen
 		}
 	}
 
-	public static void getSession(String oAuthId, Provider oAuthProvider,
+	public void getSession(String oAuthId, Provider oAuthProvider,
 			AsyncHttpResponseHandler handler) {
 		// TODO Implement oAuth login
 	}
 
-	public static void getUser(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(USERS_ENDPOINT, id);
+	public void getUser(String id, AsyncHttpResponseHandler handler) {
+		String relUrl = String.format(mUserEndpoint, id);
 		get(relUrl, handler);
 	}
 
-	public static void getUserClouds(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(USERS_CLOUDS_ENDPOINT, id);
+	public void getUserClouds(String id, AsyncHttpResponseHandler handler) {
+		String relUrl = String.format(mUserCloudEndpoint, id);
 		get(relUrl, handler);
 	}
 

@@ -1,7 +1,5 @@
 package org.cloudsdale.android.ui;
 
-import org.cloudsdale.android.R;
-
 public enum StaticNavigation {
 
 	//@formatter:off
