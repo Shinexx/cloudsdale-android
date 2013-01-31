@@ -1,8 +1,12 @@
 package org.cloudsdale.android.test;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import android.test.ApplicationTestCase;
 
 import com.google.gson.Gson;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.cloudsdale.android.Cloudsdale;
@@ -24,8 +28,9 @@ import org.json.JSONObject;
  */
 public class NetworkTests extends ApplicationTestCase<Cloudsdale> {
 
-	private CloudsdaleApiClient	client;
-	private Gson				gson;
+	private static CloudsdaleApiClient	client;
+	private static Gson					gson;
+	private static String				response;
 
 	public NetworkTests() {
 		super(Cloudsdale.class);
@@ -36,6 +41,7 @@ public class NetworkTests extends ApplicationTestCase<Cloudsdale> {
 		createApplication();
 		client = new CloudsdaleApiClient(getApplication());
 		gson = getApplication().getJsonDeserializer();
+		response = null;
 		super.setUp();
 	}
 
@@ -43,37 +49,48 @@ public class NetworkTests extends ApplicationTestCase<Cloudsdale> {
 	 * Test establishing a session via Cloudsdale credentials
 	 */
 	public void testCloudsdaleSession() {
+		final CountDownLatch signal = new CountDownLatch(1);
 		client.getSession(Constants.DUMMY_EMAIL, Constants.DUMMY_PASSWORD,
-				new JsonHttpResponseHandler() {
+				new AsyncHttpResponseHandler() {
 
 					@Override
-					public void onFailure(Throwable error, JSONObject response) {
-						fail();
+					public void onFailure(Throwable error, String response) {
+						response = null;
 
 						super.onFailure(error, response);
+						signal.countDown();
 					}
 
 					@Override
 					public void onSuccess(String json) {
-						SessionResponse response = gson.fromJson(json,
-								SessionResponse.class);
-
-						// Make sure all relevant data is present
-						assertNotNull(response);
-						assertNotNull(response.getResult());
-						assertNotNull(response.getResult().getClientId());
-						assertNotNull(response.getResult().getUser());
-
-						// Make sure we got the user we expected
-						assertEquals(Constants.DUMMY_ID, response.getResult()
-								.getUser().getId());
-						assertEquals(Constants.DUMMY_EMAIL, response
-								.getResult().getUser().getEmail());
+						response = json;
 
 						super.onSuccess(json);
+						signal.countDown();
 					}
 
 				});
+
+		try {
+			signal.await(10, TimeUnit.SECONDS);
+			assertNotNull(this.response);
+			SessionResponse response = gson.fromJson(this.response,
+					SessionResponse.class);
+
+			// Make sure all relevant data is present
+			assertNotNull(response);
+			assertNotNull(response.getResult());
+			assertNotNull(response.getResult().getClientId());
+			assertNotNull(response.getResult().getUser());
+
+			// Make sure we got the user we expected
+			assertEquals(Constants.DUMMY_ID, response.getResult().getUser()
+					.getId());
+			assertEquals(Constants.DUMMY_EMAIL, response.getResult().getUser()
+					.getEmail());
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
 	/**
@@ -168,91 +185,94 @@ public class NetworkTests extends ApplicationTestCase<Cloudsdale> {
 
 		});
 	}
-	
+
 	public void testCloudBansGet() {
-		client.getCloudBans(Constants.HAMMOCK_ID, new JsonHttpResponseHandler() {
+		client.getCloudBans(Constants.HAMMOCK_ID,
+				new JsonHttpResponseHandler() {
 
-			@Override
-			public void onFailure(Throwable error, JSONObject json) {
-				fail();
+					@Override
+					public void onFailure(Throwable error, JSONObject json) {
+						fail();
 
-				super.onFailure(error, json);
-			}
+						super.onFailure(error, json);
+					}
 
-			@Override
-			public void onSuccess(String json) {
-				BanResponse response = gson.fromJson(json,
-						BanResponse.class);
+					@Override
+					public void onSuccess(String json) {
+						BanResponse response = gson.fromJson(json,
+								BanResponse.class);
 
-				// Make sure all relevant data is present
-				assertNotNull(response);
-				assertNotNull(response.getResults());
+						// Make sure all relevant data is present
+						assertNotNull(response);
+						assertNotNull(response.getResults());
 
-				// Make sure we got the data we expected
-				assertTrue(response.getResults().size() > 0);
+						// Make sure we got the data we expected
+						assertTrue(response.getResults().size() > 0);
 
-				super.onSuccess(json);
-			}
+						super.onSuccess(json);
+					}
 
-		});
+				});
 	}
-	
+
 	public void testCloudDropsGet() {
-		client.getCloudDrops(Constants.HAMMOCK_ID, new JsonHttpResponseHandler() {
+		client.getCloudDrops(Constants.HAMMOCK_ID,
+				new JsonHttpResponseHandler() {
 
-			@Override
-			public void onFailure(Throwable error, JSONObject json) {
-				fail();
+					@Override
+					public void onFailure(Throwable error, JSONObject json) {
+						fail();
 
-				super.onFailure(error, json);
-			}
+						super.onFailure(error, json);
+					}
 
-			@Override
-			public void onSuccess(String json) {
-				DropResponse response = gson.fromJson(json,
-						DropResponse.class);
+					@Override
+					public void onSuccess(String json) {
+						DropResponse response = gson.fromJson(json,
+								DropResponse.class);
 
-				// Make sure all relevant data is present
-				assertNotNull(response);
-				assertNotNull(response.getResults());
+						// Make sure all relevant data is present
+						assertNotNull(response);
+						assertNotNull(response.getResults());
 
-				// Make sure we got the data we expected
-				assertTrue(response.getResults().size() > 0);
+						// Make sure we got the data we expected
+						assertTrue(response.getResults().size() > 0);
 
-				super.onSuccess(json);
-			}
+						super.onSuccess(json);
+					}
 
-		});
+				});
 	}
-	
+
 	public void testCloudMessagesGet() {
-		client.getCloudMessages(Constants.HAMMOCK_ID, new JsonHttpResponseHandler() {
+		client.getCloudMessages(Constants.HAMMOCK_ID,
+				new JsonHttpResponseHandler() {
 
-			@Override
-			public void onFailure(Throwable error, JSONObject json) {
-				fail();
+					@Override
+					public void onFailure(Throwable error, JSONObject json) {
+						fail();
 
-				super.onFailure(error, json);
-			}
+						super.onFailure(error, json);
+					}
 
-			@Override
-			public void onSuccess(String json) {
-				MessageResponse response = gson.fromJson(json,
-						MessageResponse.class);
+					@Override
+					public void onSuccess(String json) {
+						MessageResponse response = gson.fromJson(json,
+								MessageResponse.class);
 
-				// Make sure all relevant data is present
-				assertNotNull(response);
-				assertNotNull(response.getResults());
+						// Make sure all relevant data is present
+						assertNotNull(response);
+						assertNotNull(response.getResults());
 
-				// Make sure we got the data we expected
-				assertTrue(response.getResults().size() > 0);
+						// Make sure we got the data we expected
+						assertTrue(response.getResults().size() > 0);
 
-				super.onSuccess(json);
-			}
+						super.onSuccess(json);
+					}
 
-		});
+				});
 	}
-	
+
 	public void testCloudPopularGet() {
 		client.getCloudPopular(new JsonHttpResponseHandler() {
 
@@ -280,7 +300,7 @@ public class NetworkTests extends ApplicationTestCase<Cloudsdale> {
 
 		});
 	}
-	
+
 	public void testCloudRecentGet() {
 		client.getCloudRecents(new JsonHttpResponseHandler() {
 
@@ -308,7 +328,7 @@ public class NetworkTests extends ApplicationTestCase<Cloudsdale> {
 
 		});
 	}
-	
+
 	public void testCloudSearchPost() {
 		client.postCloudSearch("Hammock", new JsonHttpResponseHandler() {
 

@@ -2,7 +2,6 @@ package org.cloudsdale.android;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,13 +39,15 @@ public class Cloudsdale extends Application {
 	private FayeManager			mFayeManager;
 	private NetworkManager		mNetManager;
 	private CloudManager		mCloudManager;
+	private SessionManager		mSessionManager;
 
 	@Override
 	public void onCreate() {
 		mUserAccountManager = new SessionManager(this);
-		mUserManager = new UserManager();
+		mUserManager = new UserManager(this);
 		mFayeManager = new FayeManager(this);
 		mNetManager = new NetworkManager(this);
+		mSessionManager = new SessionManager(this);
 
 		super.onCreate();
 	}
@@ -57,7 +58,7 @@ public class Cloudsdale extends Application {
 	 * @return A boolean representing the debug status of the app.
 	 */
 	public boolean isDebuggable() {
-		return (0 != (getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE));
+		return BuildConfig.DEBUG;
 	}
 
 	/**
@@ -102,7 +103,7 @@ public class Cloudsdale extends Application {
 	 * @return The UserManager attached to this application instance
 	 */
 	public UserManager getUserManager() {
-		if (mUserManager == null) mUserManager = new UserManager();
+		if (mUserManager == null) mUserManager = new UserManager(this);
 		return mUserManager;
 	}
 
@@ -132,7 +133,7 @@ public class Cloudsdale extends Application {
 	 * @return The CloudManager attached to this application instance
 	 */
 	public CloudManager getNearestPegasus() {
-		if (mCloudManager == null) mCloudManager = new CloudManager();
+		if (mCloudManager == null) mCloudManager = new CloudManager(this);
 		return mCloudManager;
 	}
 
@@ -144,6 +145,11 @@ public class Cloudsdale extends Application {
 	public CloudsdaleApiClient callZephyr() {
 		if (mApiClient == null) mApiClient = new CloudsdaleApiClient(this);
 		return mApiClient;
+	}
+	
+	public SessionManager getSessionManager() {
+		if(mSessionManager == null) mSessionManager = new SessionManager(this);
+		return mSessionManager;
 	}
 
 	/**

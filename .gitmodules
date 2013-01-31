@@ -22,3 +22,9 @@
 [submodule "submodules/androidquery"]
 	path = submodules/androidquery
 	url = git@github.com:androidquery/androidquery.git
+[submodule "submodules/ShowcaseView"]
+	path = submodules/ShowcaseView
+	url = git://github.com/Espiandev/ShowcaseView.git
+[submodule "submodules/cardsui-for-android"]
+	path = submodules/cardsui-for-android
+	url = git://github.com/nadavfima/cardsui-for-android.git

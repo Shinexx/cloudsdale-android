@@ -1,5 +1,7 @@
 package org.cloudsdale.android.managers;
 
+import org.cloudsdale.android.Cloudsdale;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -12,5 +14,11 @@ public abstract class ManagerBase {
 																	.readLock();
 	protected final Lock					mWriteLock		= mReadWriteLock
 																	.writeLock();
+	
+	protected Cloudsdale mAppInstance;
 
+	public ManagerBase(Cloudsdale application) {
+		this.mAppInstance = application;
+	}
+	
 }

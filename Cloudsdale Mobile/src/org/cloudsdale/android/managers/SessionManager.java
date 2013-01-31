@@ -2,12 +2,7 @@ package org.cloudsdale.android.managers;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences.Editor;
-import android.os.Bundle;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
@@ -21,17 +16,15 @@ import org.cloudsdale.android.models.api.User;
  *         Cloudsdale.org
  * 
  */
-public class SessionManager {
+public class SessionManager extends ManagerBase {
 
-	public static final String	KEY_ID				= "id";
-	public static final String	PREFERENCES_NAME	= "LoggedUserPrefs";
+	public static final String	KEY_ID	= "id";
 
-	private Cloudsdale			mAppInstance;
-	private Account				mUserAccount;
+	private Account				mActiveSession;
 	private AccountManager		mAccountManager;
 
 	public SessionManager(Cloudsdale cloudsdale) {
-		mAppInstance = cloudsdale;
+		super(cloudsdale);
 	}
 
 	public AccountManager getAccountManager() {
@@ -53,24 +46,33 @@ public class SessionManager {
 		User user = session.getUser();
 		Account account = new Account(user.getName(),
 				appContext.getString(R.string.account_type));
-		final Bundle extras = new Bundle();
-		extras.putString(KEY_ID, user.getId());
 		AccountManager am = getAccountManager();
 		boolean accountCreated = am.addAccountExplicitly(account,
-				user.getAuthToken(), extras);
+				user.getAuthToken(), null);
 		if (accountCreated) {
-			mUserAccount = account;
+			am.setUserData(account, KEY_ID, session.getUser().getId());
+			mActiveSession = account;
 		}
 		return accountCreated;
 	}
 
 	/**
-	 * Cache an already existing user account
+	 * Sets the account associated with the active session
 	 * 
 	 * @param account
+	 *            The account to set as active
 	 */
-	public void cacheAccount(Account account) {
-		mUserAccount = account;
+	public void setActiveSession(Account account) {
+		mActiveSession = account;
+	}
+
+	/**
+	 * Gets the account associated with the currently active session
+	 * 
+	 * @return The account associated with the active session
+	 */
+	public Account getActiveSession() {
+		return mActiveSession;
 	}
 
 	/**
@@ -78,45 +80,15 @@ public class SessionManager {
 	 * 
 	 * @return The stored user account or
 	 */
-	public Account getAccount() {
-		if (mUserAccount != null) {
-			return mUserAccount;
-		} else {
-			Context context = mAppInstance.getContext();
-			AccountManager am = getAccountManager();
-			Account[] accounts = am.getAccountsByType(context
-					.getString(R.string.account_type));
-			if (accounts.length > 0) {
-				Account account = accounts[0];
-				cacheAccount(account);
-				return account;
-			} else {
-				return null;
-			}
-		}
+	public Account[] getAccounts() {
+		Context context = mAppInstance.getContext();
+		AccountManager am = getAccountManager();
+		Account[] accounts = am.getAccountsByType(context
+				.getString(R.string.account_type));
+		return accounts;
 	}
 
 	public void deleteAccount() {
-		if (mUserAccount != null) {
-			mUserAccount = null;
-		}
-		Editor edit = mAppInstance.getContext()
-				.getSharedPreferences(PREFERENCES_NAME, 0).edit();
-		edit.remove(KEY_ID);
-		edit.commit();
-		AccountManager am = getAccountManager();
-		am.removeAccount(mUserAccount, new AccountManagerCallback<Boolean>() {
-
-			@Override
-			public void run(AccountManagerFuture<Boolean> arg0) {
-				Intent intent = new Intent();
-				// TODO Re-do this once the views are back in place
-				// intent.setClass(Cloudsdale.getContext(),
-				// LoginActivity.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				mAppInstance.getContext().startActivity(intent);
-			}
-		}, null);
+		// TODO Be able to delete accounts
 	}
 }

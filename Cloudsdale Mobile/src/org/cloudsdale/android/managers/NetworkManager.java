@@ -13,14 +13,13 @@ import org.cloudsdale.android.Cloudsdale;
  * @author Jamison Greeley atomicrat2552@gmail.com
  * 
  */
-public class NetworkManager {
+public class NetworkManager extends ManagerBase {
 
 	// Connectivity status objects
 	private ConnectivityManager	mConnectivityManager;
-	private Cloudsdale		mAppInstance;
 
 	public NetworkManager(Cloudsdale mAppInstance) {
-		mAppInstance = mAppInstance;
+		super(mAppInstance);
 	}
 
 	public boolean isInternetConnected() {

@@ -1,41 +1,38 @@
 package org.cloudsdale.android.ui;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bugsense.trace.BugSenseHandler;
 
+import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 
 public class StartActivity extends SherlockActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// SET THEMES HERE
 		super.onCreate(savedInstanceState);
 		getSupportActionBar().hide();
 		setContentView(R.layout.activity_start);
-		// Setup BugSense
 		BugSenseHandler.initAndStartSession(this, "2bccbeb2");
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		// Get the account
-		Context context = getApplicationContext();
-		AccountManager am = AccountManager.get(context);
-		Account[] accounts = am.getAccountsByType(context
-				.getString(R.string.account_type));
+		Account[] accounts = ((Cloudsdale) getApplication())
+				.getSessionManager().getAccounts();
 
+		Intent intent = new Intent();
 		if (accounts.length > 0) {
-			// TODO Act when at least one user is signed in
+			intent.setClass(this, HomeActivity.class);
 		} else {
-			// TODO Act when no users are signed in
+			intent.setClass(this, LoginActivity.class);
 		}
+		startActivity(intent);
 	}
 
 	@Override

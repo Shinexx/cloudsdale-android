@@ -14,18 +14,19 @@ import java.io.UnsupportedEncodingException;
 
 public class CloudsdaleApiClient {
 
-	private Cloudsdale	mAppInstance;
-	private String		mBaseUrl;
-	private String		mSessionEndpoint;
-	private String		mUserEndpoint;
-	private String		mUserCloudEndpoint;
-	private String		mCloudEndpoint;
-	private String		mCloudBansEndpoint;
-	private String		mCloudDropsEndpoint;
-	private String		mCloudMessagesEndpoint;
-	private String		mCloudPopularEndpoint;
-	private String		mCloudRecentEndpoint;
-	private String		mCloudSearchEndpoint;
+	private Cloudsdale		mAppInstance;
+	private String			mBaseUrl;
+	private String			mSessionEndpoint;
+	private String			mUserEndpoint;
+	private String			mUserCloudEndpoint;
+	private String			mCloudEndpoint;
+	private String			mCloudBansEndpoint;
+	private String			mCloudDropsEndpoint;
+	private String			mCloudMessagesEndpoint;
+	private String			mCloudPopularEndpoint;
+	private String			mCloudRecentEndpoint;
+	private String			mCloudSearchEndpoint;
+	private AsyncHttpClient	mClient;
 
 	public CloudsdaleApiClient(Cloudsdale cloudsdale) {
 		mAppInstance = cloudsdale;
@@ -53,14 +54,16 @@ public class CloudsdaleApiClient {
 	}
 
 	private AsyncHttpClient getAsyncClient() {
-		AsyncHttpClient client = new AsyncHttpClient();
-		client.setUserAgent("cloudsdale-android");
-		client.addHeader("Accept", "application/json");
-		client.addHeader("Content-Encoding", "utf-8");
-		client.addHeader("Content-Type", "application/json");
-		client.addHeader("X_AUTH_INTERNAL_TOKEN",
-				mAppInstance.getString(R.string.cloudsdale_auth_token));
-		return client;
+		if (mClient == null) {
+			mClient = new AsyncHttpClient();
+			mClient.setUserAgent("cloudsdale-android");
+			mClient.addHeader("Accept", "application/json");
+			mClient.addHeader("Content-Encoding", "utf-8");
+			mClient.addHeader("Content-Type", "application/json");
+			mClient.addHeader("X_AUTH_INTERNAL_TOKEN",
+					mAppInstance.getString(R.string.cloudsdale_auth_token));
+		}
+		return mClient;
 	}
 
 	private String getAbsoluteUrl(String relativeUrl) {
@@ -75,8 +78,9 @@ public class CloudsdaleApiClient {
 	private void post(String relativeUrl, String json,
 			AsyncHttpResponseHandler responseHandler) {
 		try {
+			String url = getAbsoluteUrl(relativeUrl);
 			getAsyncClient().post(mAppInstance.getContext(),
-					getAbsoluteUrl(relativeUrl),
+					url,
 					new StringEntity(json, "utf-8"), "application/json",
 					responseHandler);
 		} catch (UnsupportedEncodingException e) {
@@ -88,7 +92,7 @@ public class CloudsdaleApiClient {
 		String relUrl = String.format(mCloudEndpoint, id);
 		get(relUrl, handler);
 	}
-	
+
 	public void getCloudBans(String id, AsyncHttpResponseHandler handler) {
 		String relUrl = String.format(mCloudBansEndpoint, id);
 		get(relUrl, handler);
@@ -131,7 +135,7 @@ public class CloudsdaleApiClient {
 		get(relUrl, handler);
 	}
 
-	public void getSession(String email, String password,
+	public void postSession(String email, String password,
 			AsyncHttpResponseHandler handler) {
 		try {
 			String json = new JSONObject().put("email", email)
@@ -142,7 +146,7 @@ public class CloudsdaleApiClient {
 		}
 	}
 
-	public void getSession(String oAuthId, Provider oAuthProvider,
+	public void postSession(String oAuthId, Provider oAuthProvider,
 			AsyncHttpResponseHandler handler) {
 		// TODO Implement oAuth login
 	}

@@ -1,28 +1,37 @@
 package org.cloudsdale.android.managers;
 
-import android.content.Context;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+
+import com.bugsense.trace.BugSenseHandler;
+import com.google.gson.Gson;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.exceptions.QueryException;
+import org.cloudsdale.android.models.network.CloudResponse;
+import org.cloudsdale.android.models.network.UserResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import lombok.val;
+import java.util.concurrent.CountDownLatch;
 
 /**
- * Manager class designed to store and retrieve Cloudsdale users. Copyright (c)
- * 2012 Cloudsdale.org
+ * Manager class designed to cache and retrieve Cloudsdale users. <br />
+ * Copyright (c) 2012 Cloudsdale.org
  * 
- * @author Jamison Greeley (atomicrat2552@gmail.com)
+ * @author Jamison Greeley (berwyn.codeweaver@gmail.com)
  * 
  */
 public class UserManager extends ManagerBase {
 
-	private HashMap<String, User>	mStoredUsers;
+	private HashMap<String, User>	mCachedUsers;
+
+	public UserManager(Cloudsdale mAppInstance) {
+		super(mAppInstance);
+	}
 
 	/**
 	 * Gets the user that has logged into the application
@@ -32,8 +41,14 @@ public class UserManager extends ManagerBase {
 	 *             When the query cannot be completed
 	 */
 	public User getLoggedInUser() throws QueryException {
-		// TODO Re-implement using API client
-		return null;
+		Account activeAccount = mAppInstance.getSessionManager()
+				.getActiveSession();
+		AccountManager am = mAppInstance.getSessionManager()
+				.getAccountManager();
+		String id = am.getUserData(activeAccount, SessionManager.KEY_ID);
+		User loggedInUser = getUserById(id);
+		getCloudsForUser(loggedInUser);
+		return loggedInUser;
 	}
 
 	/**
@@ -45,9 +60,44 @@ public class UserManager extends ManagerBase {
 	 * @throws QueryException
 	 *             When the query cannot be completed
 	 */
-	public User getUserById(final String id) throws QueryException {
-		// TODO Re-implement using API client
-		return null;
+	public User getUserById(String id) throws QueryException {
+		if (mCachedUsers.containsKey(id)) {
+			mReadLock.lock();
+			User returnUser = mCachedUsers.get(id);
+			mReadLock.unlock();
+			return returnUser;
+		} else {
+			final CountDownLatch latch = new CountDownLatch(1);
+			mAppInstance.callZephyr().getUser(id,
+					new AsyncHttpResponseHandler() {
+
+						@Override
+						public void onSuccess(String json) {
+							Gson gson = mAppInstance.getJsonDeserializer();
+							UserResponse response = gson.fromJson(json,
+									UserResponse.class);
+							storeUser(response.getResult());
+							super.onSuccess(json);
+						}
+
+						@Override
+						public void onFinish() {
+							latch.countDown();
+							super.onFinish();
+						}
+
+					});
+			try {
+				latch.await();
+				mReadLock.lock();
+				User returnUser = mCachedUsers.get(id);
+				mReadLock.unlock();
+				return returnUser;
+			} catch (InterruptedException e) {
+				BugSenseHandler.sendException(e);
+				throw new QueryException("Request was interrupted", 422);
+			}
+		}
 	}
 
 	/**
@@ -59,7 +109,41 @@ public class UserManager extends ManagerBase {
 	 *             When the query can't be completed
 	 */
 	private void getCloudsForUser(User user) throws QueryException {
-		// TODO Re-implement using API client
+		final CountDownLatch latch = new CountDownLatch(1);
+		final ArrayList<Cloud> userClouds = new ArrayList<Cloud>();
+		mAppInstance.callZephyr().getUserClouds(user.getId(),
+				new AsyncHttpResponseHandler() {
+
+					@Override
+					public void onSuccess(String json) {
+						Gson gson = mAppInstance.getJsonDeserializer();
+						ArrayList<Cloud> clouds = gson.fromJson(json,
+								CloudResponse.class).getResults();
+						userClouds.addAll(clouds);
+						super.onSuccess(json);
+					}
+
+					@Override
+					public void onFinish() {
+						latch.countDown();
+						super.onFinish();
+					}
+
+				});
+		try {
+			latch.await();
+			user.getClouds().addAll(userClouds);
+			new Thread() {
+				public void run() {
+					for (Cloud c : userClouds) {
+						mAppInstance.getNearestPegasus().storeCloud(c);
+					}
+				};
+			}.run();
+		} catch (InterruptedException e) {
+			BugSenseHandler.sendException(e);
+			throw new QueryException("Request interrupted", 422);
+		}
 	}
 
 	/**
@@ -70,7 +154,7 @@ public class UserManager extends ManagerBase {
 	 */
 	public void storeUser(User user) {
 		mWriteLock.lock();
-		mStoredUsers.put(user.getId(), user);
+		mCachedUsers.put(user.getId(), user);
 		mWriteLock.unlock();
 	}
 }
