@@ -28,7 +28,7 @@ public class StartActivity extends SherlockActivity {
 
 		Intent intent = new Intent();
 		if (accounts.length > 0) {
-			intent.setClass(this, HomeActivity.class);
+			intent.setClass(this, CloudsdaleActivity.class);
 		} else {
 			intent.setClass(this, LoginActivity.class);
 		}

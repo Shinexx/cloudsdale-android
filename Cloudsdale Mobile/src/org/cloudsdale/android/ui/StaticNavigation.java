@@ -1,9 +1,13 @@
 package org.cloudsdale.android.ui;
 
+import org.cloudsdale.android.R;
+
 public enum StaticNavigation {
 
 	//@formatter:off
 	// ITEM("Display Name", R.drawable.ic_my_icon, "Tag")
+	HOME("Home", R.drawable.ic_launcher, "home"),
+	ABOUT("About", R.drawable.ic_launcher, "about");
 	;
 	//@formatter:on
 

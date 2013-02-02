@@ -222,7 +222,7 @@ public class LoginActivity extends Activity {
 			manager.storeAccount(response.getResult());
 			Account[] accounts = manager.getAccounts();
 			manager.setActiveSession(accounts[accounts.length - 1]);
-			Intent intent = new Intent(this, HomeActivity.class);
+			Intent intent = new Intent(this, CloudsdaleActivity.class);
 			startActivity(intent);
 		}
 	}
