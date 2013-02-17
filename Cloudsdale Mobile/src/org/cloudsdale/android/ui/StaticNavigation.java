@@ -6,8 +6,8 @@ public enum StaticNavigation {
 
 	//@formatter:off
 	// ITEM("Display Name", R.drawable.ic_my_icon, "Tag")
-	HOME("Home", R.drawable.ic_launcher, "home"),
-	ABOUT("About", R.drawable.ic_launcher, "about");
+	HOME("Home", R.drawable.ic_action_home, "home"),
+	ABOUT("About", R.drawable.ic_action_info, "about");
 	;
 	//@formatter:on
 

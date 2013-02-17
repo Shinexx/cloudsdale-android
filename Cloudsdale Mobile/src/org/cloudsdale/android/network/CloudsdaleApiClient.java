@@ -1,14 +1,14 @@
 package org.cloudsdale.android.network;
 
+import com.google.gson.JsonObject;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.apache.http.entity.StringEntity;
+import org.cloudsdale.android.BCrypt;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.network.Provider;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
@@ -79,8 +79,7 @@ public class CloudsdaleApiClient {
 			AsyncHttpResponseHandler responseHandler) {
 		try {
 			String url = getAbsoluteUrl(relativeUrl);
-			getAsyncClient().post(mAppInstance.getContext(),
-					url,
+			getAsyncClient().post(mAppInstance.getContext(), url,
 					new StringEntity(json, "utf-8"), "application/json",
 					responseHandler);
 		} catch (UnsupportedEncodingException e) {
@@ -117,12 +116,9 @@ public class CloudsdaleApiClient {
 	}
 
 	public void postCloudSearch(String query, AsyncHttpResponseHandler handler) {
-		try {
-			String json = new JSONObject().put("q", query).toString();
-			post(mCloudSearchEndpoint, json, handler);
-		} catch (JSONException e) {
-			// this won't happen
-		}
+		JsonObject json = new JsonObject();
+		json.addProperty("q", query);
+		post(mCloudSearchEndpoint, json.toString(), handler);
 	}
 
 	public void getUser(String id, AsyncHttpResponseHandler handler) {
@@ -137,18 +133,23 @@ public class CloudsdaleApiClient {
 
 	public void postSession(String email, String password,
 			AsyncHttpResponseHandler handler) {
-		try {
-			String json = new JSONObject().put("email", email)
-					.put("password", password).toString();
-			post(mSessionEndpoint, json, handler);
-		} catch (JSONException e) {
-			// This also won't happen
-		}
+		JsonObject json = new JsonObject();
+		json.addProperty("email", email);
+		json.addProperty("password", password);
+		post(mSessionEndpoint, json.toString(), handler);
 	}
 
 	public void postSession(String oAuthId, Provider oAuthProvider,
-			AsyncHttpResponseHandler handler) {
-		// TODO Implement oAuth login
+			String internalToken, AsyncHttpResponseHandler handler) {
+		JsonObject oAuth = new JsonObject();
+		oAuth.addProperty("cli_type", "android");
+		oAuth.addProperty("provider", oAuthProvider.toString());
+		oAuth.addProperty("uid", oAuthId);
+		oAuth.addProperty("token", BCrypt.hashpw(
+				oAuthId + oAuthProvider.toString(), internalToken));
+		JsonObject body = new JsonObject();
+		body.add("oauth", oAuth);
+		post(mSessionEndpoint, body.toString(), handler);
 	}
 
 }

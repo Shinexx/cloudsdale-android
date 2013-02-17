@@ -26,6 +26,11 @@
         android:theme="@style/Theme.CloudsdaleLight"
         android:vmSafeMode="true" >
 
+        <!-- Google Application Backup Bridge -->
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIrMIkwMPLid-J_qJPP9ITf1qPbpL2NA3nwG56IQ" />
+
         <!-- Activities -->
         <activity
             android:name="org.cloudsdale.android.ui.StartActivity"

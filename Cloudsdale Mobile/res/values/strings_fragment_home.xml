@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="fragment_home_cloud_count_text">You\'re a member of %1s clouds</string>
+    <string name="fragment_home_join_date_text">You joined on %1s</string>
+    <string name="fragment_home_title">Welcome back!</string>
+
+</resources>

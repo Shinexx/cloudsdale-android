@@ -23,9 +23,9 @@ import org.cloudsdale.android.network.CloudsdaleApiClient;
 public class Cloudsdale extends Application {
 
 	// Thirty minutes
-	public final int			AVATAR_EXPIRATION	= 30 * 60 * 1000;
+	public static final int		AVATAR_EXPIRATION	= 30 * 60 * 1000;
 	// Sixty minutes
-	public final int			CLOUD_EXPIRATION	= 1000 * 60 * 60;
+	public static final int		CLOUD_EXPIRATION	= 1000 * 60 * 60;
 
 	// API client
 	private CloudsdaleApiClient	mApiClient;
@@ -34,7 +34,6 @@ public class Cloudsdale extends Application {
 	private Gson				mJsonDeserializer;
 
 	// Managers
-	private SessionManager		mUserAccountManager;
 	private UserManager			mUserManager;
 	private FayeManager			mFayeManager;
 	private NetworkManager		mNetManager;
@@ -43,7 +42,6 @@ public class Cloudsdale extends Application {
 
 	@Override
 	public void onCreate() {
-		mUserAccountManager = new SessionManager(this);
 		mUserManager = new UserManager(this);
 		mFayeManager = new FayeManager(this);
 		mNetManager = new NetworkManager(this);
@@ -84,17 +82,6 @@ public class Cloudsdale extends Application {
 			mJsonDeserializer = builder.create();
 		}
 		return mJsonDeserializer;
-	}
-
-	/**
-	 * Gets the UserAccountManager instance for this application instance
-	 * 
-	 * @return The UserAccountManager attached to this application instance
-	 */
-	public SessionManager getUserAccountManager() {
-		if (mUserAccountManager == null)
-			mUserAccountManager = new SessionManager(this);
-		return mUserAccountManager;
 	}
 
 	/**
@@ -146,9 +133,10 @@ public class Cloudsdale extends Application {
 		if (mApiClient == null) mApiClient = new CloudsdaleApiClient(this);
 		return mApiClient;
 	}
-	
+
 	public SessionManager getSessionManager() {
-		if(mSessionManager == null) mSessionManager = new SessionManager(this);
+		if (mSessionManager == null)
+			mSessionManager = new SessionManager(this);
 		return mSessionManager;
 	}
 

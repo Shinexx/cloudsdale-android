@@ -52,8 +52,15 @@ public class SessionManager extends ManagerBase {
 		if (accountCreated) {
 			am.setUserData(account, KEY_ID, session.getUser().getId());
 			mActiveSession = account;
+			return accountCreated;
+		} else {
+			if (am.getPassword(account) != null) {
+				am.setPassword(account, user.getAuthToken());
+				return true;
+			} else {
+				return false;
+			}
 		}
-		return accountCreated;
 	}
 
 	/**
@@ -86,6 +93,21 @@ public class SessionManager extends ManagerBase {
 		Account[] accounts = am.getAccountsByType(context
 				.getString(R.string.account_type));
 		return accounts;
+	}
+
+	/**
+	 * Get the IDs of all users signed into this device
+	 * 
+	 * @return A String array containing the IDs of all logged in users
+	 */
+	public String[] getAccountIds() {
+		Account[] accounts = getAccounts();
+		String[] ids = new String[accounts.length];
+		for (int i = 0; i < accounts.length; i++) {
+			ids[i] = getAccountManager().getUserData(accounts[i],
+					SessionManager.KEY_ID);
+		}
+		return ids;
 	}
 
 	public void deleteAccount() {

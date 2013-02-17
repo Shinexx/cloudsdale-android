@@ -39,12 +39,12 @@ public class StaticNavigationAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		AQuery aq = new AQuery(context);
-		View view = aq.inflate(convertView, R.layout.widget_static_navigation,
+		View view = aq.inflate(convertView, R.layout.widget_sliding_menu_item,
 				parent);
 
-		((ImageView) view.findViewById(R.id.static_navigation_icon))
+		((ImageView) view.findViewById(R.id.sliding_menu_item_icon))
 				.setImageResource(getItem(position).getResId());
-		((TextView) view.findViewById(R.id.static_navigation_label))
+		((TextView) view.findViewById(R.id.sliding_menu_item_lable))
 				.setText(getItem(position).getDisplayName());
 
 		return view;

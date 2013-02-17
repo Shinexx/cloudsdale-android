@@ -26,6 +26,7 @@ public class CloudManager extends ManagerBase {
 
 	public CloudManager(Cloudsdale mAppInstance) {
 		super(mAppInstance);
+		mCachedClouds = new HashMap<String, Cloud>();
 	}
 
 	/**
