@@ -6,12 +6,14 @@
     android:orientation="horizontal"
     android:weightSum="1.0" >
 
-    <FrameLayout
-        android:id="@+id/menu_frame"
+    <fragment
+        android:id="@+id/tablet_menu"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:layout_weight=".3" />
+        android:layout_weight=".25"
+        class="org.cloudsdale.android.ui.fragments.SlidingMenuFragment"
+        android:tag="slidingMenu" />
 
     <FrameLayout
         android:id="@+id/content_frame"

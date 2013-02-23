@@ -4,9 +4,11 @@ import org.cloudsdale.android.models.api.Message;
 
 import java.util.ArrayList;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class MessageResponse extends Response {
 
 	private Message result;

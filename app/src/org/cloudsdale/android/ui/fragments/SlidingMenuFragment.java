@@ -11,10 +11,8 @@ import android.widget.ListView;
 
 import com.commonsware.cwac.merge.MergeAdapter;
 
-import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
-import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.ui.StaticNavigation;
 import org.cloudsdale.android.ui.adapters.CloudAdapter;
 import org.cloudsdale.android.ui.adapters.StaticNavigationAdapter;

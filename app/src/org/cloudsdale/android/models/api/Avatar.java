@@ -3,8 +3,10 @@ package org.cloudsdale.android.models.api;
 import org.cloudsdale.android.models.Model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class Avatar extends Model {
 
 	private String	normal;
@@ -12,5 +14,5 @@ public class Avatar extends Model {
 	private String	thumb;
 	private String	preview;
 	private String	chat;
-	
+
 }

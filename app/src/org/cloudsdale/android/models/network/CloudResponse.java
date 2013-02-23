@@ -4,9 +4,11 @@ import org.cloudsdale.android.models.api.Cloud;
 
 import java.util.ArrayList;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class CloudResponse extends Response {
 
 	private Cloud result;

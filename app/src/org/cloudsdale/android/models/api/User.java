@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * User model for Cloudsdale
@@ -15,6 +16,7 @@ import lombok.Data;
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class User extends IdentityModel {
 
 	public static enum Role {
@@ -101,5 +103,5 @@ public class User extends IdentityModel {
 	public void setClouds(ArrayList<Cloud> clouds) {
 		this.clouds = clouds;
 	}
-	
+
 }

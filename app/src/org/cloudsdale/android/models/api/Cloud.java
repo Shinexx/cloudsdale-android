@@ -7,8 +7,10 @@ import org.cloudsdale.android.models.IdentityModel;
 import java.util.Date;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class Cloud extends IdentityModel {
 
 	private String		name;

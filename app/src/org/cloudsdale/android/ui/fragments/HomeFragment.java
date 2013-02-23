@@ -22,8 +22,6 @@ import org.cloudsdale.android.models.network.SessionResponse;
 import org.cloudsdale.android.ui.CloudsdaleActivity;
 import org.cloudsdale.android.ui.widget.NowLayout;
 
-import java.util.Calendar;
-
 /**
  * Fragment that displays a home view with all the user accounts logged into the
  * device.<br/>
@@ -50,9 +48,13 @@ public class HomeFragment extends Fragment {
 		AQuery aq = new AQuery(getActivity());
 		View host = aq.inflate(null, R.layout.fragment_home, container);
 
-		handleSessionRenewal();
-
 		return host;
+	}
+
+	@Override
+	public void onResume() {
+		handleSessionRenewal();
+		super.onResume();
 	}
 
 	private void clearProgressViews() {
@@ -63,6 +65,9 @@ public class HomeFragment extends Fragment {
 
 	private void handleSessionRenewal() {
 		if (mAppInstance.getSessionManager().getActiveSession() == null) {
+			if (mAppInstance.isDebuggable()) {
+				Log.d(TAG, "Renewing Session");
+			}
 			String accountId = mAppInstance.getSessionManager().getAccountIds()[0];
 			mAppInstance.callZephyr().postSession(accountId,
 					Provider.CLOUDSDALE,
@@ -90,11 +95,16 @@ public class HomeFragment extends Fragment {
 							mAppInstance.getSessionManager().storeAccount(
 									session);
 							inflateHomeCards(session.getUser());
+							((CloudsdaleActivity) getActivity())
+									.refreshSlidingMenuClouds(session.getUser());
 							super.onSuccess(json);
 						}
 
 					});
 		} else {
+			if (mAppInstance.isDebuggable()) {
+				Log.d(TAG, "No session renewal required, inflating home view");
+			}
 			inflateHomeCards(mAppInstance.getUserManager().getLoggedInUser());
 		}
 	}
@@ -121,7 +131,6 @@ public class HomeFragment extends Fragment {
 					R.string.fragment_home_cloud_count_text,
 					u.getClouds().size());
 			aq.id(R.id.home_card_quickbadge).image(u.getAvatar().getNormal());
-			// ((CloudsdaleActivity) getActivity()).refreshSlidingMenuClouds();
 		}
 	}
 }

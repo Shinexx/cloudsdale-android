@@ -28,6 +28,8 @@ public class NowLayout extends LinearLayout implements OnGlobalLayoutListener {
 		getViewTreeObserver().addOnGlobalLayoutListener(this);
 	}
 
+	/** Suppressing warning because this method is needed for back compat **/
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onGlobalLayout() {
 		getViewTreeObserver().removeGlobalOnLayoutListener(this);

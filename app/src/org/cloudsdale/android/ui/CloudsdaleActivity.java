@@ -1,11 +1,11 @@
 package org.cloudsdale.android.ui;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.ContextThemeWrapper;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -37,32 +37,32 @@ import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
 public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		SlidingMenuFragment.ISlidingMenuFragmentCallbacks, OnItemClickListener {
 
+	// Suppressing Lint warning - Resource object doesn't exist at compile time
 	@SuppressLint("ResourceAsColor")
-	public static final Style	INFINITE			= new Style.Builder()
-															.setBackgroundColor(
-																	R.color.holo_red_light)
-															.setDuration(
-																	Style.DURATION_INFINITE)
-															.build();
+	public static final Style		INFINITE			= new Style.Builder()
+																.setBackgroundColor(
+																		R.color.holo_red_light)
+																.setDuration(
+																		Style.DURATION_INFINITE)
+																.build();
 
-	private static final String	SAVED_FRAGMENT_KEY	= "savedFragment";
+	private static final String		TAG					= "Cloudsdale Activity";
+	private static final String		SAVED_FRAGMENT_KEY	= "savedFragment";
+	private static HomeFragment		homeFragment;
+	private static AboutFragment	aboutFragment;
 
-	private SlidingMenu			slidingMenu;
-	private SlidingMenuFragment	slidingFragment;
-	private boolean				isOnTablet;
-	private HomeFragment		homeFragment;
-	private AboutFragment		aboutFragment;
-	private Cloudsdale			mAppInstance;
+	private SlidingMenu				slidingMenu;
+	private SlidingMenuFragment		slidingFragment;
+	private boolean					isOnTablet;
+	private Cloudsdale				mAppInstance;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_base);
-		isOnTablet = findViewById(R.id.menu_frame) != null;
-		homeFragment = new HomeFragment();
-		aboutFragment = new AboutFragment();
-		slidingFragment = new SlidingMenuFragment();
+		isOnTablet = findViewById(R.id.tablet_menu) != null;
 		mAppInstance = (Cloudsdale) getApplication();
+		generateFragments();
 
 		if (isOnTablet) {
 			setupTablet();
@@ -72,13 +72,21 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 
 		if (savedInstanceState != null
 				&& savedInstanceState.containsKey(SAVED_FRAGMENT_KEY)) {
-
+			// TODO replace fragments when we icicle the activity
 		} else {
-			if (homeFragment == null) {
-				homeFragment = new HomeFragment();
-			}
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.content_frame, homeFragment).commit();
+		}
+	}
+
+	private void generateFragments() {
+		if (homeFragment == null) {
+			homeFragment = new HomeFragment();
+			homeFragment.setRetainInstance(true);
+		}
+		if (aboutFragment == null) {
+			aboutFragment = new AboutFragment();
+			aboutFragment.setRetainInstance(true);
 		}
 	}
 
@@ -87,27 +95,18 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 		slidingMenu = getSlidingMenu();
 		slidingMenu.setSlidingEnabled(false);
-		slidingFragment.setCallback(this);
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.menu_frame, slidingFragment).commit();
 	}
 
 	private void setupPhone() {
-		setBehindContentView(R.layout.widget_sliding_menu);
+		setBehindContentView(R.layout.fragment_sliding_menu);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		setSlidingActionBarEnabled(true);
 		showContent();
-		Context context = new ContextThemeWrapper(this,
-				R.style.Theme_CloudsdaleDark);
 		slidingMenu = getSlidingMenu();
 		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
 		slidingMenu.setSlidingEnabled(true);
 		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		ListView navList = (ListView) findViewById(android.R.id.list);
-		MergeAdapter listAdapter = slidingFragment.generateAdapter(context);
-		navList.setAdapter(listAdapter);
-		navList.setOnItemClickListener(this);
 	}
 
 	@Override
@@ -163,5 +162,15 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 	}
 
 	public void refreshSlidingMenuClouds(User user) {
+		if (mAppInstance.isDebuggable()) {
+			Log.d(TAG, String.format("Received refresh for user %1s",
+					user == null ? "[null]" : user.getName() + " with "
+							+ user.getClouds().size() + "clouds"));
+		}
+		// MergeAdapter listAdapter = (MergeAdapter) slidingFragment
+		// .getListAdapter();
+		// CloudAdapter cloudsAdapter = (CloudAdapter)
+		// listAdapter.getAdapter(1);
+		// cloudsAdapter.addCloud(user.getClouds().toArray(new Cloud[0]));
 	}
 }
