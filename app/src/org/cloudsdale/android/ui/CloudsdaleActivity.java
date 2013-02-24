@@ -1,7 +1,6 @@
 package org.cloudsdale.android.ui;
 
 import android.annotation.SuppressLint;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -39,22 +38,21 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 
 	// Suppressing Lint warning - Resource object doesn't exist at compile time
 	@SuppressLint("ResourceAsColor")
-	public static final Style		INFINITE			= new Style.Builder()
-																.setBackgroundColor(
-																		R.color.holo_red_light)
-																.setDuration(
-																		Style.DURATION_INFINITE)
-																.build();
+	public static final Style	INFINITE			= new Style.Builder()
+															.setBackgroundColor(
+																	R.color.holo_red_light)
+															.setDuration(
+																	Style.DURATION_INFINITE)
+															.build();
 
-	private static final String		TAG					= "Cloudsdale Activity";
-	private static final String		SAVED_FRAGMENT_KEY	= "savedFragment";
-	private static HomeFragment		homeFragment;
-	private static AboutFragment	aboutFragment;
+	private static final String	TAG					= "Cloudsdale Activity";
+	private static final String	SAVED_FRAGMENT_KEY	= "savedFragment";
 
-	private SlidingMenu				slidingMenu;
-	private SlidingMenuFragment		slidingFragment;
-	private boolean					isOnTablet;
-	private Cloudsdale				mAppInstance;
+	private HomeFragment		homeFragment;
+	private AboutFragment		aboutFragment;
+	private SlidingMenu			slidingMenu;
+	private boolean				isOnTablet;
+	private Cloudsdale			mAppInstance;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -119,7 +117,6 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
-
 		}
 	}
 
