@@ -13,6 +13,12 @@ import java.util.Map;
 
 import lombok.val;
 
+/**
+ * An implemented API client for Cloudsdale.org Copyright(c) 2013 Cloudsdale.org
+ * 
+ * @author Jamison Greeley (berwyn.codeweaver@gmail.com)
+ * 
+ */
 public class CloudsdaleApiClient extends AbstractApiClient {
 
 	private Cloudsdale							mAppInstance;
@@ -28,6 +34,12 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 															}
 														};
 
+	/**
+	 * Creates an API client, given the current application instance
+	 * 
+	 * @param cloudsdale
+	 *            The current application instance
+	 */
 	public CloudsdaleApiClient(Cloudsdale cloudsdale) {
 		super("cloudsdale-android", headers);
 		mAppInstance = cloudsdale;
