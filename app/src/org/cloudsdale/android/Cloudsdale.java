@@ -7,8 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.cloudsdale.android.managers.CloudManager;
 import org.cloudsdale.android.managers.FayeManager;
@@ -21,7 +19,6 @@ import org.cloudsdale.android.network.CloudsdaleApiClient;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 
 /**
  * Global application class
@@ -178,9 +175,9 @@ public class Cloudsdale extends Application {
 	/**
 	 * Fetches the remote config JSON and configures our API clients
 	 */
-	public void configureFromRemote(AsyncHttpResponseHandler handler) {
-		val remoteUrl = getString(R.string.config_url);
-		new AsyncHttpClient().get(remoteUrl, handler);
+	public void configureFromRemote(JsonObject config) {
+		mConfig = config;
+		// TODO configure the services
 	}
 
 	public void configureApiServices(JsonArray services) {
