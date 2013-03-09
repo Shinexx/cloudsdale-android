@@ -9,6 +9,7 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.network.Provider;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import lombok.val;
@@ -55,7 +56,7 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	 *            The list of services this app supports
 	 */
 	public void configure(JsonObject service) {
-		mHostUrl = service.get("host").getAsString();
+		hostUrl = service.get("host").getAsString();
 		processEndpoints(service.getAsJsonArray("endpoints"));
 	}
 
@@ -80,7 +81,7 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 		json.addProperty("email", email);
 		json.addProperty("password", password);
 		val relUrl = buildRelUrl("sessions");
-		post(relUrl, json.toString(), handler);
+		super.post(relUrl, json.toString(), "application/json", handler);
 	}
 
 	/**
@@ -108,7 +109,64 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 		JsonObject body = new JsonObject();
 		body.add("oauth", oAuth);
 		val relUrl = buildRelUrl("sessions");
-		post(relUrl, body.toString(), handler);
+		super.post(relUrl, body.toString(), "application/json", handler);
+	}
+
+	/**
+	 * Given a template to use, as well as an optional list of arguments,
+	 * performs an HTTP GET on the resource <br/>
+	 * The list used should be of the format {@code new List<String>()
+	 * "replace this", "replace with this", "replace 2", "replace with 2"}
+	 * 
+	 * @param template
+	 *            The template key to use
+	 * @param arguments
+	 *            The list of arguments to format the url stem with, alternating
+	 *            between what key to use and wha to replace it with
+	 * @param handler
+	 *            Response handler to handle the failure or success of the
+	 *            request
+	 */
+	public void get(String template, List<String> arguments,
+			AsyncHttpResponseHandler handler) {
+		String urlStem = endpointTemplates.get(template);
+		if (arguments != null && arguments.size() > 0) {
+			for (int i = 0; i < arguments.size(); i++) {
+				urlStem = urlStem.replace(arguments.get(i),
+						arguments.get(i + 1));
+			}
+		}
+		super.get(urlStem, handler);
+	}
+
+	/**
+	 * Given a template to use, as well as an optional list of arguments and a
+	 * JSON body, performs an HTTP POST request on the resource <br/>
+	 * The list used should be of the format {@code new List<String>()
+	 * "replace this", "replace with this", "replace 2", "replace with 2"}
+	 * 
+	 * @param template
+	 *            The template key to use
+	 * @param arguments
+	 *            The list of arguments to format the url stem with, alternating
+	 *            between what key to use and wha to replace it with
+	 * @param body
+	 *            The JSON body to send to the server
+	 * @param handler
+	 *            Response handler to handle the failure or success of the
+	 *            request
+	 */
+	public void post(String template, List<String> arguments, JsonObject body,
+			AsyncHttpResponseHandler handler) {
+		String urlStem = endpointTemplates.get(template);
+		if (arguments != null && arguments.size() > 0) {
+			for (int i = 0; i < arguments.size(); i++) {
+				urlStem = urlStem.replace(arguments.get(i),
+						arguments.get(i + 1));
+			}
+		}
+		val bodyParsed = "";
+		super.post(urlStem, bodyParsed, "application/json", handler);
 	}
 
 	/**
@@ -140,12 +198,29 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	}
 
 	/**
+	 * TODO - document this?
 	 * 
 	 * @param handler
+	 *            Response handler to handle the failure or success of the
+	 *            request
 	 */
 	public void getUserRestore(AsyncHttpResponseHandler handler) {
 		val relUrl = buildRelUrl("users:restore");
 		get(relUrl, handler);
+	}
+
+	/**
+	 * Given a user's ID, bans a user from the service
+	 * 
+	 * @param id
+	 *            The user's string ID
+	 * @param handler
+	 *            Response handler to handle the failure or success of the
+	 *            request
+	 */
+	public void postUserBan(String id, AsyncHttpResponseHandler handler) {
+		val relUrl = buildRelUrl("users:ban", "{userid}", id);
+		post(relUrl, "", handler);
 	}
 
 	/**
@@ -160,6 +235,25 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	public void getUserClouds(String id, AsyncHttpResponseHandler handler) {
 		String relUrl = buildRelUrl("user:clouds", "{userid}", id);
 		get(relUrl, handler);
+	}
+
+	/**
+	 * Given a user's ID, posts acceptance to the site's Terms and Conditions
+	 * 
+	 * @param id
+	 *            The user's ID
+	 * @param handler
+	 *            Response handler to handle the failure or success of the
+	 *            request
+	 */
+	public void postUserTnCAccept(String id, AsyncHttpResponseHandler handler) {
+		val relUrl = buildRelUrl("user:accept_terms_and_conditions",
+				"{userid}", id);
+		post(relUrl, "", handler);
+	}
+
+	public void postUserAvatar(String id, AsyncHttpResponseHandler handler) {
+		// TODO - implement avatar uploads, and document it
 	}
 
 	/**
@@ -180,6 +274,40 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	public void getCloud(String id, AsyncHttpResponseHandler handler) {
 		String relUrl = buildRelUrl("cloud", "{cloudid}", id);
 		get(relUrl, handler);
+	}
+
+	/**
+	 * Given a cloud's ID, fetches all the users that are a member of that cloud
+	 * 
+	 * @param id
+	 *            The cloud's string ID
+	 * @param handler
+	 *            Response handler to handle the failure or success of the
+	 *            request
+	 */
+	public void getCloudUsers(String id, AsyncHttpResponseHandler handler) {
+		val relUrl = buildRelUrl("cloud:users", "{cloudid}", id);
+		get(relUrl, handler);
+	}
+
+	/**
+	 * Given a cloud's ID, fetches all online users that are a member of that
+	 * cloud
+	 * 
+	 * @param id
+	 *            The cloud's string ID
+	 * @param handler
+	 *            Response handler to handle the failure or success of the
+	 *            request
+	 */
+	public void getCloudUsersOnline(String id, AsyncHttpResponseHandler handler) {
+		val relUrl = buildRelUrl("cloud:users:online", "{cloudid}", id);
+		get(relUrl, handler);
+	}
+
+	public void postCloudJoin(String cloudId, String userId, AsyncHttpResponseHandler handler) {
+		val relUrl = buildRelUrl("cloud:join", "{cloudid}", cloudId, "{userid}", userId);
+		post()
 	}
 
 	/**

@@ -25,9 +25,9 @@ import lombok.val;
  */
 abstract class AbstractApiClient {
 
-	protected AsyncHttpClient		mClient;
-	protected String				mHostUrl;
-	protected Map<String, String>	mEndpointTemplates;
+	protected AsyncHttpClient		httpClient;
+	protected String				hostUrl;
+	protected Map<String, String>	endpointTemplates;
 	private String					userAgent;
 	private Map<String, String>		headers;
 	private Context					context;
@@ -41,7 +41,7 @@ abstract class AbstractApiClient {
 	 *            Any headers to be sent with HTTP requests
 	 */
 	protected AbstractApiClient(String userAgent, Map<String, String> headers) {
-		mEndpointTemplates = new HashMap<String, String>();
+		endpointTemplates = new HashMap<String, String>();
 		this.userAgent = userAgent;
 		this.headers = headers;
 	}
@@ -56,8 +56,8 @@ abstract class AbstractApiClient {
 	protected void processEndpoints(JsonArray endpoints) {
 		for (JsonElement element : endpoints) {
 			val obj = element.getAsJsonObject();
-			mEndpointTemplates.put(obj.get("id").toString(), obj
-					.get("template").toString());
+			endpointTemplates.put(obj.get("id").toString(), obj.get("template")
+					.toString());
 		}
 	}
 
@@ -102,19 +102,20 @@ abstract class AbstractApiClient {
 	 * 
 	 * @param url
 	 *            The URL fragment to perform the request on
-	 * @param json
-	 *            The JSON body to send to the server
+	 * @param body
+	 *            The UTF-8 encoded text body to send to the server
+	 * @param mimeType
+	 * 			  The mimetype of the text body being sent           
 	 * @param responseHandler
 	 *            Response handler that handles the failure or success of the
 	 *            query
 	 */
-	protected void post(String url, String json,
+	protected void post(String url, String body, String mimeType,
 			AsyncHttpResponseHandler responseHandler) {
 		try {
 			val fullUrl = getAbsoluteUrl(url);
 			getAsyncClient().post(context, fullUrl,
-					new StringEntity(json, "utf-8"), "application/json",
-					responseHandler);
+					new StringEntity(body, "utf-8"), mimeType, responseHandler);
 		} catch (UnsupportedEncodingException e) {
 			// This won't happen
 		}
@@ -128,7 +129,7 @@ abstract class AbstractApiClient {
 	 * @return The full URL stem
 	 */
 	protected String buildRelUrl(String template) {
-		return mEndpointTemplates.get(template);
+		return endpointTemplates.get(template);
 	}
 
 	/**
@@ -176,14 +177,14 @@ abstract class AbstractApiClient {
 	 * @return The current async client
 	 */
 	private AsyncHttpClient getAsyncClient() {
-		if (mClient == null) {
-			mClient = new AsyncHttpClient();
-			mClient.setUserAgent(userAgent);
+		if (httpClient == null) {
+			httpClient = new AsyncHttpClient();
+			httpClient.setUserAgent(userAgent);
 			for (Entry<String, String> header : headers.entrySet()) {
-				mClient.addHeader(header.getKey(), header.getValue());
+				httpClient.addHeader(header.getKey(), header.getValue());
 			}
 		}
-		return mClient;
+		return httpClient;
 	}
 
 	/**
@@ -194,6 +195,6 @@ abstract class AbstractApiClient {
 	 * @return The full URL
 	 */
 	private String getAbsoluteUrl(String relativeUrl) {
-		return mHostUrl + relativeUrl;
+		return hostUrl + relativeUrl;
 	}
 }

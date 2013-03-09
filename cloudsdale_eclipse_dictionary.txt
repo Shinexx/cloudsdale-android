@@ -23,3 +23,4 @@ jamsion
 useragent
 endpoints
 placeholder
+mimetype
