@@ -57,7 +57,8 @@ public class CloudManager extends ManagerBase {
 			return returnCloud;
 		} else {
 			final CountDownLatch latch = new CountDownLatch(1);
-			mAppInstance.callZephyr().getCloud(id,
+			mAppInstance.callZephyr().get("cloud",
+					new String[] { "{cloudid}", id },
 					new AsyncHttpResponseHandler() {
 
 						@Override
@@ -93,7 +94,8 @@ public class CloudManager extends ManagerBase {
 			throws QueryException {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final ArrayList<Cloud> returnClouds = new ArrayList<Cloud>();
-		mAppInstance.callZephyr().getUserClouds(userId,
+		mAppInstance.callZephyr().get("user:clouds",
+				new String[] { "{userid}", userId },
 				new AsyncHttpResponseHandler() {
 
 					@Override
@@ -114,14 +116,14 @@ public class CloudManager extends ManagerBase {
 				});
 		try {
 			latch.await();
-			new Thread(){
-				
+			new Thread() {
+
 				public void run() {
-					for(Cloud c : returnClouds) {
+					for (Cloud c : returnClouds) {
 						storeCloud(c);
 					}
 				};
-				
+
 			}.run();
 			return returnClouds;
 		} catch (InterruptedException e) {
