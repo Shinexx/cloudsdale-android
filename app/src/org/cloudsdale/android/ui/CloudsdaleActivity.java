@@ -12,15 +12,20 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.commonsware.cwac.merge.MergeAdapter;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
+import org.cloudsdale.android.models.api.Session;
 import org.cloudsdale.android.models.api.User;
+import org.cloudsdale.android.models.network.Provider;
+import org.cloudsdale.android.models.network.SessionResponse;
 import org.cloudsdale.android.ui.fragments.AboutFragment;
 import org.cloudsdale.android.ui.fragments.CloudFragment;
 import org.cloudsdale.android.ui.fragments.HomeFragment;
@@ -106,6 +111,12 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
 	}
+	
+	@Override
+	protected void onResume() {
+		handleSessionRenewal();
+		super.onResume();
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -158,7 +169,7 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 
 	}
 
-	public void refreshSlidingMenuClouds(User user) {
+	private void refreshSlidingMenuClouds(User user) {
 		if (mAppInstance.isDebuggable()) {
 			Log.d(TAG, String.format("Received refresh for user %1s",
 					user == null ? "[null]" : user.getName() + " with "
@@ -169,5 +180,50 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		// CloudAdapter cloudsAdapter = (CloudAdapter)
 		// listAdapter.getAdapter(1);
 		// cloudsAdapter.addCloud(user.getClouds().toArray(new Cloud[0]));
+	}
+
+	private void handleSessionRenewal() {
+		if (mAppInstance.getSessionManager().getActiveSession() == null) {
+			if (mAppInstance.isDebuggable()) {
+				Log.d(TAG, "Renewing Session");
+			}
+			String accountId = mAppInstance.getSessionManager().getAccountIds()[0];
+			mAppInstance.callZephyr().postSession(accountId,
+					Provider.CLOUDSDALE,
+					getString(R.string.cloudsdale_auth_token),
+					new AsyncHttpResponseHandler() {
+
+						@Override
+						public void onFailure(Throwable error, String json) {
+							if (mAppInstance.isDebuggable() && json != null) {
+								Log.d(TAG, json);
+							}
+							Crouton.showText(CloudsdaleActivity.this,
+									"There was an error loading your account",
+									CloudsdaleActivity.INFINITE);
+							super.onFailure(error, json);
+						}
+
+						@Override
+						public void onSuccess(String json) {
+							SessionResponse response = mAppInstance
+									.getJsonDeserializer().fromJson(json,
+											SessionResponse.class);
+							Session session = response.getResult();
+							mAppInstance.getSessionManager().storeAccount(
+									session);
+							homeFragment.inflateHomeCards(session.getUser());
+							refreshSlidingMenuClouds(session.getUser());
+							super.onSuccess(json);
+						}
+
+					});
+		} else {
+			if (mAppInstance.isDebuggable()) {
+				Log.d(TAG, "No session renewal required, inflating home view");
+			}
+			homeFragment.inflateHomeCards(mAppInstance.getUserManager()
+					.getLoggedInUser());
+		}
 	}
 }

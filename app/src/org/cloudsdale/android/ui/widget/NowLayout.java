@@ -5,11 +5,11 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import org.cloudsdale.android.R;
 
-public class NowLayout extends LinearLayout implements OnGlobalLayoutListener {
+public class NowLayout extends ListView implements OnGlobalLayoutListener {
 
 	public NowLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -23,8 +23,10 @@ public class NowLayout extends LinearLayout implements OnGlobalLayoutListener {
 	}
 
 	private void initLayoutObserver() {
+		// This is a holdover from when we had a linear layout base instead of a
+		// ListView one
 		// force vertical orientation and add observer
-		setOrientation(LinearLayout.VERTICAL);
+		// setOrientation(LinearLayout.VERTICAL);
 		getViewTreeObserver().addOnGlobalLayoutListener(this);
 	}
 
