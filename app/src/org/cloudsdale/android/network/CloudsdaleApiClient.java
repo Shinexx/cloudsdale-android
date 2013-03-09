@@ -1,5 +1,7 @@
 package org.cloudsdale.android.network;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -11,46 +13,21 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.network.Provider;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
+
+import lombok.val;
 
 public class CloudsdaleApiClient {
 
-	private Cloudsdale		mAppInstance;
-	private String			mBaseUrl;
-	private String			mSessionEndpoint;
-	private String			mUserEndpoint;
-	private String			mUserCloudEndpoint;
-	private String			mCloudEndpoint;
-	private String			mCloudBansEndpoint;
-	private String			mCloudDropsEndpoint;
-	private String			mCloudMessagesEndpoint;
-	private String			mCloudPopularEndpoint;
-	private String			mCloudRecentEndpoint;
-	private String			mCloudSearchEndpoint;
-	private AsyncHttpClient	mClient;
+	private Cloudsdale			mAppInstance;
+	private AsyncHttpClient		mClient;
+	private String				mHostUrl;
+	private Map<String, String>	mEndpointTemplates;
 
 	public CloudsdaleApiClient(Cloudsdale cloudsdale) {
 		mAppInstance = cloudsdale;
-		mBaseUrl = mAppInstance.getString(R.string.cloudsdale_api_base);
-		mSessionEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_sessions_endpoint);
-		mUserEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_user_endpoint);
-		mUserCloudEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_user_clouds_endpoint);
-		mCloudEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_cloud_endpoint);
-		mCloudBansEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_cloud_bans_endpoint);
-		mCloudDropsEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_cloud_drop_endpoint);
-		mCloudMessagesEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_cloud_chat_messages_endpoint);
-		mCloudPopularEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_cloud_popular_endpoint);
-		mCloudRecentEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_cloud_recent_endpoint);
-		mCloudSearchEndpoint = mAppInstance
-				.getString(R.string.cloudsdale_cloud_search_endpoint);
+		mEndpointTemplates = new HashMap<String, String>();
 	}
 
 	private AsyncHttpClient getAsyncClient() {
@@ -66,8 +43,23 @@ public class CloudsdaleApiClient {
 		return mClient;
 	}
 
+	private String getBaseUrl() {
+		if (mHostUrl == null) {
+			JsonArray array = mAppInstance.getConfig().getAsJsonArray(
+					"services");
+			for (JsonElement element : array) {
+				JsonObject obj = element.getAsJsonObject();
+				if (obj.get("id").equals("cloudsdale")) { return obj
+						.get("host").getAsString(); }
+			}
+			return null;
+		} else {
+			return mHostUrl;
+		}
+	}
+
 	private String getAbsoluteUrl(String relativeUrl) {
-		return mBaseUrl + relativeUrl;
+		return getBaseUrl() + relativeUrl;
 	}
 
 	private void get(String relativeUrl,
@@ -87,47 +79,73 @@ public class CloudsdaleApiClient {
 		}
 	}
 
+	private String buildRelUrl(String template) {
+		return mEndpointTemplates.get(template);
+	}
+
+	private String buildRelUrl(String template, String replace,
+			String replaceArg) {
+		return buildRelUrl(template).replace(replace, replaceArg);
+	}
+
+	private String buildRelUrl(String template, String replace,
+			String replaceArg, String subRes, String subResReplace) {
+		return buildRelUrl(template, replace, replaceArg).replace(subRes,
+				subResReplace);
+	}
+
+	public void processEndpoints(JsonArray endpoints) {
+		for (JsonElement element : endpoints) {
+			val obj = element.getAsJsonObject();
+			mEndpointTemplates.put(obj.get("id").toString(), obj
+					.get("template").toString());
+		}
+	}
+
 	public void getCloud(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(mCloudEndpoint, id);
+		String relUrl = buildRelUrl("cloud", "{cloudid}", id);
 		get(relUrl, handler);
 	}
 
 	public void getCloudBans(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(mCloudBansEndpoint, id);
+		String relUrl = buildRelUrl("cloud:bans", "{cloudid}", id);
 		get(relUrl, handler);
 	}
 
 	public void getCloudDrops(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(mCloudDropsEndpoint, id);
+		String relUrl = buildRelUrl("cloud:drops", "{cloudid}", id);
 		get(relUrl, handler);
 	}
 
 	public void getCloudMessages(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(mCloudMessagesEndpoint, id);
+		String relUrl = buildRelUrl("cloud:messages", "{cloudid}", id);
 		get(relUrl, handler);
 	}
 
 	public void getCloudPopular(AsyncHttpResponseHandler handler) {
-		get(mCloudPopularEndpoint, handler);
+		val relUrl = buildRelUrl("clouds:popular");
+		get(relUrl, handler);
 	}
 
 	public void getCloudRecents(AsyncHttpResponseHandler handler) {
-		get(mCloudRecentEndpoint, handler);
+		val relUrl = buildRelUrl("clouds:recent");
+		get(relUrl, handler);
 	}
 
 	public void postCloudSearch(String query, AsyncHttpResponseHandler handler) {
 		JsonObject json = new JsonObject();
 		json.addProperty("q", query);
-		post(mCloudSearchEndpoint, json.toString(), handler);
+		val relUrl = buildRelUrl("clouds:search");
+		post(relUrl, json.toString(), handler);
 	}
 
 	public void getUser(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(mUserEndpoint, id);
+		String relUrl = buildRelUrl("user", "{userid}", id);
 		get(relUrl, handler);
 	}
 
 	public void getUserClouds(String id, AsyncHttpResponseHandler handler) {
-		String relUrl = String.format(mUserCloudEndpoint, id);
+		String relUrl = buildRelUrl("user:clouds", "{userid}", id);
 		get(relUrl, handler);
 	}
 
@@ -136,7 +154,8 @@ public class CloudsdaleApiClient {
 		JsonObject json = new JsonObject();
 		json.addProperty("email", email);
 		json.addProperty("password", password);
-		post(mSessionEndpoint, json.toString(), handler);
+		val relUrl = buildRelUrl("sessions");
+		post(relUrl, json.toString(), handler);
 	}
 
 	public void postSession(String oAuthId, Provider oAuthProvider,
@@ -149,7 +168,8 @@ public class CloudsdaleApiClient {
 				oAuthId + oAuthProvider.toString(), internalToken));
 		JsonObject body = new JsonObject();
 		body.add("oauth", oAuth);
-		post(mSessionEndpoint, body.toString(), handler);
+		val relUrl = buildRelUrl("sessions");
+		post(relUrl, body.toString(), handler);
 	}
 
 }

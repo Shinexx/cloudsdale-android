@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import org.cloudsdale.android.managers.CloudManager;
 import org.cloudsdale.android.managers.FayeManager;
@@ -32,6 +33,7 @@ public class Cloudsdale extends Application {
 
 	// objects
 	private Gson				mJsonDeserializer;
+	private JsonObject			mConfig;
 
 	// Managers
 	private UserManager			mUserManager;
@@ -57,6 +59,16 @@ public class Cloudsdale extends Application {
 	 */
 	public boolean isDebuggable() {
 		return BuildConfig.DEBUG;
+	}
+
+	/**
+	 * Determines if our API client has been configured and is ready to request
+	 * resources
+	 * 
+	 * @return a boolean stating whether the client is configured
+	 */
+	public boolean isConfigured() {
+		return false;
 	}
 
 	/**
@@ -153,4 +165,12 @@ public class Cloudsdale extends Application {
 			return getString(R.string.facebook_app_key);
 		}
 	}
+
+	public void configureFromRemote() {
+
+	}
+	
+	public JsonObject getConfig() {
+		return mConfig;
+	}	
 }
