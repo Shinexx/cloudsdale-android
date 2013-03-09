@@ -4,8 +4,8 @@
     <!-- INTERNAL -->
     <string name="cloudsdale_auth_token">$2a$10$7Pfcv89Q9c/9WMAk6ySfhu</string>
     <string name="faye_token">650659cd4801877e56a176d70dcd4851fa4c86327b3b9439fef2fbf77543b8e2</string>
-    <string name="config_url">https://gist.github.com/atomicrat2552/be2900b802ba24f4c732/raw/42d2d829e452a8287435cb5bd3b7fe7bc683b3d4/config.json</string>
-
+    <string name="config_url">https://gist.github.com/atomicrat2552/be2900b802ba24f4c732/raw/f5f86dcb326678404005796cc5b44c87d929050e/config.json</string>
+    
     <!-- 3rd Party API DEBUG -->
     <string name="facebook_app_key_debug">213007855430354</string>
     <string name="facebook_app_secret_debug">442e0c7b6e1c2c26c0ef04fa1feb173c</string>
