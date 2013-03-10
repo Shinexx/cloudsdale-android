@@ -49,10 +49,10 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	}
 
 	/**
-	 * Given a list of services, configures itself to work for Cloudsdale
+	 * Given a service, configures itself to work for Cloudsdale
 	 * 
-	 * @param services
-	 *            The list of services this app supports
+	 * @param service
+	 *            The JsonObject representing this service
 	 */
 	public void configure(JsonObject service) {
 		hostUrl = service.get("host").getAsString();

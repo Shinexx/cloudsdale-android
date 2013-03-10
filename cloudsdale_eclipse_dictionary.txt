@@ -25,3 +25,4 @@ endpoints
 placeholder
 mimetype
 config
+derpibooru

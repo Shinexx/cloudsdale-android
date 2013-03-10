@@ -6,6 +6,7 @@ import android.content.Context;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.cloudsdale.android.managers.CloudManager;
@@ -19,6 +20,7 @@ import org.cloudsdale.android.network.CloudsdaleApiClient;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 
 /**
  * Global application class
@@ -173,15 +175,37 @@ public class Cloudsdale extends Application {
 	}
 
 	/**
-	 * Fetches the remote config JSON and configures our API clients
+	 * Given a JsonObject, configures our API clients
+	 * 
+	 * @param config
+	 *            JsonObject containing the client's configuration parameters
 	 */
 	public void configureFromRemote(JsonObject config) {
 		mConfig = config;
-		// TODO configure the services
+		configureApiServices(config.get("services").getAsJsonArray());
+		// TODO Configure push URLs
 	}
 
+	/**
+	 * Configures our remote services, given a list of services
+	 * 
+	 * @param services
+	 *            The JsonArray list of service objects
+	 */
 	public void configureApiServices(JsonArray services) {
-		// TODO configure the APIs
+		for (JsonElement element : services) {
+			val obj = element.getAsJsonObject();
+			val id = obj.get("id").getAsString();
+			if (id.equals("cloudsdale")) {
+				mApiClient.configure(obj);
+			} else if (id.equals("cloudsdale-faye")) {
+				// TODO Configure Faye resources
+			} else if (id.equals("my-little-face-when")) {
+				// TODO Configure MLFW
+			} else if (id.equals("derpibooru")) {
+				// TODO Configure Derpibooru
+			}
+		}
 	}
 
 }

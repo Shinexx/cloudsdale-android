@@ -26,6 +26,7 @@ import lombok.val;
 
 public class StartActivity extends SherlockActivity {
 
+	@SuppressWarnings("unused")
 	private static String	TAG				= "Start Activity";
 	private static String	APP_STORE_KEY	= "app_store_url";
 	private String			playStoreUrl;
