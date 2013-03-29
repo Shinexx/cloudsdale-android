@@ -28,3 +28,6 @@
 [submodule "submodules/cardsui-for-android"]
 	path = submodules/cardsui-for-android
 	url = git://github.com/nadavfima/cardsui-for-android.git
+[submodule "submodules/android-remote-configured-httpclient"]
+	path = submodules/android-remote-configured-httpclient
+	url = git@github.com:berwyn/android-remote-configured-httpclient.git
