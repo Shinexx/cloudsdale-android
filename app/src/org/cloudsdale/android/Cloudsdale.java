@@ -17,7 +17,6 @@ import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpResponse;
 
 import org.cloudsdale.android.managers.FayeManager;
-import org.cloudsdale.android.managers.NetworkManager;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
 import org.cloudsdale.android.network.CloudsdaleApiClient;
@@ -59,11 +58,9 @@ public class Cloudsdale extends Application {
 	@Bean
 	@Getter
 	DataStore					dataStore;
-	private FayeManager			mFayeManager;
 
 	@Override
 	public void onCreate() {
-		mFayeManager = new FayeManager(this);
 
 		cloudsdaleApi.getRemoteConfiguration(configUrl,
 				new AsyncHttpClient.JSONObjectCallback() {
@@ -142,16 +139,6 @@ public class Cloudsdale extends Application {
 			mJsonDeserializer = builder.create();
 		}
 		return mJsonDeserializer;
-	}
-
-	/**
-	 * Gets the FayeManager attached to this application instance
-	 * 
-	 * @return The FayeManager attached to this application instance
-	 */
-	public FayeManager getFayeManager() {
-		if (mFayeManager == null) mFayeManager = new FayeManager(this);
-		return mFayeManager;
 	}
 
 	/**
