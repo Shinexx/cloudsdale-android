@@ -2,6 +2,7 @@ package org.cloudsdale.android;
 
 import android.app.Application;
 import android.content.Context;
+import android.net.ConnectivityManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,13 +11,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EApplication;
+import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpResponse;
 
 import org.cloudsdale.android.managers.FayeManager;
 import org.cloudsdale.android.managers.NetworkManager;
-import org.cloudsdale.android.managers.SessionManager;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
 import org.cloudsdale.android.network.CloudsdaleApiClient;
@@ -53,18 +54,16 @@ public class Cloudsdale extends Application {
 	private JsonObject			mConfig;
 
 	// Managers
+	@SystemService
+	ConnectivityManager			connectivityManager;
 	@Bean
 	@Getter
-	DataStore dataStore;
+	DataStore					dataStore;
 	private FayeManager			mFayeManager;
-	private NetworkManager		mNetManager;
-	private SessionManager		mSessionManager;
 
 	@Override
 	public void onCreate() {
 		mFayeManager = new FayeManager(this);
-		mNetManager = new NetworkManager(this);
-		mSessionManager = new SessionManager(this);
 
 		cloudsdaleApi.getRemoteConfiguration(configUrl,
 				new AsyncHttpClient.JSONObjectCallback() {
@@ -111,6 +110,15 @@ public class Cloudsdale extends Application {
 		return false;
 	}
 
+	public boolean hasInternetConnection() {
+		val activeNetInfo = connectivityManager.getActiveNetworkInfo();
+		if (activeNetInfo == null) {
+			return false;
+		} else {
+			return activeNetInfo.isConnected();
+		}
+	}
+
 	/**
 	 * Convenience method to retrieve the current application context
 	 * 
@@ -147,28 +155,12 @@ public class Cloudsdale extends Application {
 	}
 
 	/**
-	 * Gets the NetworkManager attached to this application instance
-	 * 
-	 * @return The NetworkManager attached to this application instance
-	 */
-	public NetworkManager getNetworkManager() {
-		if (mNetManager == null) mNetManager = new NetworkManager(this);
-		return mNetManager;
-	}
-
-	/**
 	 * Gets the Cloudsale API client
 	 * 
 	 * @return The Cloudsdale API client in use by the application
 	 */
 	public CloudsdaleApiClient callZephyr() {
 		return cloudsdaleApi;
-	}
-
-	public SessionManager getSessionManager() {
-		if (mSessionManager == null)
-			mSessionManager = new SessionManager(this);
-		return mSessionManager;
 	}
 
 	/**
