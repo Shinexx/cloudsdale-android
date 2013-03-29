@@ -1,4 +1,4 @@
-package org.cloudsdale.android;
+package org.cloudsdale.android.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

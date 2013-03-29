@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
 
     <application
-        android:name="org.cloudsdale.android.Cloudsdale"
+        android:name="org.cloudsdale.android.Cloudsdale_"
         android:allowBackup="true"
         android:allowClearUserData="true"
         android:hardwareAccelerated="true"

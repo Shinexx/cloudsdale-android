@@ -1,11 +1,13 @@
 package org.cloudsdale.android.network;
 
+import com.googlecode.androidannotations.annotations.App;
+import com.googlecode.androidannotations.annotations.EBean;
 import com.koushikdutta.async.http.AsyncHttpClient;
 
-import org.cloudsdale.android.BCrypt;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.network.Provider;
+import org.cloudsdale.android.util.BCrypt;
 import org.codeweaver.remoteconfiguredhttpclient.AbstractApiClient;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,9 +21,11 @@ import java.util.Map;
  * @author Jamison Greeley (berwyn.codeweaver@gmail.com)
  * 
  */
+@EBean
 public class CloudsdaleApiClient extends AbstractApiClient {
 
-	private Cloudsdale							mAppInstance;
+	@App
+	Cloudsdale									cloudsdale;
 	@SuppressWarnings("serial")
 	private static final Map<String, String>	cloudsdaleHeaders	= new HashMap<String, String>() {
 																		{
@@ -40,11 +44,10 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	 * @param cloudsdale
 	 *            The current application instance
 	 */
-	public CloudsdaleApiClient(Cloudsdale cloudsdale) {
+	public CloudsdaleApiClient() {
 		super("cloudsdale-android", cloudsdaleHeaders);
-		mAppInstance = cloudsdale;
 		addHeader("X_AUTH_INTERNAL_TOKEN",
-				mAppInstance.getString(R.string.cloudsdale_auth_token));
+				cloudsdale.getString(R.string.cloudsdale_auth_token));
 	}
 
 	/**

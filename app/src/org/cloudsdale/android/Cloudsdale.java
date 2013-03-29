@@ -8,18 +8,22 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EApplication;
+import com.googlecode.androidannotations.annotations.res.StringRes;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.AsyncHttpResponse;
 
-import org.cloudsdale.android.managers.CloudManager;
 import org.cloudsdale.android.managers.FayeManager;
 import org.cloudsdale.android.managers.NetworkManager;
 import org.cloudsdale.android.managers.SessionManager;
-import org.cloudsdale.android.managers.UserManager;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
 import org.cloudsdale.android.network.CloudsdaleApiClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.val;
 
 /**
@@ -27,35 +31,63 @@ import lombok.val;
  * 
  * @author Jamison Greeley (atomicrat2552@gmail.com)
  */
+@EApplication
 public class Cloudsdale extends Application {
 
 	// Thirty minutes
 	public static final int		AVATAR_EXPIRATION	= 30 * 60 * 1000;
 	// Sixty minutes
 	public static final int		CLOUD_EXPIRATION	= 1000 * 60 * 60;
+	private static final String	DATE_FORMAT			= "yyyy/MM/dd HH:mm:ss Z";
+	private static final String	SERVICES_JSON_KEY	= "services";
 
-	// API client
-	private CloudsdaleApiClient	mApiClient;
+	// API clients
+	@Bean
+	CloudsdaleApiClient			cloudsdaleApi;
 
 	// objects
 	private Gson				mJsonDeserializer;
+	@StringRes(R.string.config_url)
+	String						configUrl;
 	@Getter
-	@Setter
 	private JsonObject			mConfig;
 
 	// Managers
-	private UserManager			mUserManager;
+	@Bean
+	@Getter
+	DataStore dataStore;
 	private FayeManager			mFayeManager;
 	private NetworkManager		mNetManager;
-	private CloudManager		mCloudManager;
 	private SessionManager		mSessionManager;
 
 	@Override
 	public void onCreate() {
-		mUserManager = new UserManager(this);
 		mFayeManager = new FayeManager(this);
 		mNetManager = new NetworkManager(this);
 		mSessionManager = new SessionManager(this);
+
+		cloudsdaleApi.getRemoteConfiguration(configUrl,
+				new AsyncHttpClient.JSONObjectCallback() {
+
+					@Override
+					public void onCompleted(Exception e,
+							AsyncHttpResponse source, JSONObject result) {
+						if (e != null) {
+							// TODO Handle exception
+							e.printStackTrace();
+						} else {
+							mConfig = getJsonDeserializer().fromJson(
+									result.toString(), JsonObject.class);
+							try {
+								configureApiServices(mConfig
+										.getAsJsonArray(SERVICES_JSON_KEY));
+							} catch (JSONException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}
+					}
+				});
 
 		super.onCreate();
 	}
@@ -97,21 +129,11 @@ public class Cloudsdale extends Application {
 	public Gson getJsonDeserializer() {
 		if (mJsonDeserializer == null) {
 			GsonBuilder builder = new GsonBuilder();
-			builder.setDateFormat("yyyy/MM/dd HH:mm:ss Z");
+			builder.setDateFormat(DATE_FORMAT);
 			builder.registerTypeAdapter(User.Role.class, new GsonRoleAdapter());
 			mJsonDeserializer = builder.create();
 		}
 		return mJsonDeserializer;
-	}
-
-	/**
-	 * Gets the UserManager attached to this application instance
-	 * 
-	 * @return The UserManager attached to this application instance
-	 */
-	public UserManager getUserManager() {
-		if (mUserManager == null) mUserManager = new UserManager(this);
-		return mUserManager;
 	}
 
 	/**
@@ -135,23 +157,12 @@ public class Cloudsdale extends Application {
 	}
 
 	/**
-	 * Gets the CloudManager attached to this application instance
-	 * 
-	 * @return The CloudManager attached to this application instance
-	 */
-	public CloudManager getNearestPegasus() {
-		if (mCloudManager == null) mCloudManager = new CloudManager(this);
-		return mCloudManager;
-	}
-
-	/**
 	 * Gets the Cloudsale API client
 	 * 
 	 * @return The Cloudsdale API client in use by the application
 	 */
 	public CloudsdaleApiClient callZephyr() {
-		if (mApiClient == null) mApiClient = new CloudsdaleApiClient(this);
-		return mApiClient;
+		return cloudsdaleApi;
 	}
 
 	public SessionManager getSessionManager() {
@@ -175,29 +186,18 @@ public class Cloudsdale extends Application {
 	}
 
 	/**
-	 * Given a JsonObject, configures our API clients
-	 * 
-	 * @param config
-	 *            JsonObject containing the client's configuration parameters
-	 */
-	public void configureFromRemote(JsonObject config) {
-		mConfig = config;
-		configureApiServices(config.get("services").getAsJsonArray());
-		// TODO Configure push URLs
-	}
-
-	/**
 	 * Configures our remote services, given a list of services
 	 * 
 	 * @param services
 	 *            The JsonArray list of service objects
+	 * @throws JSONException
 	 */
-	public void configureApiServices(JsonArray services) {
+	public void configureApiServices(JsonArray services) throws JSONException {
 		for (JsonElement element : services) {
-			val obj = element.getAsJsonObject();
-			val id = obj.get("id").getAsString();
+			val obj = new JSONObject(element.getAsString());
+			val id = obj.optString("id");
 			if (id.equals("cloudsdale")) {
-				mApiClient.configure(obj);
+				cloudsdaleApi.configure(obj);
 			} else if (id.equals("cloudsdale-faye")) {
 				// TODO Configure Faye resources
 			} else if (id.equals("my-little-face-when")) {
