@@ -33,24 +33,14 @@
 
         <!-- Activities -->
         <activity
-            android:name="org.cloudsdale.android.ui.StartActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleInstance" >
+            android:name="org.cloudsdale.android.ui.CloudsdaleActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_home" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name="org.cloudsdale.android.ui.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
-        </activity>
-        <activity
-            android:name="org.cloudsdale.android.ui.CloudsdaleActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_home" >
         </activity>
 
         <!-- Services -->
