@@ -33,7 +33,7 @@
 
         <!-- Activities -->
         <activity
-            android:name="org.cloudsdale.android.ui.CloudsdaleActivity"
+            android:name="org.cloudsdale.android.ui.CloudsdaleActivity_"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_home" >
             <intent-filter>
