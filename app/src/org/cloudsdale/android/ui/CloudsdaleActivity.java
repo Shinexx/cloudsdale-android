@@ -17,7 +17,6 @@ import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpResponse;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -45,7 +44,7 @@ import org.json.JSONObject;
  * @author Jamison Greeley (berwyn.codeweaver@gmail.com)
  * 
  */
-@EActivity
+@EActivity(R.layout.activity_base)
 public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		SlidingMenuFragment.ISlidingMenuFragmentCallbacks, OnItemClickListener {
 
@@ -75,9 +74,7 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_base);
 		isOnTablet = findViewById(R.id.tablet_menu) != null;
-		cloudsdale = (Cloudsdale) getApplication();
 		generateFragments();
 
 		if (isOnTablet) {

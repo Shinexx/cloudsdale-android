@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import org.cloudsdale.android.ui.LoginActivity;
+import org.cloudsdale.android.ui.CloudsdaleActivity_;
 
 class AccountAuthenticator extends
         AbstractAccountAuthenticator {
@@ -33,7 +33,7 @@ class AccountAuthenticator extends
 	        String[] requiredFeatures, Bundle options)
 	        throws NetworkErrorException {
 		Bundle reply = new Bundle();
-		Intent i = new Intent(mContext, LoginActivity.class);
+		Intent i = new Intent(mContext, CloudsdaleActivity_.class);
 		i.setAction("org.cloudsdale.android.account.LOGIN");
 		i.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
 		reply.putParcelable(AccountManager.KEY_INTENT, i);
