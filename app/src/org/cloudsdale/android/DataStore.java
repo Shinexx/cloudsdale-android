@@ -112,6 +112,16 @@ public class DataStore {
 	}
 
 	/**
+	 * Convenience method to get the cached user for the logged in user
+	 * 
+	 * @return The cached logged in user
+	 */
+	public User getLoggedInUser() {
+		val id = accountManager.getUserData(activeAccount, KEY_USER_ACCOUNT_ID);
+		return getUser(id);
+	}
+
+	/**
 	 * Persists an account to the system, based on the user in a given session
 	 * 
 	 * @param session

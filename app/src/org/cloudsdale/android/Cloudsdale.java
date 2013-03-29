@@ -16,7 +16,6 @@ import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpResponse;
 
-import org.cloudsdale.android.managers.FayeManager;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
 import org.cloudsdale.android.network.CloudsdaleApiClient;
