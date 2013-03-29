@@ -1,17 +1,17 @@
 package org.cloudsdale.android.network;
 
-import com.google.gson.JsonObject;
-import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.koushikdutta.async.http.AsyncHttpClient;
 
 import org.cloudsdale.android.BCrypt;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.network.Provider;
+import org.codeweaver.remoteconfiguredhttpclient.AbstractApiClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import lombok.val;
 
 /**
  * An implemented API client for Cloudsdale.org Copyright(c) 2013 Cloudsdale.org
@@ -23,16 +23,16 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 
 	private Cloudsdale							mAppInstance;
 	@SuppressWarnings("serial")
-	private static final Map<String, String>	headers	= new HashMap<String, String>() {
-															{
-																put("Accept",
-																		"application/json");
-																put("Content-Encoding",
-																		"utf-8");
-																put("Content-Type",
-																		"application/json");
-															}
-														};
+	private static final Map<String, String>	cloudsdaleHeaders	= new HashMap<String, String>() {
+																		{
+																			put("Accept",
+																					"application/json");
+																			put("Content-Encoding",
+																					"utf-8");
+																			put("Content-Type",
+																					"application/json");
+																		}
+																	};
 
 	/**
 	 * Creates an API client, given the current application instance
@@ -41,11 +41,10 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	 *            The current application instance
 	 */
 	public CloudsdaleApiClient(Cloudsdale cloudsdale) {
-		super("cloudsdale-android", headers);
+		super("cloudsdale-android", cloudsdaleHeaders);
 		mAppInstance = cloudsdale;
 		addHeader("X_AUTH_INTERNAL_TOKEN",
 				mAppInstance.getString(R.string.cloudsdale_auth_token));
-		setContext(mAppInstance.getContext());
 	}
 
 	/**
@@ -54,9 +53,9 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	 * @param service
 	 *            The JsonObject representing this service
 	 */
-	public void configure(JsonObject service) {
-		hostUrl = service.get("host").getAsString();
-		processEndpoints(service.getAsJsonArray("endpoints"));
+	public void configure(JSONObject service) throws JSONException {
+		setHostUrl(service.getString("host"));
+		configureEndpoints(service.getJSONArray("endpoints"), "id", "template");
 	}
 
 	/**
@@ -73,14 +72,14 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	 * @param handler
 	 *            Response handler to handle the failure or success of the
 	 *            request
+	 * @throws JSONException
 	 */
 	public void postSession(String email, String password,
-			AsyncHttpResponseHandler handler) {
-		JsonObject json = new JsonObject();
-		json.addProperty("email", email);
-		json.addProperty("password", password);
-		val relUrl = buildRelUrl("sessions");
-		super.post(relUrl, json.toString(), "application/json", handler);
+			AsyncHttpClient.JSONObjectCallback callback) throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("email", email);
+		json.put("password", password);
+		post("sessions", null, json, callback);
 	}
 
 	/**
@@ -96,74 +95,20 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	 * @param handler
 	 *            Response handler to handle the failure or success of the
 	 *            request
+	 * @throws JSONException
 	 */
 	public void postSession(String oAuthId, Provider oAuthProvider,
-			String internalToken, AsyncHttpResponseHandler handler) {
-		JsonObject oAuth = new JsonObject();
-		oAuth.addProperty("cli_type", "android");
-		oAuth.addProperty("provider", oAuthProvider.toString());
-		oAuth.addProperty("uid", oAuthId);
-		oAuth.addProperty("token", BCrypt.hashpw(
-				oAuthId + oAuthProvider.toString(), internalToken));
-		JsonObject body = new JsonObject();
-		body.add("oauth", oAuth);
-		val relUrl = buildRelUrl("sessions");
-		super.post(relUrl, body.toString(), "application/json", handler);
-	}
-
-	/**
-	 * Given a template to use, as well as an optional list of arguments,
-	 * performs an HTTP GET on the resource <br/>
-	 * The list used should be of the format {@code new List<String>()
-	 * "replace this", "replace with this", "replace 2", "replace with 2"}
-	 * 
-	 * @param template
-	 *            The template key to use
-	 * @param arguments
-	 *            The list of arguments to format the url stem with, alternating
-	 *            between what key to use and wha to replace it with
-	 * @param handler
-	 *            Response handler to handle the failure or success of the
-	 *            request
-	 */
-	public void get(String template, String[] arguments,
-			AsyncHttpResponseHandler handler) {
-		String urlStem = endpointTemplates.get(template);
-		if (arguments != null && arguments.length > 0) {
-			for (int i = 0; i < arguments.length; i++) {
-				urlStem = urlStem.replace(arguments[i], arguments[i + 1]);
-			}
-		}
-		super.get(urlStem, handler);
-	}
-
-	/**
-	 * Given a template to use, as well as an optional list of arguments and a
-	 * JSON body, performs an HTTP POST request on the resource <br/>
-	 * The list used should be of the format {@code new List<String>()
-	 * "replace this", "replace with this", "replace 2", "replace with 2"}
-	 * 
-	 * @param template
-	 *            The template key to use
-	 * @param arguments
-	 *            The list of arguments to format the url stem with, alternating
-	 *            between what key to use and wha to replace it with
-	 * @param body
-	 *            The JSON body to send to the server
-	 * @param handler
-	 *            Response handler to handle the failure or success of the
-	 *            request
-	 */
-	public void post(String template, String[] arguments, JsonObject body,
-			AsyncHttpResponseHandler handler) {
-		String urlStem = endpointTemplates.get(template);
-		if (arguments != null && arguments.length > 0) {
-			for (int i = 0; i < arguments.length; i++) {
-				urlStem = urlStem.replace(arguments[i], arguments[i + 1]);
-			}
-		}
-		val bodyParsed = "";
-		super.post(urlStem, bodyParsed, "application/json", handler);
+			String internalToken, AsyncHttpClient.JSONObjectCallback callback)
+			throws JSONException {
+		JSONObject oAuth = new JSONObject();
+		oAuth.put("cli_type", "android");
+		oAuth.put("provider", oAuthProvider.toString());
+		oAuth.put("uid", oAuthId);
+		oAuth.put("token", BCrypt.hashpw(oAuthId + oAuthProvider.toString(),
+				internalToken));
+		JSONObject body = new JSONObject();
+		body.put("oauth", oAuth);
+		post("sessions", null, body, callback);
 	}
 
 }
