@@ -5,7 +5,9 @@
 
 package org.cloudsdale.android;
 
+import android.content.Context;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
 import org.cloudsdale.android.R.string;
 import org.cloudsdale.android.network.CloudsdaleApiClient_;
 
@@ -17,8 +19,9 @@ public final class Cloudsdale_
     private void init_() {
         Resources resources_ = this.getResources();
         configUrl = resources_.getString(string.config_url);
-        cloudsdaleApi = CloudsdaleApiClient_.getInstance_(this);
+        connectivityManager = ((ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE));
         dataStore = DataStore_.getInstance_(this);
+        cloudsdaleApi = CloudsdaleApiClient_.getInstance_(this);
     }
 
     @Override
