@@ -32,7 +32,8 @@ import org.cloudsdale.android.models.network.Provider;
 import org.cloudsdale.android.models.network.SessionResponse;
 import org.cloudsdale.android.ui.fragments.AboutFragment;
 import org.cloudsdale.android.ui.fragments.CloudFragment;
-import org.cloudsdale.android.ui.fragments.HomeFragment;
+import org.cloudsdale.android.ui.fragments.HomeFragment_;
+import org.cloudsdale.android.ui.fragments.LoginFragment_;
 import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,7 +47,8 @@ import org.json.JSONObject;
  */
 @EActivity(R.layout.activity_base)
 public class CloudsdaleActivity extends SlidingFragmentActivity implements
-		SlidingMenuFragment.ISlidingMenuFragmentCallbacks, OnItemClickListener {
+		SlidingMenuFragment.ISlidingMenuFragmentCallbacks, OnItemClickListener,
+		ActivityCallbacks {
 
 	// Suppressing Lint warning - Resource object doesn't exist at compile time
 	@SuppressLint("ResourceAsColor")
@@ -60,8 +62,9 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 	private static final String	TAG					= "Cloudsdale Activity";
 	private static final String	SAVED_FRAGMENT_KEY	= "savedFragment";
 
-	private HomeFragment		homeFragment;
+	private HomeFragment_		homeFragment;
 	private AboutFragment		aboutFragment;
+	private LoginFragment_		loginFragment;
 	private SlidingMenu			slidingMenu;
 	private boolean				isOnTablet;
 
@@ -87,14 +90,21 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 				&& savedInstanceState.containsKey(SAVED_FRAGMENT_KEY)) {
 			// TODO replace fragments when we icicle the activity
 		} else {
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.content_frame, homeFragment).commit();
+			if (cloudsdale.getDataStore().getActiveAccount() == null
+					&& cloudsdale.getDataStore().getAccounts().length <= 0) {
+				loginFragment = new LoginFragment_();
+				getSupportFragmentManager().beginTransaction()
+						.replace(R.id.content_frame, loginFragment).commit();
+			} else {
+				getSupportFragmentManager().beginTransaction()
+						.replace(R.id.content_frame, homeFragment).commit();
+			}
 		}
 	}
 
 	private void generateFragments() {
 		if (homeFragment == null) {
-			homeFragment = new HomeFragment();
+			homeFragment = new HomeFragment_();
 			homeFragment.setRetainInstance(true);
 		}
 		if (aboutFragment == null) {
@@ -124,7 +134,7 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 
 	@Override
 	protected void onResume() {
-		handleSessionRenewal();
+		// handleSessionRenewal();
 		super.onResume();
 	}
 
@@ -242,5 +252,20 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		Crouton.showText(CloudsdaleActivity.this,
 				"There was an error loading your account",
 				CloudsdaleActivity.INFINITE);
+	}
+
+	@Override
+	public void onLoginCompleted() {
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		ft.remove(loginFragment);
+		ft.add(R.id.content_frame, homeFragment);
+		ft.commit();
+	}
+
+	@Override
+	public void onLoginFailed() {
+		// TODO Auto-generated method stub
+
 	}
 }

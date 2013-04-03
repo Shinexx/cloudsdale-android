@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -11,6 +12,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -28,19 +31,19 @@ import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.DataStore;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.network.SessionResponse;
+import org.cloudsdale.android.ui.ActivityCallbacks;
 import org.cloudsdale.android.ui.CloudsdaleActivity;
-import org.holoeverywhere.widget.EditText;
-import org.holoeverywhere.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 @EFragment(R.layout.fragment_login)
 public class LoginFragment extends Fragment {
-
+	
 	private static final String	TAG	= "Cloudsdale Login Fragment";
 
 	private String				email;
 	private String				password;
+	private ActivityCallbacks	callbacks;
 
 	@ViewById(R.id.email)
 	EditText					emailView;
@@ -54,6 +57,12 @@ public class LoginFragment extends Fragment {
 	TextView					loginStatusMessageView;
 	@App
 	Cloudsdale					cloudsdale;
+	
+	@Override
+	public void onAttach(Activity activity) {
+		callbacks = (ActivityCallbacks) activity;
+		super.onAttach(activity);
+	}
 
 	@AfterViews
 	void addViewBehaviour() {
@@ -195,12 +204,12 @@ public class LoginFragment extends Fragment {
 	}
 
 	private void processSessionResponse(String json, boolean error) {
-		showProgress(false);
 		if (cloudsdale.isDebuggable()) {
 			Log.d(TAG, "Received response:\n " + json);
 		}
 		Gson gson = cloudsdale.getJsonDeserializer();
 		SessionResponse response = gson.fromJson(json, SessionResponse.class);
+		showProgress(false);
 		if (error) {
 			Crouton.showText(getActivity(),
 					"Error: " + response.getErrors()[0].getMessage(),
@@ -210,7 +219,7 @@ public class LoginFragment extends Fragment {
 			manager.storeAccount(response.getResult());
 			Account[] accounts = manager.getAccounts();
 			manager.setActiveAccount(accounts[accounts.length - 1]);
-			// TODO Callback to activity that we're logged in
+			callbacks.onLoginCompleted();
 		}
 	}
 

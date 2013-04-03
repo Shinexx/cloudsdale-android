@@ -1,7 +1,5 @@
 package org.cloudsdale.android.network;
 
-import com.googlecode.androidannotations.annotations.App;
-import com.googlecode.androidannotations.annotations.EBean;
 import com.koushikdutta.async.http.AsyncHttpClient;
 
 import org.cloudsdale.android.Cloudsdale;
@@ -21,11 +19,10 @@ import java.util.Map;
  * @author Jamison Greeley (berwyn.codeweaver@gmail.com)
  * 
  */
-@EBean
 public class CloudsdaleApiClient extends AbstractApiClient {
 
-	@App
-	Cloudsdale									cloudsdale;
+	private Cloudsdale							cloudsdale;
+
 	@SuppressWarnings("serial")
 	private static final Map<String, String>	cloudsdaleHeaders	= new HashMap<String, String>() {
 																		{
@@ -44,10 +41,9 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	 * @param cloudsdale
 	 *            The current application instance
 	 */
-	public CloudsdaleApiClient() {
+	public CloudsdaleApiClient(Cloudsdale cloudsdale) {
 		super("cloudsdale-android", cloudsdaleHeaders);
-		addHeader("X_AUTH_INTERNAL_TOKEN",
-				cloudsdale.getString(R.string.cloudsdale_auth_token));
+		this.cloudsdale = cloudsdale;
 	}
 
 	/**
@@ -57,6 +53,8 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	 *            The JsonObject representing this service
 	 */
 	public void configure(JSONObject service) throws JSONException {
+		addHeader("X_AUTH_INTERNAL_TOKEN",
+				cloudsdale.getString(R.string.cloudsdale_auth_token));
 		setHostUrl(service.getString("host"));
 		configureEndpoints(service.getJSONArray("endpoints"), "id", "template");
 	}

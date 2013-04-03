@@ -6,9 +6,10 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.androidquery.AQuery;
+import com.googlecode.androidannotations.annotations.App;
+import com.googlecode.androidannotations.annotations.EFragment;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
@@ -23,11 +24,13 @@ import org.cloudsdale.android.ui.widget.NowLayout;
  * @author Jamison Greeley (berwyn.codeweaver@gmail.com)
  * 
  */
+@EFragment(R.layout.fragment_home)
 public class HomeFragment extends Fragment {
 
 	private static final String	TAG	= "Home Fragment";
 
-	private Cloudsdale			mAppInstance;
+	@App
+	Cloudsdale			mAppInstance;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,15 +38,6 @@ public class HomeFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		AQuery aq = new AQuery(getActivity());
-		View host = aq.inflate(null, R.layout.fragment_home, container);
-
-		return host;
-	}
-	
 	private void clearProgressViews() {
 		AQuery aq = new AQuery(getActivity());
 		aq.id(R.id.home_progress_bar).gone();

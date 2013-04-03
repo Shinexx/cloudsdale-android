@@ -3,13 +3,14 @@ package org.cloudsdale.android;
 import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.googlecode.androidannotations.annotations.Bean;
+import com.google.gson.JsonParser;
 import com.googlecode.androidannotations.annotations.EApplication;
 import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.res.StringRes;
@@ -33,6 +34,8 @@ import lombok.val;
 @EApplication
 public class Cloudsdale extends Application {
 
+	private static final String	TAG					= "Cloudsdale";
+
 	// Thirty minutes
 	public static final int		AVATAR_EXPIRATION	= 30 * 60 * 1000;
 	// Sixty minutes
@@ -41,8 +44,7 @@ public class Cloudsdale extends Application {
 	private static final String	SERVICES_JSON_KEY	= "services";
 
 	// API clients
-	@Bean
-	CloudsdaleApiClient			cloudsdaleApi;
+	private CloudsdaleApiClient	cloudsdaleApi;
 
 	// objects
 	private Gson				mJsonDeserializer;
@@ -54,25 +56,31 @@ public class Cloudsdale extends Application {
 	// Managers
 	@SystemService
 	ConnectivityManager			connectivityManager;
-	@Bean
 	@Getter
-	DataStore					dataStore;
+	private DataStore			dataStore;
 
 	@Override
 	public void onCreate() {
-
+		dataStore = new DataStore(this);
+		cloudsdaleApi = new CloudsdaleApiClient(this);
 		cloudsdaleApi.getRemoteConfiguration(configUrl,
 				new AsyncHttpClient.JSONObjectCallback() {
 
 					@Override
 					public void onCompleted(Exception e,
 							AsyncHttpResponse source, JSONObject result) {
+						if (isDebuggable()) {
+							Log.d(TAG,
+									"Received configuration:\n"
+											+ result.toString());
+						}
 						if (e != null) {
 							// TODO Handle exception
 							e.printStackTrace();
+
 						} else {
-							mConfig = getJsonDeserializer().fromJson(
-									result.toString(), JsonObject.class);
+							mConfig = new JsonParser().parse(result.toString())
+									.getAsJsonObject();
 							try {
 								configureApiServices(mConfig
 										.getAsJsonArray(SERVICES_JSON_KEY));
@@ -172,7 +180,10 @@ public class Cloudsdale extends Application {
 	 */
 	public void configureApiServices(JsonArray services) throws JSONException {
 		for (JsonElement element : services) {
-			val obj = new JSONObject(element.getAsString());
+			if (isDebuggable()) {
+				Log.d(TAG, "Processing service: " + element.toString());
+			}
+			val obj = new JSONObject(element.toString());
 			val id = obj.optString("id");
 			if (id.equals("cloudsdale")) {
 				cloudsdaleApi.configure(obj);

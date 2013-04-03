@@ -4,8 +4,6 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.support.v4.util.LruCache;
 
-import com.googlecode.androidannotations.annotations.App;
-import com.googlecode.androidannotations.annotations.EBean;
 import com.googlecode.androidannotations.annotations.res.StringRes;
 
 import org.cloudsdale.android.models.api.Cloud;
@@ -29,7 +27,6 @@ import lombok.val;
  * @version 1.0
  * 
  */
-@EBean
 public class DataStore {
 
 	private static final ReentrantReadWriteLock	CLOUD_LOCK			= new ReentrantReadWriteLock(
@@ -39,10 +36,8 @@ public class DataStore {
 	private static final int					CACHE_SIZE			= 20 * 1024 * 1024; // 20MiB
 	private static final String					KEY_USER_ACCOUNT_ID	= "id";
 
-	@App
-	Cloudsdale									cloudsdale;
-	@StringRes(R.string.account_type)
-	String										accountType;
+	private Cloudsdale							cloudsdale;
+	private String								accountType;
 
 	private LruCache<String, Cloud>				clouds;
 	private LruCache<String, User>				users;
@@ -51,10 +46,13 @@ public class DataStore {
 	@Setter
 	private Account								activeAccount;
 
-	public DataStore() {
+	public DataStore(Cloudsdale cloudsdale) {
 		clouds = new LruCache<String, Cloud>(CACHE_SIZE);
 		users = new LruCache<String, User>(CACHE_SIZE);
-		accountManager = AccountManager.get(cloudsdale);
+		this.cloudsdale = cloudsdale;
+		accountManager = AccountManager.get(this.cloudsdale);
+		accountType = this.cloudsdale.getString(R.string.account_type);
+
 	}
 
 	/**
