@@ -30,7 +30,7 @@ import org.cloudsdale.android.models.api.Session;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.network.Provider;
 import org.cloudsdale.android.models.network.SessionResponse;
-import org.cloudsdale.android.ui.fragments.AboutFragment;
+import org.cloudsdale.android.ui.fragments.AboutFragment_;
 import org.cloudsdale.android.ui.fragments.CloudFragment;
 import org.cloudsdale.android.ui.fragments.HomeFragment_;
 import org.cloudsdale.android.ui.fragments.LoginFragment_;
@@ -63,7 +63,7 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 	private static final String	SAVED_FRAGMENT_KEY	= "savedFragment";
 
 	private HomeFragment_		homeFragment;
-	private AboutFragment		aboutFragment;
+	private AboutFragment_		aboutFragment;
 	private LoginFragment_		loginFragment;
 	private SlidingMenu			slidingMenu;
 	private boolean				isOnTablet;
@@ -98,6 +98,7 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 			} else {
 				getSupportFragmentManager().beginTransaction()
 						.replace(R.id.content_frame, homeFragment).commit();
+				handleSessionRenewal();
 			}
 		}
 	}
@@ -108,7 +109,7 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 			homeFragment.setRetainInstance(true);
 		}
 		if (aboutFragment == null) {
-			aboutFragment = new AboutFragment();
+			aboutFragment = new AboutFragment_();
 			aboutFragment.setRetainInstance(true);
 		}
 	}
@@ -160,9 +161,6 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 				ft.replace(R.id.content_frame, homeFragment);
 				ft.commit();
 			} else if (id.equals("about")) {
-				if (aboutFragment == null) {
-					aboutFragment = new AboutFragment();
-				}
 				ft.replace(R.id.content_frame, aboutFragment);
 				ft.commit();
 			}

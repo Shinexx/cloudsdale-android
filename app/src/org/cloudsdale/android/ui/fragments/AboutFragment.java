@@ -3,33 +3,32 @@ package org.cloudsdale.android.ui.fragments;
 import android.app.Application;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.TextView;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
 
 import org.cloudsdale.android.R;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+@EFragment(R.layout.fragment_about)
 public class AboutFragment extends Fragment {
 
-	private TextView	versionText;
-	private WebView		changelogText;
-	private WebView		licenseText;
+	@ViewById(R.id.about_version_label)
+	TextView	versionText;
+	@ViewById(R.id.about_changelog_view)
+	WebView		changelogText;
+	@ViewById(R.id.about_license_view)
+	WebView		licenseText;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View root = inflater.inflate(R.layout.fragment_about, container, false);
-		versionText = (TextView) root.findViewById(R.id.about_version_label);
-		changelogText = (WebView) root.findViewById(R.id.about_changelog_view);
-		licenseText = (WebView) root.findViewById(R.id.about_license_view);
-
+	@AfterViews
+	public void fillViews() {
 		versionText.setText(getString(R.string.fragment_about_version_text,
 				getVersionName()));
 
@@ -62,8 +61,6 @@ public class AboutFragment extends Fragment {
 		} catch (IOException e) {
 			licenseText.setVisibility(View.GONE);
 		}
-
-		return root;
 	}
 
 	private String getVersionName() {
