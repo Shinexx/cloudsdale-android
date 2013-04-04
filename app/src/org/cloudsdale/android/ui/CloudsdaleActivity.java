@@ -11,9 +11,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.view.MenuItem;
+import com.androidquery.AQuery;
 import com.commonsware.cwac.merge.MergeAdapter;
 import com.googlecode.androidannotations.annotations.App;
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
 import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpResponse;
@@ -24,6 +26,7 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
 import org.cloudsdale.android.Cloudsdale;
+import org.cloudsdale.android.DataStore;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.Session;
@@ -35,6 +38,7 @@ import org.cloudsdale.android.ui.fragments.CloudFragment;
 import org.cloudsdale.android.ui.fragments.HomeFragment_;
 import org.cloudsdale.android.ui.fragments.LoginFragment_;
 import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
+import org.codeweaver.remoteconfiguredhttpclient.RemoteConfigurationListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,7 +52,7 @@ import org.json.JSONObject;
 @EActivity(R.layout.activity_base)
 public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		SlidingMenuFragment.ISlidingMenuFragmentCallbacks, OnItemClickListener,
-		ActivityCallbacks {
+		ActivityCallbacks, RemoteConfigurationListener {
 
 	// Suppressing Lint warning - Resource object doesn't exist at compile time
 	@SuppressLint("ResourceAsColor")
@@ -67,17 +71,21 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 	private LoginFragment_		loginFragment;
 	private SlidingMenu			slidingMenu;
 	private boolean				isOnTablet;
+	private AQuery				aQuery;
 
 	// Injected resources
 	@App
 	Cloudsdale					cloudsdale;
 	@StringRes(R.string.cloudsdale_auth_token)
 	String						authToken;
+	@ViewById(R.id.base_config_placeholder)
+	View						placeholderView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		isOnTablet = findViewById(R.id.tablet_menu) != null;
+		aQuery = new AQuery(this);
 		generateFragments();
 
 		if (isOnTablet) {
@@ -90,16 +98,7 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 				&& savedInstanceState.containsKey(SAVED_FRAGMENT_KEY)) {
 			// TODO replace fragments when we icicle the activity
 		} else {
-			if (cloudsdale.getDataStore().getActiveAccount() == null
-					&& cloudsdale.getDataStore().getAccounts().length <= 0) {
-				loginFragment = new LoginFragment_();
-				getSupportFragmentManager().beginTransaction()
-						.replace(R.id.content_frame, loginFragment).commit();
-			} else {
-				getSupportFragmentManager().beginTransaction()
-						.replace(R.id.content_frame, homeFragment).commit();
-				handleSessionRenewal();
-			}
+			cloudsdale.configure(this);
 		}
 	}
 
@@ -131,12 +130,6 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		slidingMenu.setSlidingEnabled(true);
 		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
-	}
-
-	@Override
-	protected void onResume() {
-		// handleSessionRenewal();
-		super.onResume();
 	}
 
 	@Override
@@ -265,5 +258,27 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 	public void onLoginFailed() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void onConfigurationFailed(Throwable error, JSONObject response) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onConfigurationSucceeded(int statusCode,
+			JSONObject configuration) {
+		DataStore ds = cloudsdale.getDataStore();
+		aQuery.id(placeholderView).gone();
+		if (ds.getActiveAccount() == null && ds.getAccounts().length <= 0) {
+			loginFragment = new LoginFragment_();
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.content_frame, loginFragment).commit();
+		} else {
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.content_frame, homeFragment).commit();
+			handleSessionRenewal();
+		}
 	}
 }

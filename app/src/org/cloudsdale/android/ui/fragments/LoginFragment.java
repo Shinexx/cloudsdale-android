@@ -38,7 +38,7 @@ import org.json.JSONObject;
 
 @EFragment(R.layout.fragment_login)
 public class LoginFragment extends Fragment {
-	
+
 	private static final String	TAG	= "Cloudsdale Login Fragment";
 
 	private String				email;
@@ -57,7 +57,7 @@ public class LoginFragment extends Fragment {
 	TextView					loginStatusMessageView;
 	@App
 	Cloudsdale					cloudsdale;
-	
+
 	@Override
 	public void onAttach(Activity activity) {
 		callbacks = (ActivityCallbacks) activity;
@@ -210,7 +210,7 @@ public class LoginFragment extends Fragment {
 		Gson gson = cloudsdale.getJsonDeserializer();
 		SessionResponse response = gson.fromJson(json, SessionResponse.class);
 		showProgress(false);
-		if (error) {
+		if (error || response.getErrors().length > 0) {
 			Crouton.showText(getActivity(),
 					"Error: " + response.getErrors()[0].getMessage(),
 					Style.ALERT);

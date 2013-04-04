@@ -1,5 +1,7 @@
 package org.cloudsdale.android.network;
 
+import android.util.Log;
+
 import com.koushikdutta.async.http.AsyncHttpClient;
 
 import org.cloudsdale.android.Cloudsdale;
@@ -20,6 +22,8 @@ import java.util.Map;
  * 
  */
 public class CloudsdaleApiClient extends AbstractApiClient {
+
+	private static final String					TAG					= "Cloudsdale API Client";
 
 	private Cloudsdale							cloudsdale;
 
@@ -55,6 +59,10 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 	public void configure(JSONObject service) throws JSONException {
 		addHeader("X_AUTH_INTERNAL_TOKEN",
 				cloudsdale.getString(R.string.cloudsdale_auth_token));
+		if(cloudsdale.isDebuggable()) {
+			Log.d(TAG, "Configuring with \n" + service.toString());
+			Log.d(TAG, "Configuring with host string [" + service.getString("host") + "]");
+		}
 		setHostUrl(service.getString("host"));
 		configureEndpoints(service.getJSONArray("endpoints"), "id", "template");
 	}
@@ -109,6 +117,9 @@ public class CloudsdaleApiClient extends AbstractApiClient {
 				internalToken));
 		JSONObject body = new JSONObject();
 		body.put("oauth", oAuth);
+		if (cloudsdale.isDebuggable()) {
+			Log.d(TAG, buildUrl("sessions", null));
+		}
 		post("sessions", null, body, callback);
 	}
 

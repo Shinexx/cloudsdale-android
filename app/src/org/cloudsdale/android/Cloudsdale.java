@@ -20,6 +20,7 @@ import com.koushikdutta.async.http.AsyncHttpResponse;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
 import org.cloudsdale.android.network.CloudsdaleApiClient;
+import org.codeweaver.remoteconfiguredhttpclient.RemoteConfigurationListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,6 +51,10 @@ public class Cloudsdale extends Application {
 	private Gson				mJsonDeserializer;
 	@StringRes(R.string.config_url)
 	String						configUrl;
+	@StringRes(R.string.facebook_app_key_debug)
+	String						facebookDebugKey;
+	@StringRes(R.string.facebook_app_key)
+	String						facebookKey;
 	@Getter
 	private JsonObject			mConfig;
 
@@ -63,35 +68,6 @@ public class Cloudsdale extends Application {
 	public void onCreate() {
 		dataStore = new DataStore(this);
 		cloudsdaleApi = new CloudsdaleApiClient(this);
-		cloudsdaleApi.getRemoteConfiguration(configUrl,
-				new AsyncHttpClient.JSONObjectCallback() {
-
-					@Override
-					public void onCompleted(Exception e,
-							AsyncHttpResponse source, JSONObject result) {
-						if (isDebuggable()) {
-							Log.d(TAG,
-									"Received configuration:\n"
-											+ result.toString());
-						}
-						if (e != null) {
-							// TODO Handle exception
-							e.printStackTrace();
-
-						} else {
-							mConfig = new JsonParser().parse(result.toString())
-									.getAsJsonObject();
-							try {
-								configureApiServices(mConfig
-										.getAsJsonArray(SERVICES_JSON_KEY));
-							} catch (JSONException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						}
-					}
-				});
-
 		super.onCreate();
 	}
 
@@ -165,10 +141,49 @@ public class Cloudsdale extends Application {
 	 */
 	public String getFacebookAppKey() {
 		if (isDebuggable()) {
-			return getString(R.string.facebook_app_key_debug);
+			return facebookDebugKey;
 		} else {
-			return getString(R.string.facebook_app_key);
+			return facebookKey;
 		}
+	}
+
+	public void configure(final RemoteConfigurationListener configListener) {
+		cloudsdaleApi.getRemoteConfiguration(configUrl,
+				new AsyncHttpClient.JSONObjectCallback() {
+
+					@Override
+					public void onCompleted(Exception e,
+							AsyncHttpResponse source, JSONObject result) {
+						if (e != null) {
+							// TODO Handle exception
+							if (isDebuggable()) {
+								Log.e(TAG, "Error during configure request");
+								e.printStackTrace();
+							}
+							configListener.onConfigurationFailed(e, result);
+							return;
+						} else {
+							mConfig = new JsonParser().parse(result.toString())
+									.getAsJsonObject();
+							try {
+								configureApiServices(mConfig
+										.getAsJsonArray(SERVICES_JSON_KEY));
+								configListener.onConfigurationSucceeded(200,
+										null);
+								return;
+							} catch (JSONException e1) {
+								// TODO Auto-generated catch block
+								if (isDebuggable()) {
+									Log.e(TAG, "Error during configure request");
+									e1.printStackTrace();
+								}
+								configListener
+										.onConfigurationFailed(e1, result);
+								return;
+							}
+						}
+					}
+				});
 	}
 
 	/**
@@ -178,11 +193,8 @@ public class Cloudsdale extends Application {
 	 *            The JsonArray list of service objects
 	 * @throws JSONException
 	 */
-	public void configureApiServices(JsonArray services) throws JSONException {
+	private void configureApiServices(JsonArray services) throws JSONException {
 		for (JsonElement element : services) {
-			if (isDebuggable()) {
-				Log.d(TAG, "Processing service: " + element.toString());
-			}
 			val obj = new JSONObject(element.toString());
 			val id = obj.optString("id");
 			if (id.equals("cloudsdale")) {
