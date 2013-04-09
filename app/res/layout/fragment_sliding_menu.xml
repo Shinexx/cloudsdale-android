@@ -11,6 +11,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="left"
         class="org.cloudsdale.android.ui.fragments.SlidingMenuFragment"
-        android:tag="slidingMenu" />
+        android:tag="@string/sliding_fragment_tag" />
 
 </FrameLayout>

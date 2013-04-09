@@ -5,11 +5,11 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.animation.AnimationUtils;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 
 import org.cloudsdale.android.R;
 
-public class NowLayout extends ListView implements OnGlobalLayoutListener {
+public class NowLayout extends LinearLayout implements OnGlobalLayoutListener {
 
 	public NowLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);

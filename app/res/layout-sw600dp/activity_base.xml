@@ -13,7 +13,7 @@
         android:layout_gravity="left"
         android:layout_weight=".25"
         class="org.cloudsdale.android.ui.fragments.SlidingMenuFragment"
-        android:tag="slidingMenu" />
+        android:tag="@string/sliding_fragment_tag" />
 
     <FrameLayout
         android:id="@+id/content_frame"

@@ -11,5 +11,6 @@
     <string name="tag_navigation_fragment">slidingNavFragment</string>
     <string name="home_login_text">Logging you in</string>
     <string name="base_setup_string">Setting up</string>
+    <string name="sliding_fragment_tag">slidingFragment</string>
 
 </resources>

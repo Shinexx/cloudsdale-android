@@ -33,6 +33,7 @@ import org.cloudsdale.android.models.api.Session;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.network.Provider;
 import org.cloudsdale.android.models.network.SessionResponse;
+import org.cloudsdale.android.ui.adapters.CloudAdapter;
 import org.cloudsdale.android.ui.fragments.AboutFragment_;
 import org.cloudsdale.android.ui.fragments.CloudFragment;
 import org.cloudsdale.android.ui.fragments.HomeFragment_;
@@ -69,6 +70,7 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 	private HomeFragment_		homeFragment;
 	private AboutFragment_		aboutFragment;
 	private LoginFragment_		loginFragment;
+	private SlidingMenuFragment	slidingFragment;
 	private SlidingMenu			slidingMenu;
 	private boolean				isOnTablet;
 	private AQuery				aQuery;
@@ -78,6 +80,8 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 	Cloudsdale					cloudsdale;
 	@StringRes(R.string.cloudsdale_auth_token)
 	String						authToken;
+	@StringRes(R.string.sliding_fragment_tag)
+	String						slidingFragmentTag;
 	@ViewById(R.id.base_config_placeholder)
 	View						placeholderView;
 
@@ -93,6 +97,10 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		} else {
 			setupPhone();
 		}
+
+		FragmentManager fm = getSupportFragmentManager();
+		slidingFragment = (SlidingMenuFragment) fm
+				.findFragmentByTag(slidingFragmentTag);
 
 		if (savedInstanceState != null
 				&& savedInstanceState.containsKey(SAVED_FRAGMENT_KEY)) {
@@ -186,11 +194,10 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 					user == null ? "[null]" : user.getName() + " with "
 							+ user.getClouds().size() + "clouds"));
 		}
-		// MergeAdapter listAdapter = (MergeAdapter) slidingFragment
-		// .getListAdapter();
-		// CloudAdapter cloudsAdapter = (CloudAdapter)
-		// listAdapter.getAdapter(1);
-		// cloudsAdapter.addCloud(user.getClouds().toArray(new Cloud[0]));
+		MergeAdapter listAdapter = (MergeAdapter) slidingFragment
+				.getListAdapter();
+		CloudAdapter cloudsAdapter = (CloudAdapter) listAdapter.getAdapter(3);
+		cloudsAdapter.addCloud(user.getClouds().toArray(new Cloud[0]));
 	}
 
 	private void handleSessionRenewal() {

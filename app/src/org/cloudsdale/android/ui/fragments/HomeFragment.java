@@ -58,6 +58,7 @@ public class HomeFragment extends Fragment {
 					null);
 			((NowLayout) getView().findViewById(R.id.home_card_host))
 					.addView(card);
+			aQuery = aQuery.id(card);
 			String joinDate = DateFormat.getLongDateFormat(getActivity())
 					.format(u.getMemberSince());
 			aQuery.find(R.id.home_card_username).text(u.getName());
