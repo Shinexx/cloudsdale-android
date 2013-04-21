@@ -6,13 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
-import com.actionbarsherlock.view.MenuItem;
 import com.androidquery.AQuery;
-import com.commonsware.cwac.merge.MergeAdapter;
 import com.googlecode.androidannotations.annotations.App;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
@@ -20,7 +15,6 @@ import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpResponse;
 import com.slidingmenu.lib.SlidingMenu;
-import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -33,13 +27,13 @@ import org.cloudsdale.android.models.api.Session;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.network.Provider;
 import org.cloudsdale.android.models.network.SessionResponse;
-import org.cloudsdale.android.ui.adapters.CloudAdapter;
 import org.cloudsdale.android.ui.fragments.AboutFragment_;
 import org.cloudsdale.android.ui.fragments.CloudFragment;
 import org.cloudsdale.android.ui.fragments.HomeFragment_;
 import org.cloudsdale.android.ui.fragments.LoginFragment_;
 import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
 import org.codeweaver.remoteconfiguredhttpclient.RemoteConfigurationListener;
+import org.holoeverywhere.app.Activity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,9 +45,9 @@ import org.json.JSONObject;
  * 
  */
 @EActivity(R.layout.activity_base)
-public class CloudsdaleActivity extends SlidingFragmentActivity implements
-		SlidingMenuFragment.ISlidingMenuFragmentCallbacks, OnItemClickListener,
-		ActivityCallbacks, RemoteConfigurationListener {
+public class CloudsdaleActivity extends Activity implements
+		SlidingMenuFragment.ISlidingMenuFragmentCallbacks, ActivityCallbacks,
+		RemoteConfigurationListener {
 
 	// Suppressing Lint warning - Resource object doesn't exist at compile time
 	@SuppressLint("ResourceAsColor")
@@ -92,10 +86,8 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		aQuery = new AQuery(this);
 		generateFragments();
 
-		if (isOnTablet) {
-			setupTablet();
-		} else {
-			setupPhone();
+		if (!isOnTablet) {
+			generateSlidingMenu();
 		}
 
 		FragmentManager fm = getSupportFragmentManager();
@@ -121,36 +113,14 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		}
 	}
 
-	private void setupTablet() {
-		setBehindContentView(new View(this));
-		getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-		slidingMenu = getSlidingMenu();
-		slidingMenu.setSlidingEnabled(false);
-	}
-
-	private void setupPhone() {
-		setBehindContentView(R.layout.fragment_sliding_menu);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		setSlidingActionBarEnabled(true);
-		showContent();
-		slidingMenu = getSlidingMenu();
-		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
-		slidingMenu.setSlidingEnabled(true);
+	private void generateSlidingMenu() {
+		getSupportActionBar().setHomeButtonEnabled(true);
+		slidingMenu = new SlidingMenu(this);
+		slidingMenu.setMode(SlidingMenu.LEFT);
 		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				if (!isOnTablet) {
-					toggle();
-				}
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
+		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
+		slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
+		slidingMenu.setMenu(R.layout.fragment_sliding_menu);
 	}
 
 	@Override
@@ -168,24 +138,6 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 		} else if (clazz == Cloud.class) {
 			ft.replace(R.id.content_frame, new CloudFragment());
 		}
-		showContent();
-	}
-
-	@Override
-	public void onItemClick(AdapterView<?> adapter, View view, int position,
-			long id) {
-		MergeAdapter mergeAdapter = (MergeAdapter) ((ListView) adapter)
-				.getAdapter();
-		if (mergeAdapter.getItem(position) instanceof StaticNavigation) {
-			listItemClicked(
-					((StaticNavigation) mergeAdapter.getItem(position))
-							.getTextId(),
-					StaticNavigation.class);
-		} else if (mergeAdapter.getItem(position) instanceof Cloud) {
-			listItemClicked(((Cloud) mergeAdapter.getItem(position)).getId(),
-					Cloud.class);
-		}
-
 	}
 
 	private void refreshSlidingMenuClouds(User user) {
@@ -194,10 +146,11 @@ public class CloudsdaleActivity extends SlidingFragmentActivity implements
 					user == null ? "[null]" : user.getName() + " with "
 							+ user.getClouds().size() + "clouds"));
 		}
-		MergeAdapter listAdapter = (MergeAdapter) slidingFragment
-				.getListAdapter();
-		CloudAdapter cloudsAdapter = (CloudAdapter) listAdapter.getAdapter(3);
-		cloudsAdapter.addCloud(user.getClouds().toArray(new Cloud[0]));
+		// MergeAdapter listAdapter = (MergeAdapter) slidingFragment
+		// .getListAdapter();
+		// CloudAdapter cloudsAdapter = (CloudAdapter)
+		// listAdapter.getAdapter(3);
+		// cloudsAdapter.addCloud(user.getClouds().toArray(new Cloud[0]));
 	}
 
 	private void handleSessionRenewal() {

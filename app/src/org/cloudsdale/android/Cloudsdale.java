@@ -1,6 +1,5 @@
 package org.cloudsdale.android;
 
-import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.util.Log;
@@ -21,6 +20,7 @@ import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
 import org.cloudsdale.android.network.CloudsdaleApiClient;
 import org.codeweaver.remoteconfiguredhttpclient.RemoteConfigurationListener;
+import org.holoeverywhere.app.Application;
 import org.json.JSONException;
 import org.json.JSONObject;
 
