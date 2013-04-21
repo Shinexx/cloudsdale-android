@@ -93,12 +93,82 @@ public class CloudsdaleActivity extends Activity implements
 		FragmentManager fm = getSupportFragmentManager();
 		slidingFragment = (SlidingMenuFragment) fm
 				.findFragmentByTag(slidingFragmentTag);
+		slidingFragment.setCallback(this);
 
 		if (savedInstanceState != null
 				&& savedInstanceState.containsKey(SAVED_FRAGMENT_KEY)) {
 			// TODO replace fragments when we icicle the activity
 		} else {
 			cloudsdale.configure(this);
+		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		slidingFragment.setCallback(null);
+		super.onDestroy();
+	}
+
+	@Override
+	public void listItemClicked(String id, Class<?> clazz) {
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		if (clazz == StaticNavigation.class) {
+			if (id.equals("home")) {
+				ft.replace(R.id.content_frame, homeFragment);
+				ft.commit();
+			} else if (id.equals("about")) {
+				ft.replace(R.id.content_frame, aboutFragment);
+				ft.commit();
+			}
+		} else if (clazz == Cloud.class) {
+			ft.replace(R.id.content_frame, new CloudFragment());
+		}
+	}
+
+	public void displayLoginFailCrouton(String error) {
+		if (cloudsdale.isDebuggable() && error != null) {
+			Log.e(TAG, error);
+		}
+		Crouton.showText(CloudsdaleActivity.this,
+				"There was an error loading your account",
+				CloudsdaleActivity.INFINITE);
+	}
+
+	@Override
+	public void onLoginCompleted() {
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		ft.remove(loginFragment);
+		ft.add(R.id.content_frame, homeFragment);
+		ft.commit();
+	}
+
+	@Override
+	public void onLoginFailed() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onConfigurationFailed(Throwable error, JSONObject response) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onConfigurationSucceeded(int statusCode,
+			JSONObject configuration) {
+		DataStore ds = cloudsdale.getDataStore();
+		aQuery.id(placeholderView).gone();
+		if (ds.getActiveAccount() == null && ds.getAccounts().length <= 0) {
+			loginFragment = new LoginFragment_();
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.content_frame, loginFragment).commit();
+		} else {
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.content_frame, homeFragment).commit();
+			handleSessionRenewal();
 		}
 	}
 
@@ -121,23 +191,6 @@ public class CloudsdaleActivity extends Activity implements
 		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
 		slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
 		slidingMenu.setMenu(R.layout.fragment_sliding_menu);
-	}
-
-	@Override
-	public void listItemClicked(String id, Class<?> clazz) {
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
-		if (clazz == StaticNavigation.class) {
-			if (id.equals("home")) {
-				ft.replace(R.id.content_frame, homeFragment);
-				ft.commit();
-			} else if (id.equals("about")) {
-				ft.replace(R.id.content_frame, aboutFragment);
-				ft.commit();
-			}
-		} else if (clazz == Cloud.class) {
-			ft.replace(R.id.content_frame, new CloudFragment());
-		}
 	}
 
 	private void refreshSlidingMenuClouds(User user) {
@@ -193,52 +246,6 @@ public class CloudsdaleActivity extends Activity implements
 			}
 			homeFragment.inflateHomeCards(cloudsdale.getDataStore()
 					.getLoggedInUser());
-		}
-	}
-
-	public void displayLoginFailCrouton(String error) {
-		if (cloudsdale.isDebuggable() && error != null) {
-			Log.e(TAG, error);
-		}
-		Crouton.showText(CloudsdaleActivity.this,
-				"There was an error loading your account",
-				CloudsdaleActivity.INFINITE);
-	}
-
-	@Override
-	public void onLoginCompleted() {
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
-		ft.remove(loginFragment);
-		ft.add(R.id.content_frame, homeFragment);
-		ft.commit();
-	}
-
-	@Override
-	public void onLoginFailed() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onConfigurationFailed(Throwable error, JSONObject response) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onConfigurationSucceeded(int statusCode,
-			JSONObject configuration) {
-		DataStore ds = cloudsdale.getDataStore();
-		aQuery.id(placeholderView).gone();
-		if (ds.getActiveAccount() == null && ds.getAccounts().length <= 0) {
-			loginFragment = new LoginFragment_();
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.content_frame, loginFragment).commit();
-		} else {
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.content_frame, homeFragment).commit();
-			handleSessionRenewal();
 		}
 	}
 }

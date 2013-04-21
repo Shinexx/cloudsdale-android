@@ -61,14 +61,16 @@ public class SlidingMenuFragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		MergeAdapter adapter = (MergeAdapter) getListAdapter();
-		if (adapter.getItem(position) instanceof StaticNavigation) {
-			callback.listItemClicked(
-					((StaticNavigation) adapter.getItem(position)).getTextId(),
-					StaticNavigation.class);
-		} else if (adapter.getItem(position) instanceof Cloud) {
-			callback.listItemClicked(
-					((Cloud) adapter.getItem(position)).getId(), Cloud.class);
+		if (callback != null) {
+			MergeAdapter adapter = (MergeAdapter) getListAdapter();
+			if (adapter.getItem(position) instanceof StaticNavigation) {
+				callback.listItemClicked(((StaticNavigation) adapter
+						.getItem(position)).getTextId(), StaticNavigation.class);
+			} else if (adapter.getItem(position) instanceof Cloud) {
+				callback.listItemClicked(
+						((Cloud) adapter.getItem(position)).getId(),
+						Cloud.class);
+			}
 		}
 	}
 
