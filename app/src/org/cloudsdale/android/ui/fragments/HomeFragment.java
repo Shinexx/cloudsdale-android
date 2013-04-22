@@ -45,7 +45,7 @@ public class HomeFragment extends Fragment {
 		aQuery = new AQuery(getActivity());
 		super.onCreate(savedInstanceState);
 	}
-
+	
 	public void inflateHomeCards(User... users) {
 		LayoutInflater inflater = LayoutInflater.from(getActivity());
 		aQuery.id(loginProgress).gone();

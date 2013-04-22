@@ -40,6 +40,10 @@ import org.holoeverywhere.app.Activity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.val;
 
 /**
@@ -57,43 +61,47 @@ public class CloudsdaleActivity extends Activity implements
 	// Suppressing Lint warning - Resource object doesn't exist at compile time,
 	// asset IDs do thanks to R.java
 	@SuppressLint("ResourceAsColor")
-	public static final Style	INFINITE			= new Style.Builder()
-															.setBackgroundColor(
-																	R.color.holo_red_light)
-															.setDuration(
-																	Style.DURATION_INFINITE)
-															.build();
+	public static final Style							INFINITE			= new Style.Builder()
+																					.setBackgroundColor(
+																							R.color.holo_red_light)
+																					.setDuration(
+																							Style.DURATION_INFINITE)
+																					.build();
 
-	private static final String	TAG					= "Cloudsdale Activity";
-	private static final String	SAVED_FRAGMENT_KEY	= "savedFragment";
+	private static final String							TAG					= "Cloudsdale Activity";
+	private static final String							SAVED_FRAGMENT_KEY	= "savedFragment";
 
-	private HomeFragment_		homeFragment;
-	private AboutFragment_		aboutFragment;
-	private LoginFragment_		loginFragment;
-	private SlidingMenuFragment	slidingFragment;
-	private SlidingMenu			slidingMenu;
-	private boolean				isOnTablet;
-	private AQuery				aQuery;
+	private HomeFragment_								homeFragment;
+	private AboutFragment_								aboutFragment;
+	private LoginFragment_								loginFragment;
+	private SlidingMenuFragment							slidingFragment;
+	private SlidingMenu									slidingMenu;
+	private boolean										isOnTablet;
+	private AQuery										aQuery;
+	private Map<String, SoftReference<CloudFragment>>	cloudFragments;
+	private CloudFragment								currentCloud;
 
 	// Injected resources
 	@App
-	Cloudsdale					cloudsdale;
+	Cloudsdale											cloudsdale;
 	@StringRes(R.string.cloudsdale_auth_token)
-	String						authToken;
+	String												authToken;
 	@StringRes(R.string.sliding_fragment_tag)
-	String						slidingFragmentTag;
+	String												slidingFragmentTag;
 	@ViewById(R.id.base_config_placeholder)
-	View						placeholderView;
+	View												placeholderView;
 	@StringRes(R.string.bugsense_key)
-	String						bugsenseApiKey;
+	String												bugsenseApiKey;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		isOnTablet = findViewById(R.id.tablet_menu) != null;
-		aQuery = new AQuery(this);
-		generateFragments();
 		BugSenseHandler.initAndStartSession(this, bugsenseApiKey);
+		aQuery = new AQuery(this);
+		cloudFragments = new HashMap<String, SoftReference<CloudFragment>>();
+
+		isOnTablet = findViewById(R.id.tablet_menu) != null;
+		generateFragments();
 		if (!isOnTablet) {
 			generateSlidingMenu();
 		}
@@ -124,14 +132,26 @@ public class CloudsdaleActivity extends Activity implements
 		if (clazz == StaticNavigation.class) {
 			if (id.equals("home")) {
 				ft.replace(R.id.content_frame, homeFragment);
-				ft.commit();
 			} else if (id.equals("about")) {
 				ft.replace(R.id.content_frame, aboutFragment);
-				ft.commit();
 			}
 		} else if (clazz == Cloud.class) {
-			ft.replace(R.id.content_frame, new CloudFragment());
+			CloudFragment replaceFrag;
+			if (!cloudFragments.containsKey(id)
+					|| cloudFragments.get(id).get() == null) {
+				replaceFrag = new CloudFragment();
+				cloudFragments.put(id, new SoftReference<CloudFragment>(
+						replaceFrag));
+			} else {
+				replaceFrag = cloudFragments.get(id).get();
+			}
+			Bundle args = new Bundle();
+			args.putString(CloudFragment.BUNDLE_CLOUD_ID, id);
+			replaceFrag.setArguments(args);
+			currentCloud = replaceFrag;
+			ft.replace(R.id.content_frame, currentCloud);
 		}
+		ft.commit();
 	}
 
 	public void displayLoginFailCrouton(String error) {

@@ -49,7 +49,7 @@ public class CloudAdapter extends BaseAdapter {
 
 	@Override
 	public long getItemId(int position) {
-		return Long.valueOf(getItem(position).getId(), 16);
+		return getItem(position).getId().hashCode();
 	}
 
 	@Override
