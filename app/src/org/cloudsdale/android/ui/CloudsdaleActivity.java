@@ -196,9 +196,11 @@ public class CloudsdaleActivity extends Activity implements
 		slidingMenu = new SlidingMenu(this);
 		slidingMenu.setMode(SlidingMenu.LEFT);
 		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		slidingMenu.setBehindOffsetRes(R.dimen.actionbar_home_width);
+		slidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
 		slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
 		slidingMenu.setMenu(R.layout.fragment_sliding_menu);
+		slidingMenu.setShadowDrawable(R.drawable.shadow);
+		slidingMenu.setShadowWidthRes(R.dimen.shadow_width);
 	}
 
 	private void refreshSlidingMenuClouds(User user) {

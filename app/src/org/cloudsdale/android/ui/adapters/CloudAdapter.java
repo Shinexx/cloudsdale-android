@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 
 import com.androidquery.AQuery;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
@@ -11,6 +12,7 @@ import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
+import org.holoeverywhere.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +22,7 @@ public class CloudAdapter extends BaseAdapter {
 
 	private List<Cloud>	clouds;
 	private Context		context;
+	private AQuery		aquery;
 
 	public CloudAdapter(List<Cloud> clouds, Context context) {
 		this.context = context;
@@ -51,13 +54,20 @@ public class CloudAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		AQuery aq = new AQuery(context);
-		View view = aq.inflate(convertView, R.layout.widget_sliding_menu_item,
-				parent);
+		if (aquery == null) {
+			aquery = new AQuery(context);
+		}
+		View view = aquery.inflate(convertView,
+				R.layout.widget_sliding_menu_item, parent);
 
-		aq.id(R.id.sliding_menu_item_lable).text(getItem(position).getName());
-		UrlImageViewHelper.setUrlDrawable(aq.id(R.id.sliding_menu_item_icon)
-				.getImageView(), getItem(position).getAvatar().getNormal(),
+		TextView tv = (TextView) view
+				.findViewById(R.id.sliding_menu_item_lable);
+		ImageView iv = (ImageView) view
+				.findViewById(R.id.sliding_menu_item_icon);
+
+		tv.setText(getItem(position).getName());
+		UrlImageViewHelper.setUrlDrawable(iv, getItem(position).getAvatar()
+				.getNormal(), R.drawable.ic_unknown_user,
 				Cloudsdale.CLOUD_EXPIRATION);
 
 		return view;
