@@ -4,8 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.support.v4.util.LruCache;
 
-import com.googlecode.androidannotations.annotations.res.StringRes;
-
+import org.cloudsdale.android.models.IdentityModel;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.Session;
 import org.cloudsdale.android.models.api.User;
@@ -27,96 +26,31 @@ import lombok.val;
  * @version 1.0
  * 
  */
-public class DataStore {
+public class DataStore<T extends IdentityModel> {
 
-	private static final ReentrantReadWriteLock	CLOUD_LOCK			= new ReentrantReadWriteLock(
-																			true);
-	private static final ReentrantReadWriteLock	USER_LOCK			= new ReentrantReadWriteLock(
+	private static final ReentrantReadWriteLock	LOCK				= new ReentrantReadWriteLock(
 																			true);
 	private static final int					CACHE_SIZE			= 20 * 1024 * 1024; // 20MiB
-	private static final String					KEY_USER_ACCOUNT_ID	= "id";
+	protected static final String				KEY_USER_ACCOUNT_ID	= "id";
 
-	private Cloudsdale							cloudsdale;
-	private String								accountType;
-
-	private LruCache<String, Cloud>				clouds;
-	private LruCache<String, User>				users;
-	private AccountManager						accountManager;
+	protected static AccountManager				accountManager;
 	@Getter
 	@Setter
-	private Account								activeAccount;
+	protected static Account					activeAccount;
+	protected static String						accountType;
+
+	protected Cloudsdale						cloudsdale;
+
+	protected LruCache<String, T>				cache;
 
 	public DataStore(Cloudsdale cloudsdale) {
-		clouds = new LruCache<String, Cloud>(CACHE_SIZE);
-		users = new LruCache<String, User>(CACHE_SIZE);
+		cache = new LruCache<String, T>(CACHE_SIZE);
 		this.cloudsdale = cloudsdale;
-		accountManager = AccountManager.get(this.cloudsdale);
+		if (accountManager == null) {
+			accountManager = AccountManager.get(cloudsdale);
+		}
 		accountType = this.cloudsdale.getString(R.string.account_type);
 
-	}
-
-	/**
-	 * Stores a cloud in an LRU cache. See {@link android.util.LruCache} for
-	 * cache details.
-	 * 
-	 * @param cloud
-	 *            The cloud to store
-	 */
-	public void storeCloud(Cloud cloud) {
-		CLOUD_LOCK.writeLock().lock();
-		clouds.put(cloud.getId(), cloud);
-		CLOUD_LOCK.writeLock().unlock();
-	}
-
-	/**
-	 * Retrieves a cloud from the LRU cache, if it exists
-	 * 
-	 * @param id
-	 *            The ID of the cloud to look up
-	 * @return A {@link Cloud} if one is cached, null otherwise
-	 */
-	public Cloud getCloud(String id) {
-		CLOUD_LOCK.readLock().lock();
-		val returnVal = clouds.get(id);
-		CLOUD_LOCK.readLock().unlock();
-		return returnVal;
-	}
-
-	/**
-	 * Stores a user in an LRU cache. See {@link android.util.LruCache} for
-	 * cache details.
-	 * 
-	 * @param user
-	 *            The user to store
-	 */
-	public void storeUser(User user) {
-		USER_LOCK.writeLock().lock();
-		users.put(user.getId(), user);
-		USER_LOCK.writeLock().unlock();
-	}
-
-	/**
-	 * Retrieves a user from the LRU cache, if it exists
-	 * 
-	 * @param id
-	 *            The ID of the user to look up
-	 * @return A {@link User} if one is cached, null otherwise
-	 */
-	public User getUser(String id) {
-		USER_LOCK.readLock().lock();
-		val returnVal = users.get(id);
-		USER_LOCK.readLock().unlock();
-		return returnVal;
-	}
-
-	/**
-	 * Convenience method to get the cached user for the logged in user
-	 * 
-	 * @return The cached logged in user
-	 */
-	public User getLoggedInUser() {
-		val id = accountManager.getUserData(activeAccount, KEY_USER_ACCOUNT_ID);
-		return getUser(id);
 	}
 
 	/**
@@ -126,7 +60,7 @@ public class DataStore {
 	 *            The session to generate an account (or update an account) from
 	 * @return A boolean indicating whether the account was created
 	 */
-	public boolean storeAccount(Session session) {
+	public static boolean storeAccount(Session session) {
 		User user = session.getUser();
 		Account account = new Account(user.getName(), accountType);
 		boolean accountCreated = accountManager.addAccountExplicitly(account,
@@ -148,7 +82,7 @@ public class DataStore {
 	 * 
 	 * @return An array of {@link Account} objects for all persisted accounts
 	 */
-	public Account[] getAccounts() {
+	public static Account[] getAccounts() {
 		return accountManager.getAccountsByType(accountType);
 	}
 
@@ -157,7 +91,7 @@ public class DataStore {
 	 * 
 	 * @return An array of String IDs for all persisted accounts
 	 */
-	public String[] getAccountIds() {
+	public static String[] getAccountIds() {
 		val accounts = getAccounts();
 		String[] ids = new String[accounts.length];
 		for (int i = 0; i < accounts.length; i++) {
@@ -167,12 +101,43 @@ public class DataStore {
 		return ids;
 	}
 
+	public static String getActiveAccountID() {
+		return accountManager.getUserData(activeAccount, KEY_USER_ACCOUNT_ID);
+	}
+
 	/**
 	 * Not yet implemented
 	 */
-	public void deleteAccount() {
+	public static void deleteAccount() {
 		throw new UnsupportedOperationException();
 		// TODO Delete accounts on demand
+	}
+
+	/**
+	 * Stores a cloud in an LRU cache. See {@link android.util.LruCache} for
+	 * cache details.
+	 * 
+	 * @param obj
+	 *            The object to store
+	 */
+	public void store(T obj) {
+		LOCK.writeLock().lock();
+		cache.put(obj.getId(), obj);
+		LOCK.writeLock().unlock();
+	}
+
+	/**
+	 * Retrieves a cloud from the LRU cache, if it exists
+	 * 
+	 * @param id
+	 *            The ID of the cloud to look up
+	 * @return A {@link Cloud} if one is cached, null otherwise
+	 */
+	public T get(String id) {
+		LOCK.readLock().lock();
+		val returnVal = cache.get(id);
+		LOCK.readLock().unlock();
+		return returnVal;
 	}
 
 }

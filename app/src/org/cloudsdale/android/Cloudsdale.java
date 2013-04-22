@@ -16,6 +16,7 @@ import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpResponse;
 
+import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
 import org.cloudsdale.android.network.CloudsdaleApiClient;
@@ -62,11 +63,14 @@ public class Cloudsdale extends Application {
 	@SystemService
 	ConnectivityManager			connectivityManager;
 	@Getter
-	private DataStore			dataStore;
+	private DataStore<Cloud>	cloudDataStore;
+	@Getter
+	private DataStore<User>		userDataStore;
 
 	@Override
 	public void onCreate() {
-		dataStore = new DataStore(this);
+		cloudDataStore = new DataStore<Cloud>(this);
+		userDataStore = new DataStore<User>(this);
 		cloudsdaleApi = new CloudsdaleApiClient(this);
 		super.onCreate();
 	}
@@ -145,6 +149,16 @@ public class Cloudsdale extends Application {
 		} else {
 			return facebookKey;
 		}
+	}
+
+	/**
+	 * Convenience method to get the cached user for the logged in user
+	 * 
+	 * @return The cached logged in user
+	 */
+	public User getLoggedInUser() {
+		val id = DataStore.getActiveAccountID();
+		return userDataStore.get(id);
 	}
 
 	public void configure(final RemoteConfigurationListener configListener) {
