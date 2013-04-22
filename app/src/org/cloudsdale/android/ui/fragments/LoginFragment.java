@@ -215,10 +215,9 @@ public class LoginFragment extends Fragment {
 					"Error: " + response.getErrors()[0].getMessage(),
 					Style.ALERT);
 		} else {
-			DataStore manager = cloudsdale.getDataStore();
-			manager.storeAccount(response.getResult());
-			Account[] accounts = manager.getAccounts();
-			manager.setActiveAccount(accounts[accounts.length - 1]);
+			DataStore.storeAccount(response.getResult());
+			Account[] accounts = DataStore.getAccounts();
+			DataStore.setActiveAccount(accounts[accounts.length - 1]);
 			callbacks.onLoginCompleted();
 		}
 	}

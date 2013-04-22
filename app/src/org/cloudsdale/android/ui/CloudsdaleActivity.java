@@ -49,7 +49,8 @@ public class CloudsdaleActivity extends Activity implements
 		SlidingMenuFragment.ISlidingMenuFragmentCallbacks, ActivityCallbacks,
 		RemoteConfigurationListener {
 
-	// Suppressing Lint warning - Resource object doesn't exist at compile time
+	// Suppressing Lint warning - Resource object doesn't exist at compile time,
+	// asset IDs do thanks to R.java
 	@SuppressLint("ResourceAsColor")
 	public static final Style	INFINITE			= new Style.Builder()
 															.setBackgroundColor(
@@ -159,9 +160,9 @@ public class CloudsdaleActivity extends Activity implements
 	@Override
 	public void onConfigurationSucceeded(int statusCode,
 			JSONObject configuration) {
-		DataStore ds = cloudsdale.getDataStore();
 		aQuery.id(placeholderView).gone();
-		if (ds.getActiveAccount() == null && ds.getAccounts().length <= 0) {
+		if (DataStore.getActiveAccount() == null
+				&& DataStore.getAccounts().length <= 0) {
 			loginFragment = new LoginFragment_();
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.content_frame, loginFragment).commit();
@@ -207,11 +208,11 @@ public class CloudsdaleActivity extends Activity implements
 	}
 
 	private void handleSessionRenewal() {
-		if (cloudsdale.getDataStore().getActiveAccount() == null) {
+		if (DataStore.getActiveAccount() == null) {
 			if (cloudsdale.isDebuggable()) {
 				Log.d(TAG, "Renewing Session");
 			}
-			String accountId = cloudsdale.getDataStore().getAccountIds()[0];
+			String accountId = DataStore.getAccountIds()[0];
 			try {
 				cloudsdale.callZephyr().postSession(accountId,
 						Provider.CLOUDSDALE, authToken,
@@ -228,8 +229,7 @@ public class CloudsdaleActivity extends Activity implements
 													result.toString(),
 													SessionResponse.class);
 									Session session = response.getResult();
-									cloudsdale.getDataStore().storeAccount(
-											session);
+									DataStore.storeAccount(session);
 									homeFragment.inflateHomeCards(session
 											.getUser());
 									refreshSlidingMenuClouds(session.getUser());
@@ -244,8 +244,7 @@ public class CloudsdaleActivity extends Activity implements
 			if (cloudsdale.isDebuggable()) {
 				Log.d(TAG, "No session renewal required, inflating home view");
 			}
-			homeFragment.inflateHomeCards(cloudsdale.getDataStore()
-					.getLoggedInUser());
+			homeFragment.inflateHomeCards(cloudsdale.getLoggedInUser());
 		}
 	}
 }
