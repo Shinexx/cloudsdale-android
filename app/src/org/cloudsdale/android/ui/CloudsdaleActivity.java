@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.androidquery.AQuery;
+import com.bugsense.trace.BugSenseHandler;
 import com.googlecode.androidannotations.annotations.App;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
@@ -27,6 +28,8 @@ import org.cloudsdale.android.models.api.Session;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.network.Provider;
 import org.cloudsdale.android.models.network.SessionResponse;
+import org.cloudsdale.android.ui.adapters.CloudAdapter;
+import org.cloudsdale.android.ui.adapters.SlidingMenuAdapter;
 import org.cloudsdale.android.ui.fragments.AboutFragment_;
 import org.cloudsdale.android.ui.fragments.CloudFragment;
 import org.cloudsdale.android.ui.fragments.HomeFragment_;
@@ -36,6 +39,8 @@ import org.codeweaver.remoteconfiguredhttpclient.RemoteConfigurationListener;
 import org.holoeverywhere.app.Activity;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import lombok.val;
 
 /**
  * Base activity to do core setup. <br/>
@@ -79,6 +84,8 @@ public class CloudsdaleActivity extends Activity implements
 	String						slidingFragmentTag;
 	@ViewById(R.id.base_config_placeholder)
 	View						placeholderView;
+	@StringRes(R.string.bugsense_key)
+	String						bugsenseApiKey;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -86,7 +93,7 @@ public class CloudsdaleActivity extends Activity implements
 		isOnTablet = findViewById(R.id.tablet_menu) != null;
 		aQuery = new AQuery(this);
 		generateFragments();
-
+		BugSenseHandler.initAndStartSession(this, bugsenseApiKey);
 		if (!isOnTablet) {
 			generateSlidingMenu();
 		}
@@ -200,11 +207,11 @@ public class CloudsdaleActivity extends Activity implements
 					user == null ? "[null]" : user.getName() + " with "
 							+ user.getClouds().size() + "clouds"));
 		}
-		// MergeAdapter listAdapter = (MergeAdapter) slidingFragment
-		// .getListAdapter();
-		// CloudAdapter cloudsAdapter = (CloudAdapter)
-		// listAdapter.getAdapter(3);
-		// cloudsAdapter.addCloud(user.getClouds().toArray(new Cloud[0]));
+		SlidingMenuAdapter adapter = (SlidingMenuAdapter) slidingFragment
+				.getListAdapter();
+		CloudAdapter cloudsAdapter = adapter.getCloudAdapter();
+		val clouds = user.getClouds();
+		cloudsAdapter.addCloud(clouds.toArray(new Cloud[clouds.size()]));
 	}
 
 	private void handleSessionRenewal() {

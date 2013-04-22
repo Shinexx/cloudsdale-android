@@ -23,17 +23,14 @@ package org.cloudsdale.android.faye;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat.Builder;
 import android.widget.Toast;
 
 import com.b3rwynmobile.fayeclient.FayeService;
 
 import org.cloudsdale.android.Cloudsdale;
-import org.cloudsdale.android.R;
 
 /**
  * Service class to run Faye. Provides a singleton method to get the running
