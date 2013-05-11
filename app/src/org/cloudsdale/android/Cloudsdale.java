@@ -2,6 +2,7 @@ package org.cloudsdale.android;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -36,36 +37,38 @@ import lombok.val;
 @EApplication
 public class Cloudsdale extends Application {
 
-	private static final String	TAG					= "Cloudsdale";
+	private static final String			TAG					= "Cloudsdale";
 
 	// Thirty minutes
-	public static final int		AVATAR_EXPIRATION	= 30 * 60 * 1000;
+	public static final int				AVATAR_EXPIRATION	= 30 * 60 * 1000;
 	// Sixty minutes
-	public static final int		CLOUD_EXPIRATION	= 1000 * 60 * 60;
-	private static final String	DATE_FORMAT			= "yyyy/MM/dd HH:mm:ss Z";
-	private static final String	SERVICES_JSON_KEY	= "services";
+	public static final int				CLOUD_EXPIRATION	= 1000 * 60 * 60;
+	private static final String			DATE_FORMAT			= "yyyy/MM/dd HH:mm:ss Z";
+	private static final String			SERVICES_JSON_KEY	= "services";
 
 	// API clients
-	private CloudsdaleApiClient	cloudsdaleApi;
+	private CloudsdaleApiClient			cloudsdaleApi;
 
 	// objects
-	private Gson				mJsonDeserializer;
+	private Gson						mJsonDeserializer;
 	@StringRes(R.string.config_url)
-	String						configUrl;
+	String								configUrl;
 	@StringRes(R.string.facebook_app_key_debug)
-	String						facebookDebugKey;
+	String								facebookDebugKey;
 	@StringRes(R.string.facebook_app_key)
-	String						facebookKey;
+	String								facebookKey;
 	@Getter
-	private JsonObject			mConfig;
+	private JsonObject					mConfig;
+	private RemoteConfigurationListener	configListener;
+	private ConfigurationTask			configTask;
 
 	// Managers
 	@SystemService
-	ConnectivityManager			connectivityManager;
+	ConnectivityManager					connectivityManager;
 	@Getter
-	private DataStore<Cloud>	cloudDataStore;
+	private DataStore<Cloud>			cloudDataStore;
 	@Getter
-	private DataStore<User>		userDataStore;
+	private DataStore<User>				userDataStore;
 
 	@Override
 	public void onCreate() {
@@ -162,12 +165,15 @@ public class Cloudsdale extends Application {
 	}
 
 	public void configure(final RemoteConfigurationListener configListener) {
+
+		this.configListener = configListener;
+
 		cloudsdaleApi.getRemoteConfiguration(configUrl,
 				new AsyncHttpClient.JSONObjectCallback() {
 
 					@Override
 					public void onCompleted(Exception e,
-							AsyncHttpResponse source, JSONObject result) {
+							AsyncHttpResponse source, final JSONObject result) {
 						if (e != null) {
 							// TODO Handle exception
 							if (isDebuggable()) {
@@ -177,27 +183,18 @@ public class Cloudsdale extends Application {
 							configListener.onConfigurationFailed(e, result);
 							return;
 						} else {
-							mConfig = new JsonParser().parse(result.toString())
-									.getAsJsonObject();
-							try {
-								configureApiServices(mConfig
-										.getAsJsonArray(SERVICES_JSON_KEY));
-								configListener.onConfigurationSucceeded(200,
-										null);
-								return;
-							} catch (JSONException e1) {
-								// TODO Auto-generated catch block
-								if (isDebuggable()) {
-									Log.e(TAG, "Error during configure request");
-									e1.printStackTrace();
-								}
-								configListener
-										.onConfigurationFailed(e1, result);
-								return;
-							}
+							configTask = new ConfigurationTask();
+							configTask.execute(result.toString());
 						}
 					}
 				});
+	}
+
+	public void stopConfiguration() {
+		if (configTask != null) {
+			configTask.cancel(true);
+			configTask = null;
+		}
 	}
 
 	/**
@@ -220,6 +217,43 @@ public class Cloudsdale extends Application {
 			} else if (id.equals("derpibooru")) {
 				// TODO Configure Derpibooru
 			}
+		}
+	}
+
+	class ConfigurationTask extends AsyncTask<String, Void, Void> {
+
+		private JSONObject	rawResult;
+
+		@Override
+		protected Void doInBackground(String... params) {
+			try {
+				rawResult = new JSONObject(params[0]);
+				mConfig = new JsonParser().parse(params[0]).getAsJsonObject();
+				val services = mConfig.getAsJsonArray(SERVICES_JSON_KEY);
+				configureApiServices(services);
+			} catch (JSONException e) {
+				if (isDebuggable()) {
+					Log.e(TAG, "Error during configure request");
+					e.printStackTrace();
+				}
+				cancel(true);
+			}
+			return null;
+		}
+
+		@Override
+		protected void onCancelled() {
+			if (configListener != null) {
+				configListener.onConfigurationFailed(null, null);
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			if (configListener != null) {
+				configListener.onConfigurationSucceeded(200, rawResult);
+			}
+			super.onPostExecute(result);
 		}
 	}
 

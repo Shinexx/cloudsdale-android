@@ -134,6 +134,8 @@ public class DataStore<T extends IdentityModel> {
 	 * @return A {@link Cloud} if one is cached, null otherwise
 	 */
 	public T get(String id) {
+		if(cache.size() == 0)
+			return null;
 		LOCK.readLock().lock();
 		val returnVal = cache.get(id);
 		LOCK.readLock().unlock();

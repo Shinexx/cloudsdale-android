@@ -1,5 +1,6 @@
 package org.cloudsdale.android.ui.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.format.DateFormat;
@@ -28,7 +29,9 @@ import org.cloudsdale.android.ui.widget.NowLayout;
 @EFragment(R.layout.fragment_home)
 public class HomeFragment extends Fragment {
 
-	private static final String	TAG	= "Home Fragment";
+	public static final String	SHOULD_INFLATE_CARDS_BUNDLE_KEY	= "shouldInflateCards";
+
+	private static final String	TAG								= "Home Fragment";
 
 	@App
 	Cloudsdale					cloudsdale;
@@ -46,8 +49,17 @@ public class HomeFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 	}
 	
-	public void inflateHomeCards(User... users) {
-		LayoutInflater inflater = LayoutInflater.from(getActivity());
+	@Override
+	public void onAttach(Activity activity) {
+		Bundle args = getArguments();
+		if (args != null && args.getBoolean(SHOULD_INFLATE_CARDS_BUNDLE_KEY)) {
+			inflateHomeCards(activity, cloudsdale.getLoggedInUser());
+		}
+		super.onAttach(activity);
+	}
+
+	public void inflateHomeCards(Activity activity, User... users) {
+		LayoutInflater inflater = LayoutInflater.from(activity);
 		aQuery.id(loginProgress).gone();
 		aQuery.id(profileCards).visible();
 		for (User u : users) {
@@ -70,5 +82,9 @@ public class HomeFragment extends Fragment {
 			aQuery.id(R.id.home_card_quickbadge).image(
 					u.getAvatar().getNormal());
 		}
+	}
+
+	public void inflateHomeCards(User... users) {
+		inflateHomeCards(getActivity(), users);
 	}
 }

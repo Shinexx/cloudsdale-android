@@ -11,6 +11,7 @@ import com.androidquery.AQuery;
 import com.bugsense.trace.BugSenseHandler;
 import com.googlecode.androidannotations.annotations.App;
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.koushikdutta.async.http.AsyncHttpClient;
@@ -32,6 +33,8 @@ import org.cloudsdale.android.ui.adapters.CloudAdapter;
 import org.cloudsdale.android.ui.adapters.SlidingMenuAdapter;
 import org.cloudsdale.android.ui.fragments.AboutFragment_;
 import org.cloudsdale.android.ui.fragments.CloudFragment;
+import org.cloudsdale.android.ui.fragments.CloudFragment_;
+import org.cloudsdale.android.ui.fragments.HomeFragment;
 import org.cloudsdale.android.ui.fragments.HomeFragment_;
 import org.cloudsdale.android.ui.fragments.LoginFragment_;
 import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
@@ -43,6 +46,7 @@ import org.json.JSONObject;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.val;
 
@@ -78,8 +82,10 @@ public class CloudsdaleActivity extends Activity implements
 	private SlidingMenu									slidingMenu;
 	private boolean										isOnTablet;
 	private AQuery										aQuery;
-	private Map<String, SoftReference<CloudFragment>>	cloudFragments;
+	private Map<String, SoftReference<CloudFragment_>>	cloudFragments;
 	private CloudFragment								currentCloud;
+	AtomicBoolean										isShowing			= new AtomicBoolean(
+																					false);
 
 	// Injected resources
 	@App
@@ -98,7 +104,7 @@ public class CloudsdaleActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		BugSenseHandler.initAndStartSession(this, bugsenseApiKey);
 		aQuery = new AQuery(this);
-		cloudFragments = new HashMap<String, SoftReference<CloudFragment>>();
+		cloudFragments = new HashMap<String, SoftReference<CloudFragment_>>();
 
 		isOnTablet = findViewById(R.id.tablet_menu) != null;
 		generateFragments();
@@ -120,36 +126,41 @@ public class CloudsdaleActivity extends Activity implements
 	}
 
 	@Override
+	protected void onResume() {
+		isShowing.set(true);
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		isShowing.set(false);
+		super.onPause();
+	}
+
+	@Override
 	protected void onDestroy() {
 		slidingFragment.setCallback(null);
+		cloudsdale.stopConfiguration();
 		super.onDestroy();
 	}
 
 	@Override
 	public void listItemClicked(String id, Class<?> clazz) {
+		if (!isShowing.get()) return;
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
 		if (clazz == StaticNavigation.class) {
+			Bundle args = new Bundle();
 			if (id.equals("home")) {
 				ft.replace(R.id.content_frame, homeFragment);
+				args.putBoolean(HomeFragment.SHOULD_INFLATE_CARDS_BUNDLE_KEY,
+						true);
+				homeFragment.setArguments(args);
 			} else if (id.equals("about")) {
 				ft.replace(R.id.content_frame, aboutFragment);
 			}
 		} else if (clazz == Cloud.class) {
-			CloudFragment replaceFrag;
-			if (!cloudFragments.containsKey(id)
-					|| cloudFragments.get(id).get() == null) {
-				replaceFrag = new CloudFragment();
-				cloudFragments.put(id, new SoftReference<CloudFragment>(
-						replaceFrag));
-			} else {
-				replaceFrag = cloudFragments.get(id).get();
-			}
-			Bundle args = new Bundle();
-			args.putString(CloudFragment.BUNDLE_CLOUD_ID, id);
-			replaceFrag.setArguments(args);
-			currentCloud = replaceFrag;
-			ft.replace(R.id.content_frame, currentCloud);
+			replaceCloudFragment(id, ft);
 		}
 		ft.commit();
 	}
@@ -164,7 +175,9 @@ public class CloudsdaleActivity extends Activity implements
 	}
 
 	@Override
+	@UiThread
 	public void onLoginCompleted() {
+		if (!isShowing.get()) return;
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
 		ft.remove(loginFragment);
@@ -173,20 +186,24 @@ public class CloudsdaleActivity extends Activity implements
 	}
 
 	@Override
+	@UiThread
 	public void onLoginFailed() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
+	@UiThread
 	public void onConfigurationFailed(Throwable error, JSONObject response) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
+	@UiThread
 	public void onConfigurationSucceeded(int statusCode,
 			JSONObject configuration) {
+		if (!isShowing.get()) return;
 		aQuery.id(placeholderView).gone();
 		if (DataStore.getActiveAccount() == null
 				&& DataStore.getAccounts().length <= 0) {
@@ -259,6 +276,8 @@ public class CloudsdaleActivity extends Activity implements
 													SessionResponse.class);
 									Session session = response.getResult();
 									DataStore.storeAccount(session);
+									cloudsdale.getUserDataStore().store(
+											session.getUser());
 									homeFragment.inflateHomeCards(session
 											.getUser());
 									refreshSlidingMenuClouds(session.getUser());
@@ -274,6 +293,25 @@ public class CloudsdaleActivity extends Activity implements
 				Log.d(TAG, "No session renewal required, inflating home view");
 			}
 			homeFragment.inflateHomeCards(cloudsdale.getLoggedInUser());
+		}
+	}
+
+	private void replaceCloudFragment(String id, FragmentTransaction ft) {
+		CloudFragment_ replaceFrag;
+		if (!cloudFragments.containsKey(id)
+				|| cloudFragments.get(id).get() == null) {
+			replaceFrag = new CloudFragment_();
+			cloudFragments.put(id, new SoftReference<CloudFragment_>(
+					replaceFrag));
+		} else {
+			replaceFrag = cloudFragments.get(id).get();
+		}
+		if (!replaceFrag.equals(currentCloud)) {
+			Bundle args = new Bundle();
+			args.putString(CloudFragment.BUNDLE_CLOUD_ID, id);
+			replaceFrag.setArguments(args);
+			currentCloud = replaceFrag;
+			ft.replace(R.id.content_frame, currentCloud);
 		}
 	}
 }
