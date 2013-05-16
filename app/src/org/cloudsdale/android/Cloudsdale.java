@@ -1,7 +1,9 @@
 package org.cloudsdale.android;
 
+import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -22,7 +24,6 @@ import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
 import org.cloudsdale.android.network.CloudsdaleApiClient;
 import org.codeweaver.remoteconfiguredhttpclient.RemoteConfigurationListener;
-import org.holoeverywhere.app.Application;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -98,7 +99,7 @@ public class Cloudsdale extends Application {
 	}
 
 	public boolean hasInternetConnection() {
-		val activeNetInfo = connectivityManager.getActiveNetworkInfo();
+		NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
 		if (activeNetInfo == null) {
 			return false;
 		} else {
@@ -160,7 +161,7 @@ public class Cloudsdale extends Application {
 	 * @return The cached logged in user
 	 */
 	public User getLoggedInUser() {
-		val id = DataStore.getActiveAccountID();
+		String id = DataStore.getActiveAccountID();
 		return userDataStore.get(id);
 	}
 
@@ -206,8 +207,8 @@ public class Cloudsdale extends Application {
 	 */
 	private void configureApiServices(JsonArray services) throws JSONException {
 		for (JsonElement element : services) {
-			val obj = new JSONObject(element.toString());
-			val id = obj.optString("id");
+			JSONObject obj = new JSONObject(element.toString());
+			String id = obj.optString("id");
 			if (id.equals("cloudsdale")) {
 				cloudsdaleApi.configure(obj);
 			} else if (id.equals("cloudsdale-faye")) {
@@ -229,7 +230,7 @@ public class Cloudsdale extends Application {
 			try {
 				rawResult = new JSONObject(params[0]);
 				mConfig = new JsonParser().parse(params[0]).getAsJsonObject();
-				val services = mConfig.getAsJsonArray(SERVICES_JSON_KEY);
+				JsonArray services = mConfig.getAsJsonArray(SERVICES_JSON_KEY);
 				configureApiServices(services);
 			} catch (JSONException e) {
 				if (isDebuggable()) {

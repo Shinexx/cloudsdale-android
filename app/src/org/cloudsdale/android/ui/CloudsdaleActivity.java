@@ -1,6 +1,7 @@
 package org.cloudsdale.android.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -39,7 +40,6 @@ import org.cloudsdale.android.ui.fragments.HomeFragment_;
 import org.cloudsdale.android.ui.fragments.LoginFragment_;
 import org.cloudsdale.android.ui.fragments.SlidingMenuFragment;
 import org.codeweaver.remoteconfiguredhttpclient.RemoteConfigurationListener;
-import org.holoeverywhere.app.Activity;
 import org.json.JSONException;
 import org.json.JSONObject;
 

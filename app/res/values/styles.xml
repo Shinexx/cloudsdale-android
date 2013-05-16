@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Theme.CloudsdaleLight" parent="Holo.Theme.Light.DarkActionBar"></style>
+    <style name="Theme.CloudsdaleLight" parent="android:Theme.Holo.Light.DarkActionBar"></style>
 
-    <style name="Theme.CloudsdaleDark" parent="Holo.Theme"></style>
+    <style name="Theme.CloudsdaleDark" parent="android:Theme.Holo"></style>
 
     <style name="LoginFormContainer">
         <item name="android:layout_width">match_parent</item>
