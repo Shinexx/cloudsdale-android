@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Holo.Theme"
+    style="@android:style/Theme.Holo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
     <ListView
         android:id="@android:id/list"
-        style="@style/Holo.ListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@drawable/list_divider_holo_dark" />
+        android:divider="@android:drawable/divider_horizontal_dark" />
 
     <ProgressBar
         android:id="@android:id/empty"

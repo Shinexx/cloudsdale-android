@@ -6,13 +6,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
-import org.holoeverywhere.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;

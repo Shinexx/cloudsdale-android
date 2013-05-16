@@ -3,6 +3,7 @@ package org.cloudsdale.android.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -58,7 +59,7 @@ import lombok.val;
  * 
  */
 @EActivity(R.layout.activity_base)
-public class CloudsdaleActivity extends Activity implements
+public class CloudsdaleActivity extends FragmentActivity implements
 		SlidingMenuFragment.ISlidingMenuFragmentCallbacks, ActivityCallbacks,
 		RemoteConfigurationListener {
 
@@ -67,7 +68,7 @@ public class CloudsdaleActivity extends Activity implements
 	@SuppressLint("ResourceAsColor")
 	public static final Style							INFINITE			= new Style.Builder()
 																					.setBackgroundColor(
-																							R.color.holo_red_light)
+																							android.R.color.holo_red_light)
 																					.setDuration(
 																							Style.DURATION_INFINITE)
 																					.build();

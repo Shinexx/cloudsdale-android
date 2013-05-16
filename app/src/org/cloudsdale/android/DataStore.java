@@ -92,7 +92,7 @@ public class DataStore<T extends IdentityModel> {
 	 * @return An array of String IDs for all persisted accounts
 	 */
 	public static String[] getAccountIds() {
-		val accounts = getAccounts();
+		Account[] accounts = getAccounts();
 		String[] ids = new String[accounts.length];
 		for (int i = 0; i < accounts.length; i++) {
 			ids[i] = accountManager.getUserData(accounts[i],
