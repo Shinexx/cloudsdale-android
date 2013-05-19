@@ -2,15 +2,10 @@ package org.cloudsdale.android.models.api;
 
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.cloudsdale.android.models.Model;
 
 import com.google.gson.annotations.SerializedName;
 
-@Data
-@EqualsAndHashCode(callSuper=false)
 public class Message extends Model {
 
 	private Date		timestamp;
@@ -22,4 +17,59 @@ public class Message extends Model {
 	private String		authorId;
 	private Drop[]		drops;
 
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public String[] getUrls() {
+        return urls;
+    }
+
+    public void setUrls(String[] urls) {
+        this.urls = urls;
+    }
+
+    public String getDevice() {
+        return device;
+    }
+
+    public void setDevice(String device) {
+        this.device = device;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
+    }
+
+    public Drop[] getDrops() {
+        return drops;
+    }
+
+    public void setDrops(Drop[] drops) {
+        this.drops = drops;
+    }
 }

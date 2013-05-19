@@ -11,10 +11,6 @@ import org.cloudsdale.android.models.api.User;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.val;
-
 /**
  * Data storage class, utilizing LRU caches of users and clouds, as well as
  * managing account persistence via the Android account mechanism<br>
@@ -34,9 +30,7 @@ public class DataStore<T extends IdentityModel> {
 	protected static final String				KEY_USER_ACCOUNT_ID	= "id";
 
 	protected static AccountManager				accountManager;
-	@Getter
-	@Setter
-	protected static Account					activeAccount;
+    protected static Account					activeAccount;
 	protected static String						accountType;
 
 	protected Cloudsdale						cloudsdale;
@@ -52,6 +46,14 @@ public class DataStore<T extends IdentityModel> {
 		accountType = this.cloudsdale.getString(R.string.account_type);
 
 	}
+
+    public static Account getActiveAccount() {
+        return activeAccount;
+    }
+
+    public static void setActiveAccount(Account activeAccount) {
+        DataStore.activeAccount = activeAccount;
+    }
 
 	/**
 	 * Persists an account to the system, based on the user in a given session
@@ -137,7 +139,7 @@ public class DataStore<T extends IdentityModel> {
 		if(cache.size() == 0)
 			return null;
 		LOCK.readLock().lock();
-		val returnVal = cache.get(id);
+		T returnVal = cache.get(id);
 		LOCK.readLock().unlock();
 		return returnVal;
 	}

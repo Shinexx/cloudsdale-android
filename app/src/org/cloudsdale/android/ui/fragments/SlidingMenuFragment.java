@@ -12,14 +12,15 @@ import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.ui.StaticNavigation;
 import org.cloudsdale.android.ui.adapters.SlidingMenuAdapter;
 
-import lombok.Setter;
-
 public class SlidingMenuFragment extends ListFragment {
 
-	@Setter
 	private ISlidingMenuFragmentCallbacks	callback;
 
-	public static interface ISlidingMenuFragmentCallbacks {
+    public void setCallback(ISlidingMenuFragmentCallbacks callback) {
+        this.callback = callback;
+    }
+
+    public static interface ISlidingMenuFragmentCallbacks {
 		public void listItemClicked(String id, Class<?> clazz);
 	}
 

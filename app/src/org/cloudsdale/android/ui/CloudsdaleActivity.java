@@ -1,7 +1,6 @@
 package org.cloudsdale.android.ui;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -16,9 +15,9 @@ import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.googlecode.androidannotations.annotations.res.StringRes;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpResponse;
-import com.slidingmenu.lib.SlidingMenu;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -46,10 +45,9 @@ import org.json.JSONObject;
 
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import lombok.val;
 
 /**
  * Base activity to do core setup. <br/>
@@ -69,8 +67,6 @@ public class CloudsdaleActivity extends FragmentActivity implements
 	public static final Style							INFINITE			= new Style.Builder()
 																					.setBackgroundColor(
 																							android.R.color.holo_red_light)
-																					.setDuration(
-																							Style.DURATION_INFINITE)
 																					.build();
 
 	private static final String							TAG					= "Cloudsdale Activity";
@@ -230,7 +226,7 @@ public class CloudsdaleActivity extends FragmentActivity implements
 	}
 
 	private void generateSlidingMenu() {
-		getSupportActionBar().setHomeButtonEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
 		slidingMenu = new SlidingMenu(this);
 		slidingMenu.setMode(SlidingMenu.LEFT);
 		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
@@ -250,7 +246,7 @@ public class CloudsdaleActivity extends FragmentActivity implements
 		SlidingMenuAdapter adapter = (SlidingMenuAdapter) slidingFragment
 				.getListAdapter();
 		CloudAdapter cloudsAdapter = adapter.getCloudAdapter();
-		val clouds = user.getClouds();
+		List<Cloud> clouds = user.getClouds();
 		cloudsAdapter.addCloud(clouds.toArray(new Cloud[clouds.size()]));
 	}
 

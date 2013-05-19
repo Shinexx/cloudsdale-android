@@ -27,8 +27,6 @@ import org.codeweaver.remoteconfiguredhttpclient.RemoteConfigurationListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import lombok.Getter;
-import lombok.val;
 
 /**
  * Global application class
@@ -58,7 +56,6 @@ public class Cloudsdale extends Application {
 	String								facebookDebugKey;
 	@StringRes(R.string.facebook_app_key)
 	String								facebookKey;
-	@Getter
 	private JsonObject					mConfig;
 	private RemoteConfigurationListener	configListener;
 	private ConfigurationTask			configTask;
@@ -66,9 +63,7 @@ public class Cloudsdale extends Application {
 	// Managers
 	@SystemService
 	ConnectivityManager					connectivityManager;
-	@Getter
 	private DataStore<Cloud>			cloudDataStore;
-	@Getter
 	private DataStore<User>				userDataStore;
 
 	@Override
@@ -78,6 +73,14 @@ public class Cloudsdale extends Application {
 		cloudsdaleApi = new CloudsdaleApiClient(this);
 		super.onCreate();
 	}
+
+    public DataStore<Cloud> getCloudDataStore() {
+        return cloudDataStore;
+    }
+
+    public DataStore<User> getUserDataStore() {
+        return userDataStore;
+    }
 
 	/**
 	 * Determines if the application is currently debuggable.

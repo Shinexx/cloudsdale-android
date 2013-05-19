@@ -4,14 +4,24 @@ import org.cloudsdale.android.models.api.Ban;
 
 import java.util.ArrayList;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class BanResponse extends Response {
 
 	private Ban result;
 	private ArrayList<Ban> results;
-	
+
+    public Ban getResult() {
+        return result;
+    }
+
+    public void setResult(Ban result) {
+        this.result = result;
+    }
+
+    public ArrayList<Ban> getResults() {
+        return results;
+    }
+
+    public void setResults(ArrayList<Ban> results) {
+        this.results = results;
+    }
 }
