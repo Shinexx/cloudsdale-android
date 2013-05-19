@@ -1,33 +1,15 @@
 [submodule "submodules/Faye-Android"]
 	path = submodules/Faye-Android
 	url = git@github.com:IOMUSE/Faye-Android.git
-[submodule "submodules/HoloEverywhere"]
-	path = submodules/HoloEverywhere
-	url = git@github.com:ChristopheVersieux/HoloEverywhere.git
 [submodule "submodules/SlidingMenu"]
 	path = submodules/SlidingMenu
 	url = git@github.com:jfeinstein10/SlidingMenu.git
 [submodule "submodules/UrlImageViewHelper"]
 	path = submodules/UrlImageViewHelper
 	url = git@github.com:koush/UrlImageViewHelper.git
-[submodule "submodules/facebook-android-sdk"]
-	path = submodules/facebook-android-sdk
-	url = git@github.com:facebook/facebook-android-sdk.git
 [submodule "submodules/Crouton"]
 	path = submodules/Crouton
 	url = git@github.com:keyboardsurfer/Crouton.git
 [submodule "submodules/cwac-merge"]
 	path = submodules/cwac-merge
 	url = git@github.com:commonsguy/cwac-merge.git
-[submodule "submodules/androidquery"]
-	path = submodules/androidquery
-	url = git@github.com:androidquery/androidquery.git
-[submodule "submodules/ShowcaseView"]
-	path = submodules/ShowcaseView
-	url = git://github.com/Espiandev/ShowcaseView.git
-[submodule "submodules/cardsui-for-android"]
-	path = submodules/cardsui-for-android
-	url = git://github.com/nadavfima/cardsui-for-android.git
-[submodule "submodules/android-remote-configured-httpclient"]
-	path = submodules/android-remote-configured-httpclient
-	url = git@github.com:berwyn/android-remote-configured-httpclient.git
