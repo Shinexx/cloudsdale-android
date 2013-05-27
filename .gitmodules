@@ -1,15 +1,3 @@
 [submodule "submodules/Faye-Android"]
 	path = submodules/Faye-Android
 	url = git@github.com:IOMUSE/Faye-Android.git
-[submodule "submodules/SlidingMenu"]
-	path = submodules/SlidingMenu
-	url = git@github.com:jfeinstein10/SlidingMenu.git
-[submodule "submodules/UrlImageViewHelper"]
-	path = submodules/UrlImageViewHelper
-	url = git@github.com:koush/UrlImageViewHelper.git
-[submodule "submodules/Crouton"]
-	path = submodules/Crouton
-	url = git@github.com:keyboardsurfer/Crouton.git
-[submodule "submodules/cwac-merge"]
-	path = submodules/cwac-merge
-	url = git@github.com:commonsguy/cwac-merge.git
