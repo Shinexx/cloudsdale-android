@@ -1,0 +1,6 @@
+[submodule "app/submodules/AndroidAsync"]
+	path = app/submodules/AndroidAsync
+	url = git@github.com:koush/AndroidAsync
+[submodule "app/submodules/ion"]
+	path = app/submodules/ion
+	url = git@github.com:koush/ion
