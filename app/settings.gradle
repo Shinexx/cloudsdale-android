@@ -1,4 +1,2 @@
-include ':androidasync'
-project(':androidasync').projectDir = new File('../submodules/AndroidAsync/AndroidAsync')
-include ':ion'
-project(':ion').projectDir = new File('../submodules/ion/ion')
+include ':submodules:AndroidAsync:AndroidAsync'
+include ':submodules:ion:ion'
