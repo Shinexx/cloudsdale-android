@@ -23,6 +23,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.builder.IonBodyParamsRequestBuilder;
+import com.koushikdutta.ion.builder.IonLoadRequestBuilder;
 
 
 /**
@@ -149,5 +153,13 @@ public class Cloudsdale extends Application {
 		String id = DataStore.getActiveAccountID();
 		return userDataStore.get(id);
 	}
+
+    public static class API {
+
+        static <T> IonBodyParamsRequestBuilder Request(Context context, String resource, FutureCallback<T> callback) {
+            return null;
+        }
+
+    }
 
 }
