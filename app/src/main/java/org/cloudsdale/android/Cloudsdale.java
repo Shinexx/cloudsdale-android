@@ -7,7 +7,6 @@ import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
-import org.cloudsdale.android.network.CloudsdaleApiClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,9 +42,6 @@ public class Cloudsdale extends Application {
 	private static final String			DATE_FORMAT			= "yyyy/MM/dd HH:mm:ss Z";
 	private static final String			SERVICES_JSON_KEY	= "services";
 
-	// API clients
-	private CloudsdaleApiClient			cloudsdaleApi;
-
 	// objects
 	private Gson						mJsonDeserializer;
 	@StringRes(R.string.config_url)
@@ -55,8 +51,6 @@ public class Cloudsdale extends Application {
 	@StringRes(R.string.facebook_app_key)
 	String								facebookKey;
 	private JsonObject					mConfig;
-	private RemoteConfigurationListener	configListener;
-	private ConfigurationTask			configTask;
 
 	// Managers
 	@SystemService
@@ -68,7 +62,6 @@ public class Cloudsdale extends Application {
 	public void onCreate() {
 		cloudDataStore = new DataStore<Cloud>(this);
 		userDataStore = new DataStore<User>(this);
-		cloudsdaleApi = new CloudsdaleApiClient(this);
 		super.onCreate();
 	}
 
@@ -134,15 +127,6 @@ public class Cloudsdale extends Application {
 	}
 
 	/**
-	 * Gets the Cloudsale API client
-	 * 
-	 * @return The Cloudsdale API client in use by the application
-	 */
-	public CloudsdaleApiClient callZephyr() {
-		return cloudsdaleApi;
-	}
-
-	/**
 	 * Gets the appropriate Facebook application key depending on debuggable
 	 * mode (determined at runtime)
 	 * 
@@ -164,99 +148,6 @@ public class Cloudsdale extends Application {
 	public User getLoggedInUser() {
 		String id = DataStore.getActiveAccountID();
 		return userDataStore.get(id);
-	}
-
-	public void configure(final RemoteConfigurationListener configListener) {
-
-		this.configListener = configListener;
-
-		cloudsdaleApi.getRemoteConfiguration(configUrl,
-				new AsyncHttpClient.JSONObjectCallback() {
-
-					@Override
-					public void onCompleted(Exception e,
-							AsyncHttpResponse source, final JSONObject result) {
-						if (e != null) {
-							// TODO Handle exception
-							if (isDebuggable()) {
-								Log.e(TAG, "Error during configure request");
-								e.printStackTrace();
-							}
-							configListener.onConfigurationFailed(e, result);
-							return;
-						} else {
-							configTask = new ConfigurationTask();
-							configTask.execute(result.toString());
-						}
-					}
-				});
-	}
-
-	public void stopConfiguration() {
-		if (configTask != null) {
-			configTask.cancel(true);
-			configTask = null;
-		}
-	}
-
-	/**
-	 * Configures our remote services, given a list of services
-	 * 
-	 * @param services
-	 *            The JsonArray list of service objects
-	 * @throws JSONException
-	 */
-	private void configureApiServices(JsonArray services) throws JSONException {
-		for (JsonElement element : services) {
-			JSONObject obj = new JSONObject(element.toString());
-			String id = obj.optString("id");
-			if (id.equals("cloudsdale")) {
-				cloudsdaleApi.configure(obj);
-			} else if (id.equals("cloudsdale-faye")) {
-				// TODO Configure Faye resources
-			} else if (id.equals("my-little-face-when")) {
-				// TODO Configure MLFW
-			} else if (id.equals("derpibooru")) {
-				// TODO Configure Derpibooru
-			}
-		}
-	}
-
-	class ConfigurationTask extends AsyncTask<String, Void, Void> {
-
-		private JSONObject	rawResult;
-
-		@Override
-		protected Void doInBackground(String... params) {
-			try {
-				rawResult = new JSONObject(params[0]);
-				mConfig = new JsonParser().parse(params[0]).getAsJsonObject();
-				JsonArray services = mConfig.getAsJsonArray(SERVICES_JSON_KEY);
-				configureApiServices(services);
-			} catch (JSONException e) {
-				if (isDebuggable()) {
-					Log.e(TAG, "Error during configure request");
-					e.printStackTrace();
-				}
-				cancel(true);
-			}
-			return null;
-		}
-
-		@Override
-		protected void onCancelled() {
-			if (configListener != null) {
-				configListener.onConfigurationFailed(null, null);
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			if (configListener != null) {
-				configListener.onConfigurationSucceeded(200, rawResult);
-			}
-			super.onPostExecute(result);
-		}
 	}
 
 }
