@@ -1,28 +1,43 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url 'http://mvn.bugsense.com'
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.4.+'
-        classpath 'net.ealden.gradle.plugins:gradle-androidannotations-plugin:0.3.+'
     }
 }
+
 apply plugin: 'android'
-apply plugin: 'androidannotations'
 apply plugin: 'idea'
+
+configurations {
+    compile
+    androidannotations.extendsFrom(compile)
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://mvn.bugsense.com'
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
-    compile 'com.google.code.gson:gson:2.2.+'
-    compile 'com.koushikdutta.async:androidasync:1.0.+'
-    compile 'com.koushikdutta.ion:ion:1.0.+'
-    compile 'de.keyboardsurfer.android.widget:crouton:1.8.+'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.koushikdutta.async:androidasync:1.0.5'
+    compile ('com.koushikdutta.ion:ion:1.0.2') {
+        exclude 'ion:androidasync'
+    }
+    compile ('de.keyboardsurfer.android.widget:crouton:1.8.1') {
+        exclude 'com.google.android:support:-v4'
+    }
     compile 'com.bugsense.trace:bugsense:3.2'
-    compile 'com.googlecode.android-query:android-query:0.24.+'
+    compile 'com.googlecode.android-query:android-query:0.25.9'
     compile 'com.android.support:support-v4:13.0.0'
+    compile 'org.androidannotations.androidannotations-api:3.0-SNAPSHOT'
+    androidannotations 'org.androidannotations:androidannotations:3.0-SNAPSHOT'
 }
 
 android {
@@ -30,16 +45,17 @@ android {
     buildToolsVersion "17.0.0"
 
     sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src','.apt_generated']
-            resources.srcDirs = ['src','.apt_generated']
-            aidl.srcDirs = ['src','.apt_generated']
-            renderscript.srcDirs = ['src','.apt_generated']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
-        }
+        instrumentTest.setRoot('test')
+    }
+}
 
-        instrumentTest.setRoot('tests')
+afterEvaluate { project ->
+    android.applicationVariants.each { varient ->
+        variant.javaCompile.options.compilerArgs += [
+                '-classpath', configurations.compile.asPath,
+                '-processorpath', configurations.androidannotations.asPath,
+                '-processor', 'org.androidannotations.AndroidAnnotationProcessor',
+                '-AandroidManifestFile=', varient.processResources.manifestFile
+        ]
     }
 }
