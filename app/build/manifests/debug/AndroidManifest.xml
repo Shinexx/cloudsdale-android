@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.cloudsdale.android"
+    android:versionCode="6"
+    android:versionName="0.2.4" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="17" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+
+    <application
+        android:name="org.cloudsdale.android.Cloudsdale_"
+        android:allowBackup="true"
+        android:allowClearUserData="true"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:logo="@drawable/ic_launcher"
+        android:theme="@style/Theme.CloudsdaleLight"
+        android:vmSafeMode="true" 
+        android:hasCode="true" android:uiOptions="splitActionBarWhenNarrow" android:restoreAnyVersion="false" android:killAfterRestore="true" android:supportsRtl="false" android:enabled="true">
+
+        <!-- Google Application Backup Bridge -->
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIrMIkwMPLid-J_qJPP9ITf1qPbpL2NA3nwG56IQ" />
+
+        <!-- Activities -->
+        <activity
+            android:name="org.cloudsdale.android.ui.CloudsdaleActivity_"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Services -->
+        <service android:name="org.cloudsdale.android.account.AccountAuthenticatorService" >
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+    </application>
+
+</manifest>

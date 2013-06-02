@@ -1,5 +1,9 @@
 package org.cloudsdale.android;
 
+import org.androidannotations.annotations.EApplication;
+import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.res.StringRes;
+import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.Cloud;
 import org.cloudsdale.android.models.api.User;
 import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
@@ -20,9 +24,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.googlecode.androidannotations.annotations.EApplication;
-import com.googlecode.androidannotations.annotations.SystemService;
-import com.googlecode.androidannotations.annotations.res.StringRes;
 
 
 /**
