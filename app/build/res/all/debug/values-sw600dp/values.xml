@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <dimen name="body_width">400dp</dimen>
-    <dimen name="menu_width">200dp</dimen>
-
-    <item name="fragment_drop" type="layout">@layout/fragment_drop_grid</item>
-
-</resources>
