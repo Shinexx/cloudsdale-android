@@ -1,40 +1,27 @@
-# Cloudsdale Mobile for Android
+# ![CloudsdaleApp](https://secure.gravatar.com/avatar/006b4dec507eaac9967970a1cd967167?s=22) Cloudsdale for Android
 
-## Projects
+Cloudsdale, on the go, on your favourite Android device
 
-The pulled folder will contain the following folders:
+## Introduction
 
->- Cloudsdale Mobile (CDM)
->- Assets -- All the raw assets for the projects
->	- Gson -- JSON de/serialization module
->	- Twitter4J -- The Twitter library for Android apps
->	- jBCrypt -- Java implementaiton of the Blowfish encryption protocol
+Cloudsdale for Android is built with *Java*, *Gradle* and *Android Studio*.
 
-You will need to pull the following using Git submodules:
+## Preparing the project
 
->- Holo Everywhere (HE) -- Creates the Holo UI on all Android platforms
->- ActionBar Sherlock (ABS) -- Allows use of the ActionBar on all Android platforms
->- Facebook SDK -- Can be updated by opening it via Git
->- Faye Android library  -- Android Faye client
+1. Pull the default branch, 0.2.0 as of this writing
+2. In your terminal, issue 
 
+```bash
+git submodule init
+```
+3. Move to the `app/submodules/ion/ion` directory, and remove the `settings.gradle` file
 
-## Importing into Eclipse
+You'll need to remove the settings.gradle file each time you update Ion, which should be fairly regularly
 
-DOING THIS LATER
+## Importing the project
 
-### Setting up your device for debug
-
-On your device, go to ```System settings -> Apps```
-Check the box for ```Unknown Sources``` and enable ```ADB debugging```
-
-### Setting up an Intel Accelerated AVD (Only for ICS/JB images)
-
-Open your SDK manager, and under the "Extras" header, make sure that the "Intel Harware Accelerated Execution Manager" is either installed or maked to be installed. If it is marked to be installed, install it.
-
-After the execution manager is installed, navigate to [SDK_DIR]/extras/intel/Hardware_Accelerated_Execution_Manager/ and run the executable. Default settings should work just fine.
-
-Follow all the regular steps to create an AVD, making sure to select API level 15 (ICS) or 16 (JB), and selecting the Intel Atom option for your CPU.
-
-### Creating an AVD (Emulated Android device)
-
-Open up the AVD Manager in your SDK directory. Click "new", select your platform level, select your CPU if applicable, fill in a value for the SD card (I generally do 2048MB). From here, you can either create the AVD after naming it, or select a built-in pre-defined device from the built-in skin dropdown. Save your device, then click it's entry in the list and click start. The AVD will boot. Initial boot can take some time, so please be patient.
+1. Open Android Studio
+2. Select "Import Project"
+3. Browse to the root directory, and select it
+4. Select the Gradle model
+5. Elect to use the Gradle wrapper, and click next
