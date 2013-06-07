@@ -6,18 +6,6 @@ Cloudsdale, on the go, on your favourite Android device
 
 Cloudsdale for Android is built with *Java*, *Gradle* and *Android Studio*.
 
-## Preparing the project
-
-1. Pull the default branch, 0.2.0 as of this writing
-2. In your terminal, issue 
-
-```bash
-git submodule init
-```
-3. Move to the `app/submodules/ion/ion` directory, and remove the `settings.gradle` file
-
-You'll need to remove the settings.gradle file each time you update Ion, which should be fairly regularly
-
 ## Importing the project
 
 1. Open Android Studio
