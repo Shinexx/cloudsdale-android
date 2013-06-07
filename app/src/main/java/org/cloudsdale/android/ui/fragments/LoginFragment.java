@@ -16,25 +16,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.App;
-import com.googlecode.androidannotations.annotations.Click;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ViewById;
-import com.koushikdutta.async.http.AsyncHttpClient;
-import com.koushikdutta.async.http.AsyncHttpResponse;
+import com.koushikdutta.async.future.FutureCallback;
 
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
-
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.App;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.DataStore;
 import org.cloudsdale.android.R;
+import org.cloudsdale.android.models.api.Session;
 import org.cloudsdale.android.models.network.SessionResponse;
 import org.cloudsdale.android.ui.ActivityCallbacks;
-import org.cloudsdale.android.ui.CloudsdaleActivity;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_login)
 public class LoginFragment extends Fragment {
@@ -129,37 +126,21 @@ public class LoginFragment extends Fragment {
 			// There was an error; don't attempt login and focus the first
 			// form field with an error.
 			focusView.requestFocus();
-		} else
-			try {
-				{
-					// Show a progress spinner, and kick off a background task
-					// to
-					// perform the user login attempt.
-					loginStatusMessageView
-							.setText(R.string.login_progress_signing_in);
-					showProgress(true);
-					cloudsdale.callZephyr().postSession(email, password,
-							new AsyncHttpClient.JSONObjectCallback() {
+		} else {
+			// Show a progress spinner, and kick off a background task
+			// to
+			// perform the user login attempt.
+			loginStatusMessageView.setText(R.string.login_progress_signing_in);
+			showProgress(true);
+			cloudsdale.callZephyr().postSession(getActivity(), email, password,
+					new FutureCallback<Session>() {
 
-								@Override
-								public void onCompleted(Exception e,
-										AsyncHttpResponse source,
-										JSONObject result) {
-									boolean error = false;
-									if (e != null) {
-										error = true;
-									}
-									processSessionResponse(result.toString(),
-											error);
-									showProgress(false);
-								}
-							});
-				}
-			} catch (JSONException e) {
-				showProgress(false);
-				((CloudsdaleActivity) getActivity()).displayLoginFailCrouton(e
-						.getMessage());
-			}
+						@Override
+						public void onCompleted(Exception e, Session session) {
+							// TODO Handle login!
+						}
+					});
+		}
 	}
 
 	/**

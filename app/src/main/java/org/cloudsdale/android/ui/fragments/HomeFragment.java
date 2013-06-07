@@ -9,10 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.androidquery.AQuery;
-import com.googlecode.androidannotations.annotations.App;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ViewById;
 
+import org.androidannotations.annotations.App;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
 import org.cloudsdale.android.models.api.User;

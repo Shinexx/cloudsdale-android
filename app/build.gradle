@@ -11,8 +11,7 @@ apply plugin: 'android'
 apply plugin: 'idea'
 
 configurations {
-    compile
-    androidannotations.extendsFrom(compile)
+    apt
 }
 
 repositories {
@@ -25,15 +24,14 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile 'com.google.code.gson:gson:2.2.4'
-    compile project(':app:submodules:AndroidAsync:AndroidAsync')
-    compile project(':app:submodules:ion:ion')
+    compile 'com.koushikdutta.ion:ion:1.0.8'
     compile ('de.keyboardsurfer.android.widget:crouton:1.8.1') {
         exclude group: 'com.google.android', module: 'support-v4'
     }
     compile 'com.googlecode.android-query:android-query:0.25.9'
     compile 'com.android.support:support-v4:13.0.0'
+    apt 'org.androidannotations:androidannotations:3.0-SNAPSHOT'
     compile 'org.androidannotations:androidannotations-api:3.0-SNAPSHOT'
-    androidannotations 'org.androidannotations:androidannotations:3.0-SNAPSHOT'
 }
 
 android {
@@ -45,13 +43,14 @@ android {
     }
 }
 
-afterEvaluate { project ->
-    android.applicationVariants.each { variant ->
+android.applicationVariants.each { variant ->
+    aptOutput = file("${project.buildDir}/source/apt_generated/${variant.dirName}")
+    variant.javaCompile.doFirst {
+        aptOutput.mkdirs()
         variant.javaCompile.options.compilerArgs += [
-                '-classpath', configurations.compile.asPath,
-                '-processorpath', configurations.androidannotations.asPath,
-                '-processor', 'org.androidannotations.AndroidAnnotationProcessor',
-                '-AandroidManifestFile=' + variant.processResources.manifestFile
+                '-processorpath', configurations.apt.getAsPath(),
+                '-AandroidManifestFile=' + variant.processResources.manifestFile,
+                '-s', aptOutput
         ]
     }
 }

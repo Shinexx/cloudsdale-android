@@ -1,3 +1,1 @@
-include ':app:submodules:AndroidAsync:AndroidAsync'
-include ':app:submodules:ion:ion'
 include ':app'

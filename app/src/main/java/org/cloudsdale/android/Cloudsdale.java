@@ -1,33 +1,33 @@
 package org.cloudsdale.android;
 
-import org.androidannotations.annotations.EApplication;
-import org.androidannotations.annotations.SystemService;
-import org.androidannotations.annotations.res.StringRes;
-import org.cloudsdale.android.R;
-import org.cloudsdale.android.models.api.Cloud;
-import org.cloudsdale.android.models.api.User;
-import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.util.Log;
+import android.util.Pair;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-import com.koushikdutta.ion.builder.IonBodyParamsRequestBuilder;
-import com.koushikdutta.ion.builder.IonLoadRequestBuilder;
 
+import org.androidannotations.annotations.EApplication;
+import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.res.StringRes;
+import org.cloudsdale.android.models.api.Cloud;
+import org.cloudsdale.android.models.api.Session;
+import org.cloudsdale.android.models.api.User;
+import org.cloudsdale.android.models.network.Provider;
+import org.cloudsdale.android.models.parsers.GsonRoleAdapter;
+import org.cloudsdale.android.util.BCrypt;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Global application class
@@ -37,30 +37,31 @@ import com.koushikdutta.ion.builder.IonLoadRequestBuilder;
 @EApplication
 public class Cloudsdale extends Application {
 
-	private static final String			TAG					= "Cloudsdale";
+	private static final String	TAG					= "Cloudsdale";
 
 	// Thirty minutes
-	public static final int				AVATAR_EXPIRATION	= 30 * 60 * 1000;
+	public static final int		AVATAR_EXPIRATION	= 30 * 60 * 1000;
 	// Sixty minutes
-	public static final int				CLOUD_EXPIRATION	= 1000 * 60 * 60;
-	private static final String			DATE_FORMAT			= "yyyy/MM/dd HH:mm:ss Z";
-	private static final String			SERVICES_JSON_KEY	= "services";
+	public static final int		CLOUD_EXPIRATION	= 1000 * 60 * 60;
+	private static final String	DATE_FORMAT			= "yyyy/MM/dd HH:mm:ss Z";
+	private static final String	SERVICES_JSON_KEY	= "services";
 
 	// objects
-	private Gson						mJsonDeserializer;
+	private Gson				mJsonDeserializer;
 	@StringRes(R.string.config_url)
-	String								configUrl;
+	String						configUrl;
 	@StringRes(R.string.facebook_app_key_debug)
-	String								facebookDebugKey;
+	String						facebookDebugKey;
 	@StringRes(R.string.facebook_app_key)
-	String								facebookKey;
-	private JsonObject					mConfig;
+	String						facebookKey;
+	private JsonObject			mConfig;
+	private API					api;
 
 	// Managers
 	@SystemService
-	ConnectivityManager					connectivityManager;
-	private DataStore<Cloud>			cloudDataStore;
-	private DataStore<User>				userDataStore;
+	ConnectivityManager			connectivityManager;
+	private DataStore<Cloud>	cloudDataStore;
+	private DataStore<User>		userDataStore;
 
 	@Override
 	public void onCreate() {
@@ -69,13 +70,13 @@ public class Cloudsdale extends Application {
 		super.onCreate();
 	}
 
-    public DataStore<Cloud> getCloudDataStore() {
-        return cloudDataStore;
-    }
+	public DataStore<Cloud> getCloudDataStore() {
+		return cloudDataStore;
+	}
 
-    public DataStore<User> getUserDataStore() {
-        return userDataStore;
-    }
+	public DataStore<User> getUserDataStore() {
+		return userDataStore;
+	}
 
 	/**
 	 * Determines if the application is currently debuggable.
@@ -154,12 +155,79 @@ public class Cloudsdale extends Application {
 		return userDataStore.get(id);
 	}
 
-    public static class API {
+	public API callZephyr() {
+		if (api == null) api = new API();
+		return api;
+	}
 
-        static <T> IonBodyParamsRequestBuilder Request(Context context, String resource, FutureCallback<T> callback) {
-            return null;
+	public static class API {
+
+		private Map<String, String>	endpoints;
+
+		public void processEndpoints(JsonObject service) {
+			JsonArray endpoints = service.getAsJsonArray("endpoints");
+			for (JsonElement endpoint : endpoints) {
+				JsonObject _endpoint = endpoint.getAsJsonObject();
+				this.endpoints.put(_endpoint.get("id").getAsString(), _endpoint
+						.get("template").getAsString());
+			}
+		}
+
+		private String formatUrl(String template,
+				Set<Pair<String, String>> replacements) {
+			String stem = endpoints.get(template);
+			for (Pair<String, String> replacement : replacements) {
+				stem = stem.replace("{" + replacement.first + "}",
+						replacement.second);
+			}
+			return stem;
+		}
+
+		private <T> Future<T> get(Context context, String url,
+				FutureCallback<T> callback) {
+			return Ion.with(context, url).as(new TypeToken<T>() {
+			}).setCallback(callback);
+		}
+
+		public <T> Future<T> get(Context context, String template,
+				Set<Pair<String, String>> replacements,
+				FutureCallback<T> callback) {
+			String stem = formatUrl(template, replacements);
+			return get(context, stem, callback);
+		}
+
+		private <T> Future<T> post(Context context, String url,
+				JsonObject body, FutureCallback<T> callback) {
+			return Ion.with(context, url).setJsonObjectBody(body)
+					.as(new TypeToken<T>() {
+					}).setCallback(callback);
+		}
+
+		public <T> Future<T> post(Context context, String template,
+				Set<Pair<String, String>> replacements, JsonObject body,
+				FutureCallback<T> callback) {
+			String stem = formatUrl(template, replacements);
+			return post(context, stem, body, callback);
+		}
+
+        public Future<Session> postSession(Context context, String email, String password, FutureCallback<Session> callback) {
+            JsonObject body = new JsonObject();
+            body.addProperty("email", email);
+            body.addProperty("password", password);
+            return post(context, "sessions", null, body, callback);
         }
 
-    }
+        public Future<Session> postSession(Context context, Provider oAuthProvider, String oAuthId, String internalToken, FutureCallback<Session> callback) {
+            JsonObject body = new JsonObject();
+            JsonObject payload = new JsonObject();
+            payload.addProperty("cli_type", "android");
+            payload.addProperty("provider", oAuthProvider.toString());
+            payload.addProperty("uid", oAuthId);
+            payload.addProperty("token", BCrypt.hashpw(oAuthId + oAuthProvider.toString(), internalToken));
+            body.add("oauth", payload);
+            return post(context, "sessions", null, body, callback);
+        }
+
+	}
 
 }

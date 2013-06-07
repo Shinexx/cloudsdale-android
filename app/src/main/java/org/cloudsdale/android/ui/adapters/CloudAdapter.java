@@ -8,7 +8,7 @@ import android.widget.ImageView;
 
 import android.widget.TextView;
 import com.androidquery.AQuery;
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+import com.koushikdutta.ion.Ion;
 
 import org.cloudsdale.android.Cloudsdale;
 import org.cloudsdale.android.R;
@@ -66,9 +66,9 @@ public class CloudAdapter extends BaseAdapter {
 				.findViewById(R.id.sliding_menu_item_icon);
 
 		tv.setText(getItem(position).getName());
-		UrlImageViewHelper.setUrlDrawable(iv, getItem(position).getAvatar()
-				.getNormal(), R.drawable.ic_unknown_user,
-				Cloudsdale.CLOUD_EXPIRATION);
+        Ion.with(iv)
+                .placeholder(R.drawable.ic_unknown_user)
+                .load(getItem(position).getAvatar().getNormal());
 
 		return view;
 	}
