@@ -33,5 +33,11 @@ proguard/
 *.iws
 .idea/
 
-# FUSE hidden files
+# hidden files
 .fuse_hidden*
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
