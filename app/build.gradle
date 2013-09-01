@@ -24,7 +24,6 @@ android {
 }
 
 dependencies {
-    compile 'org.cloudsdale:cloudsdale-java:1.0-SNAPSHOT'
     compile 'com.google.code.gson:gson:2.2.+'
     compile 'com.squareup.picasso:picasso:2.0.+'
     compile 'com.jakewharton:butterknife:2.0.+'

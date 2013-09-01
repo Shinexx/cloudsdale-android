@@ -7,13 +7,9 @@ import org.cloudsdale.responses.v1.CloudResponse;
 import org.cloudsdale.responses.v1.DropResponse;
 import org.cloudsdale.responses.v1.UserResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import retrofit.Callback;
-import retrofit.RequestHeaders;
+import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
-import retrofit.client.Header;
 import retrofit.converter.GsonConverter;
 import retrofit.http.*;
 import retrofit.mime.TypedFile;
@@ -137,25 +133,17 @@ public interface V1 {
         public V1 build(final String internalToken) {
             Gson gson = new GsonBuilder()
                     .setDateFormat("yyyy/MM/dd HH:mm:ss Z").create();
-            RequestHeaders headers = new RequestHeaders() {
-
-                private List<Header> headers = new ArrayList<Header>() {
-                    {
-                        new Header("X-Auth-Token", internalToken);
-                        new Header("Content-Type", "application/json");
-                        new Header("Accept", "application/json");
-                    }
-                };
-
-                @Override
-                public List<Header> get() {
-                    return headers;
+            RequestInterceptor interceptor = new RequestInterceptor() {
+                public void intercept(RequestFacade requestFacade) {
+                    requestFacade.addHeader("X-Auth-Token", internalToken);
+                    requestFacade.addHeader("Content-Type", "application/json");
+                    requestFacade.addHeader("Accpet", "application/json");
                 }
             };
             return new RestAdapter.Builder()//
                     .setConverter(new GsonConverter(gson))//
                     .setServer(BASE_URL)//
-                    .setRequestHeaders(headers)//
+                    .setRequestInterceptor(interceptor)//
                     .build()//
                     .create(V1.class);
         }

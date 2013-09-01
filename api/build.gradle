@@ -1,0 +1,12 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.code.gson:gson:2.2.+'
+    compile 'com.squareup.okhttp:okhttp:1.2.+'
+    compile 'com.squareup.retrofit:retrofit:1.2.+'
+    testCompile 'org.mockito:mockito-all:1.9.+'
+}
