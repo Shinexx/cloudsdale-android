@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    
-    <string name="fragment_cloud_header">Clouds</string>
-    <string name="chat_fragment_header">Chat</string>
-    <string name="drop_fragment_header">Drops</string>
-    
-</resources>

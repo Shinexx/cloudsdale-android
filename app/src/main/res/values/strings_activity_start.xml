@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="config_error_message">Cloudsdale wasn\'t able to connect to the internet. Please try again in a few minutes</string>
-    <string name="config_error_title">Critical error</string>
-
-</resources>
