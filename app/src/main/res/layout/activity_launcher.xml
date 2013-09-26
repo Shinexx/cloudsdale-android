@@ -12,4 +12,40 @@
         android:layout_gravity="center"
         android:src="@drawable/loading_animation"/>
 
+    <LinearLayout
+        android:id="@+id/login_form"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#aaffffff"
+        android:layout_gravity="center"
+        android:visibility="visible">
+
+        <EditText
+            android:id="@+id/login_email"
+            style="@style/Theme.Cloudsdale.LoginFormElement"
+            android:hint="Username or email address" />
+
+        <EditText
+            android:id="@+id/login_password"
+            style="@style/Theme.Cloudsdale.LoginFormElement"
+            android:inputType="textPassword"
+            android:hint="Password" />
+
+        <Button
+            android:id="@+id/login_submit"
+            style="@style/Theme.Cloudsdale.LoginFormElement"
+            android:text="Login"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/login_register"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#aa000000"
+        android:text="Need an account?"
+        android:textColor="#ffffff"
+        android:layout_gravity="bottom"/>
+
 </FrameLayout>

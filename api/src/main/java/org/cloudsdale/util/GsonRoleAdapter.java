@@ -4,7 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.cloudsdale.models.v1.User;
+import org.cloudsdale.model.v1.User;
 
 import java.lang.reflect.Type;
 

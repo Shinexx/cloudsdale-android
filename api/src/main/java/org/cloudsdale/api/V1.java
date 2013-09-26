@@ -3,9 +3,9 @@ package org.cloudsdale.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.cloudsdale.responses.v1.CloudResponse;
-import org.cloudsdale.responses.v1.DropResponse;
-import org.cloudsdale.responses.v1.UserResponse;
+import org.cloudsdale.response.v1.CloudResponse;
+import org.cloudsdale.response.v1.DropResponse;
+import org.cloudsdale.response.v1.UserResponse;
 
 import retrofit.Callback;
 import retrofit.RequestInterceptor;
