@@ -8,6 +8,12 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.+'
     compile 'com.squareup.okhttp:okhttp:1.2.+'
     compile 'com.squareup.retrofit:retrofit:1.2.+'
-    compile 'org.projectlombok:lombok:0.12.0'
     testCompile 'org.mockito:mockito-all:1.9.+'
+    testCompile 'junit:junit:4.11'
+}
+
+test {
+    testLogging {
+        events "standardOut"
+    }
 }

@@ -1,4 +1,4 @@
-package org.cloudsdale.api;
+package org.cloudsdale.api.v1;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,7 +22,7 @@ import retrofit.mime.TypedFile;
  * @see <a href="https://dev.cloudsdale.org/">Developer Documentation</a>
  */
 @Deprecated
-public interface V1 {
+public interface Cloudsdale {
 
     String BASE_URL = "https://www.cloudsdale.org/v1";
 
@@ -130,7 +130,7 @@ public interface V1 {
 
     public class Builder {
 
-        public V1 build(final String internalToken) {
+        public Cloudsdale build(final String internalToken) {
             Gson gson = new GsonBuilder()
                     .setDateFormat("yyyy/MM/dd HH:mm:ss Z").create();
             RequestInterceptor interceptor = new RequestInterceptor() {
@@ -145,7 +145,7 @@ public interface V1 {
                     .setServer(BASE_URL)//
                     .setRequestInterceptor(interceptor)//
                     .build()//
-                    .create(V1.class);
+                    .create(Cloudsdale.class);
         }
     }
 }

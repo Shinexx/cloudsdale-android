@@ -1,11 +1,11 @@
-package org.cloudsdale.test.api;
+package org.cloudsdale.test.api.v1;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
 import junit.framework.TestCase;
 
-import org.cloudsdale.api.V1;
+import org.cloudsdale.api.v1.Cloudsdale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +30,7 @@ public class RetrofitTest extends TestCase {
 	private static final String	DEBUG_USER_ID			= "awesome user id";
 	private static final String	DEBUG_CLOUD_SHORTNAME	= "awesome cloud id";
 
-	private V1 cloudsale;
+	private Cloudsdale cloudsale;
 	private Client				mockClient;
 	private Profiler<Object>	mockProfiler;
 
@@ -41,7 +41,7 @@ public class RetrofitTest extends TestCase {
 		cloudsale = new RestAdapter.Builder().setClient(mockClient)
 				.setProfiler(mockProfiler)
 				.setServer("https://www.cloudsdale.org").build()
-				.create(V1.class);
+				.create(Cloudsdale.class);
 	}
 
 	@Test

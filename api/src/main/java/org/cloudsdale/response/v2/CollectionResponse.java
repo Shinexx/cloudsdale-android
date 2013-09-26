@@ -1,30 +1,43 @@
 package org.cloudsdale.response.v2;
 
-import lombok.Data;
-
 /**
  * Created by tyr on 25/09/2013.
  */
-@Data
 public abstract class CollectionResponse {
 
     private Collection collection;
 
-    @Data
     public class Collection {
 
         private Relative next;
         private Relative prev;
 
+        public Relative getNext() {
+            return next;
+        }
+
+        public Relative getPrev() {
+            return prev;
+        }
     }
 
-    @Data
-    public class Relative {
+    public static class Relative {
 
         private int time;
         private int limit;
         private int offest;
 
+        public int getTime() {
+            return time;
+        }
+
+        public int getLimit() {
+            return limit;
+        }
+
+        public int getOffest() {
+            return offest;
+        }
     }
 
 }
