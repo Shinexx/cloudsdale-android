@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Cloudsdale</string>
     <string name="account_type">org.cloudsdale.android.account</string>
+    <string name="login_register_prompt">Need an account?</string>
 </resources>

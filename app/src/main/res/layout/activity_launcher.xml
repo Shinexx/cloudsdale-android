@@ -1,50 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cloudsdale="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#63a0d0">
 
-    <ImageView
-        android:id="@+id/loading_view"
-        android:layout_width="192dp"
-        android:layout_height="192dp"
+    <!--<ImageView-->
+        <!--android:id="@+id/loading_view"-->
+        <!--android:layout_width="192dp"-->
+        <!--android:layout_height="192dp"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:src="@drawable/loading_animation"/>-->
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/login_form"-->
+        <!--android:orientation="vertical"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="#aaffffff"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:visibility="visible">-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/login_email"-->
+            <!--style="@style/Theme.Cloudsdale.LoginFormElement"-->
+            <!--android:hint="Username or email address" />-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/login_password"-->
+            <!--style="@style/Theme.Cloudsdale.LoginFormElement"-->
+            <!--android:inputType="textPassword"-->
+            <!--android:hint="Password" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/login_submit"-->
+            <!--style="@style/Theme.Cloudsdale.LoginFormElement"-->
+            <!--android:text="Login"/>-->
+
+    <!--</LinearLayout>-->
+
+    <org.cloudsdale.android.widget.CircularImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_gravity="center"
-        android:src="@drawable/loading_animation"/>
-
-    <LinearLayout
-        android:id="@+id/login_form"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#aaffffff"
-        android:layout_gravity="center"
-        android:visibility="visible">
-
-        <EditText
-            android:id="@+id/login_email"
-            style="@style/Theme.Cloudsdale.LoginFormElement"
-            android:hint="Username or email address" />
-
-        <EditText
-            android:id="@+id/login_password"
-            style="@style/Theme.Cloudsdale.LoginFormElement"
-            android:inputType="textPassword"
-            android:hint="Password" />
-
-        <Button
-            android:id="@+id/login_submit"
-            style="@style/Theme.Cloudsdale.LoginFormElement"
-            android:text="Login"/>
-
-    </LinearLayout>
+        android:scaleType="centerCrop"
+        android:src="@drawable/moon_butt"
+        cloudsdale:borderColour="#e8e8e8"
+        cloudsdale:borderWidth="10dp"/>
 
     <Button
         android:id="@+id/login_register"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="#aa000000"
-        android:text="Need an account?"
+        android:text="@string/login_register_prompt"
         android:textColor="#ffffff"
         android:layout_gravity="bottom"/>
 
